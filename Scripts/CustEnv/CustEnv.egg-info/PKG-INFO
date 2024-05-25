@@ -1,0 +1,6 @@
+Metadata-Version: 2.1
+Name: CustEnv
+Version: 0.0.1
+Requires-Dist: gymnasium==0.29.1
+Requires-Dist: pandapower==2.14.6
+Requires-Dist: simbench==1.5.3
