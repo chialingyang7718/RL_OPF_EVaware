@@ -150,7 +150,7 @@ class PowerGrid(Env):
         pass
 
 
-    def reset(self, seed=None):
+    def reset(self, seed=None, options=None):
         super().reset(seed=seed)
         # initialization
         self.pre_reward = 0 #initialize the previous reward
