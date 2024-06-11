@@ -33,19 +33,22 @@ def change_gen_into_sgen(grid):
         pp.create_sgen(grid, bus, p_mw=p_mw, q_mvar=0, max_p_mw=max_p_mw, min_p_mw=min_p_mw, max_q_mvar=max_q_mvar, min_q_mvar=min_q_mvar)
     return grid
 
+
 def load_test_case_grid(n):
     # load the test grid from pandapower
     case = f"case{n}" # n: case number in pandapower 
     grid = getattr(pn, case)()
+    grid = change_gen_into_sgen(grid) # change the generators into static generators
     return grid
 
 def load_simple_grid():
     # load the simple grid from pandapower
     grid = pn.example_simple()
-    grid = change_gen_into_sgen(grid)
+    grid = change_gen_into_sgen(grid) # change the generators into static generators
     return grid
 
 def load_simbench_grid(grid_code):
     # load the grid from simbench
     grid = sb.get_simbench_net(grid_code)
     return grid
+

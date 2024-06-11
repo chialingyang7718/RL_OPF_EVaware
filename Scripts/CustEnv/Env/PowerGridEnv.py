@@ -5,8 +5,9 @@ Assumptions:
 - The environment is deterministic.
 - All the generators are static. (PQ bus)
 - There is no min. requirement of PV or wind generation.
+- There is no max. limitation of PV and wind curtailment.
 - Actions: generation active power, generation reactive power, ext. grid voltage
-- States: load active power, load reactive power, maximum active power from PV or wind 
+- States: load active power, load reactive power, active power generation from PV or wind 
 """
 
 #Import pandapower stuff
@@ -159,8 +160,8 @@ class PowerGrid(Env):
 
         # assign initial state of the upcoming episode
         if self.UseDataSource == False:
-            # initialize the state with existing single data saved in the grid
-            self.state = self.read_state_from_grid()
+            # add some noice
+            self.state += self.stdD * (np.random.randn(2*self.NL + self.NsG, ))
         else:
             # sampling the startpoint from the load profile
             self.load_ts_sampling()
@@ -211,14 +212,23 @@ class PowerGrid(Env):
     # [if UseDataSource == False] assign the generation limit, load limit, voltage limit, line limit manually    
     def define_limit_manually(self):
         # assign the static generator limits (PQ bus)
-        self.PsGmax = np.full(self.NsG, 10) # ASSUMPTION: the max power generation from static generator is 10 MW
+        if 'max_p_mw' not in self.net.sgen:
+            self.net.sgen.loc[:,"max_p_mw"] = self.net.sgen.loc[:,"p_mw"] * 1.5 # assume the max power output is 1.5 times the current power output if not specified
+        if 'max_q_mvar' not in self.net.sgen:
+            self.net.sgen.loc[:,"max_q_mvar"] = abs(self.net.sgen.loc[:,"q_mvar"]) * 1.5 # assume the max reactive power output is 1.5 times the current reactive power output if not specified
+        if 'min_q_mw' not in self.net.sgen:
+            self.net.sgen.loc[:,"min_q_mvar"] = abs(self.net.sgen.loc[:,"q_mvar"]) * -1.5 # assume the min power output is 1.5 times the current power output if not specified
+        # self.PsGmax = np.full(self.NsG, 10) # ASSUMPTION: the max power generation from static generator is 10 MW
+        self.PsGmax = np.full(self.NsG, self.net.sgen.loc[:,'max_p_mw'].max()) # to avoid limitation of zero if any original value is zero
         self.PsGmin = np.zeros(self.NsG) # ASSUMPTION: the min power generation from static generator is 0 MW
-        self.QsGmax = np.full(self.NsG, 10) # ASSUMPTION: the max reactive power generation from static generator is 10 MVar
-        self.QsGmin = -self.QsGmax # ASSUMPTION: the reactive power generation range is zero-centered
+        self.QsGmax = np.full(self.NsG,self.net.sgen.loc[:,'max_q_mvar'].max())
+        self.QsGmin = np.full(self.NsG, self.net.sgen.loc[:,'min_q_mvar'].min())
         # assign the load limits (PQ bus)
-        self.PLmax = np.full(self.NL, 100) # ASSUMPTION: the max active power consumption is 100 MW
+        # self.PLmax = np.full(self.NL, 100) # ASSUMPTION: the max active power consumption is 100 MW
+        self.PLmax = np.full(self.NL, self.net.load.loc[:, 'p_mw'].max() * 1.5) # ASSUMPTION: the max active power consumption is 1.5 times the maximum value in the net
         self.PLmin = np.zeros(self.NL) # ASSUMPTION: the min active power consumption is 0 MW
-        self.QLmax = np.full(self.NL, 100) # ASSUMPTION: the max reactive power consumption is 100 MVar
+        # self.QLmax = np.full(self.NL, 100) # ASSUMPTION: the max reactive power consumption is 100 MVar
+        self.QLmax = np.full(self.NL, abs(self.net.load.loc[:, 'q_mvar']).max() * 1.5) # ASSUMPTION: the max reactive power consumption is 1.5 times the maximum value in the net
         self.QLmin = -self.QLmax # ASSUMPTION: the reactive power consumption range is zero-centered
         # assign the voltage and line loading limits (valid for all buses)
         self.VGmin = 0.94 # ASSUMPTION: the min voltage is 0.94 pu

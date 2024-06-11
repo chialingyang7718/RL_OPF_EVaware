@@ -18,6 +18,7 @@ from stable_baselines3.common.monitor import Monitor
 #Import other stuff
 import torch as th
 import os
+import math
 
 
 # initialize the vectorized environment
@@ -33,10 +34,11 @@ def make_env(env_id, net, dispatching_interval, UseDataSource, UseSimbench, rank
 if __name__ == '__main__':
 
     # Load the grid
-    # grid = load_test_case_grid(14)
+    n_case = 14
+    grid = load_test_case_grid(n_case)
     # grid = load_simple_grid()
-    grid_code = "1-HV-urban--0-sw"
-    grid = load_simbench_grid(grid_code)
+    # grid_code = "1-HV-urban--0-sw"
+    # grid = load_simbench_grid(grid_code)
 
     # Parameters
     env_id = 'PowerGrid-v0'
@@ -45,31 +47,42 @@ if __name__ == '__main__':
     # Create the vectorized environment
     env = SubprocVecEnv([make_env(env_id, 
                                   net=grid, 
-                                  dispatching_interval=96, 
-                                  UseDataSource=True, 
-                                  UseSimbench=True, 
+                                  dispatching_interval=10, 
+                                  UseDataSource=False, 
+                                  UseSimbench=False, 
                                   rank=i) for i in range(num_envs)])
 
 
     # create the log path
     log_path = os.path.join('Training', 'Logs')
 
-    # custom MLP policy: change network architecture into two layers of size 256
+    # custom MLP policy: network depends on the observation space, indirectly, the number of buses
+    # first, we need to find the nearest power of 2 to the number of buses
+    def nearestPowerOf2(N):
+        a = int(math.log2(N))
+        if 2**a == N:
+            return N
+        return 2**(a + 1) # return the ceiling of the power of 2
+    
+    # choose a network size that is slightly larger than the observation space
+    NN_size = nearestPowerOf2(n_case * 2) # double of the number of buses is slightly larger the observation space which contains sgen_pmw, load_pmw, and load_qmvar
+    
+    # the policy network architecture
     policy_kwargs = dict(
-        activation_fn=th.nn.Tanh, net_arch=dict(pi=[256, 256], vf=[256, 256])
+        activation_fn=th.nn.Tanh, net_arch=dict(pi=[NN_size, NN_size], vf=[NN_size, NN_size])
     )
 
     # create the agent
     model = PPO(policy="MlpPolicy", 
                 env = env, 
-                n_steps = 100, 
+                n_steps = 10, 
                 verbose=1, 
                 policy_kwargs = policy_kwargs, 
                 tensorboard_log=log_path)
 
 
     # train the agent
-    model.learn(total_timesteps= 600000, progress_bar=True)
+    model.learn(total_timesteps= 60, progress_bar=True)
 
     # save the model
     # model.save("Training/Model/%s" % grid_code)
@@ -84,4 +97,4 @@ if __name__ == '__main__':
 # TODO: change the action into relative action??
 # TODO: output the report of divergence to the log file
 # TODO: integrate EV charging
-# TODO: choose a comparable benchmark
+# TODO: choose a comparable benchmark: interior point method, etc.

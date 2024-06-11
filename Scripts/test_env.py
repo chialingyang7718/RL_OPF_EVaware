@@ -22,7 +22,6 @@ if __name__ == '__main__':
     terminated = False
     truncated = False
 
-
     # test the environment by randomly selecting actions
     # def test_env():
     episodes = 2
