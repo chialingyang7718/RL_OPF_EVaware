@@ -6,7 +6,7 @@ Assumptions:
 - All the generators are static. (PQ bus)
 - There is no min. requirement of PV or wind generation.
 - There is no max. limitation of PV and wind curtailment.
-- Actions: generation active power, generation reactive power, ext. grid voltage
+- Actions: generation active power, generation reactive power
 - States: load active power, load reactive power, active power generation from PV or wind 
 """
 
@@ -29,7 +29,7 @@ import pandas as pd
 
 #Create a custom environment
 class PowerGrid(Env):
-    def __init__(self, net, stdD = 0.03, dispatching_intervals = 96, UseDataSource = False, UseSimbench = False):
+    def __init__(self, net, stdD = 0.03, dispatching_intervals = 96, UseDataSource = False, UseSimbench = False, EVaware = True):
         # inheritance from the parent class gymnasium.Env
         super(PowerGrid, self).__init__()
 
@@ -47,9 +47,10 @@ class PowerGrid(Env):
         
         # assign other parameters
         self.stdD = stdD # standard deviation of the consumption
+        self.dispatching_intervals = dispatching_intervals #number of dispatching intervals
         self.UseDataSource = UseDataSource # whether to use the data source or random sampling
         self.UseSimbench = UseSimbench # whether to use the simbench data
-        self.dispatching_intervals = dispatching_intervals #number of dispatching intervals
+        self.EVaware = EVaware # whether to consider the EV element
 
         # initialization
         self.pre_reward = 0 #initialize the previous reward

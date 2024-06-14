@@ -94,7 +94,11 @@ if __name__ == '__main__':
 # DONE: implement simbench data -- changed the network architecture
 # DONE: include generation uncertainties into the observation -- added action limit at the step function
 # DONE: vectorize the environment -- register the env and make vectorized env
-# TODO: change the action into relative action??
-# TODO: output the report of divergence to the log file
+# TODO: omit ext grid -- cannot omit it otherwise no reference bus is available
 # TODO: integrate EV charging
+# TODO: manually defined limits need to be adapted to the grid size e.g. q_g_mvar
+# TODO: implement safe reinforcement learning
+# TODO: generate instances of the enironment
+# TODO: change the action into relative action??
+# TODO: output the report of divergence to the log fileS
 # TODO: choose a comparable benchmark: interior point method, etc.
