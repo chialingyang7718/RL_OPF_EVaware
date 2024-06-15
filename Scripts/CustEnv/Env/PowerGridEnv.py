@@ -6,7 +6,7 @@ Assumptions:
 - All the generators are static. (PQ bus)
 - There is no min. requirement of PV or wind generation.
 - There is no max. limitation of PV and wind curtailment.
-- Actions: generation active power, generation reactive power
+- Actions: generation active power, generation reactive power (omitted ext. grid since it is typically not a direct control target)
 - States: load active power, load reactive power, active power generation from PV or wind 
 """
 
@@ -42,7 +42,7 @@ class PowerGrid(Env):
 
         # read the number of gen & loads
         self.NL = self.net.load.index.size # NL: number of loads
-        self.NxG = self.net.ext_grid.index.size  # NxG: number of ext. grids
+        # self.NxG = self.net.ext_grid.index.size  # NxG: number of ext. grids
         self.NsG = self.net.sgen.index.size #NsG: number of static generators 
         
         # assign other parameters
@@ -57,10 +57,10 @@ class PowerGrid(Env):
         self.violation = False #initialize the violation
         self.episode_length = self.dispatching_intervals #initialize the episode length
 
-        # define the action space: PsG, QsG, VxG
-        self.action_space = Box(low = np.full((2*self.NsG+self.NxG, ), -1), 
-                                high = np.full((2*self.NsG+self.NxG, ), 1), 
-                                shape=(2*self.NsG+self.NxG, ))
+        # define the action space: PsG, Qs
+        self.action_space = Box(low = np.full((2*self.NsG, ), -1), 
+                                high = np.full((2*self.NsG, ), 1), 
+                                shape=(2*self.NsG, ))
         
         # define the observation space: PL, QL, P_renewable(max generation from renewable energy sources)
         # ASSUMPTION: all the static generators are renewable energy sources
@@ -326,8 +326,8 @@ class PowerGrid(Env):
             else:
                 self.net.sgen.loc[i,'p_mw'] = denormalized_p
             self.net.sgen.loc[i, 'q_mvar'] = self.denormalize(action[i+self.NsG], self.QsGmax[i], self.QsGmin[i], 1, -1)
-        for i in range(self.NxG): # external grid (slack bus)
-            self.net.ext_grid.loc[i, 'vm_pu'] = self.denormalize(action[i+2*self.NsG], self.VGmax, self.VGmin, 1, -1)
+        # for i in range(self.NxG): # external grid (slack bus)
+        #     self.net.ext_grid.loc[i, 'vm_pu'] = self.denormalize(action[i+2*self.NsG], self.VGmax, self.VGmin, 1, -1)
         return self.net
 
     # Apply the state to the load
