@@ -6,6 +6,10 @@ Assumptions:
 - All the generators are static. (PQ bus)
 - There is no min. requirement of PV or wind generation.
 - There is no max. limitation of PV and wind curtailment.
+- All the EVs have the same capacity and charging efficiency.
+- All EV aggregators have the same number of max. allowed EVs. (100)
+- All EV aggregators connect to the same busses as the loads.
+- EV model: Tesla Model Y is chosen as the EV model since it is the best seller in the world in Jan. 2024. (https://cleantechnica.com/2024/03/05/top-selling-electric-vehicles-in-the-world-january-2024/)
 - Actions: generation active power, generation reactive power (omitted ext. grid since it is typically not a direct control target)
 - States: load active power, load reactive power, active power generation from PV or wind 
 """
@@ -45,6 +49,7 @@ class PowerGrid(Env):
         # self.NxG = self.net.ext_grid.index.size  # NxG: number of ext. grids
         self.NsG = self.net.sgen.index.size #NsG: number of static generators 
         
+
         # assign other parameters
         self.stdD = stdD # standard deviation of the consumption
         self.dispatching_intervals = dispatching_intervals #number of dispatching intervals
@@ -52,16 +57,20 @@ class PowerGrid(Env):
         self.UseSimbench = UseSimbench # whether to use the simbench data
         self.EVaware = EVaware # whether to consider the EV element
 
+        # implement EVaware
+        if self.EVaware == True:
+            self.add_EV_storage(self.net)
+
         # initialization
         self.pre_reward = 0 #initialize the previous reward
         self.violation = False #initialize the violation
         self.episode_length = self.dispatching_intervals #initialize the episode length
 
-        # define the action space: PsG, Qs
+        # define the action space: PsG, Qs, Pcharge, Pdischarge
         self.action_space = Box(low = np.full((2*self.NsG, ), -1), 
                                 high = np.full((2*self.NsG, ), 1), 
                                 shape=(2*self.NsG, ))
-        
+        ## Start from here
         # define the observation space: PL, QL, P_renewable(max generation from renewable energy sources)
         # ASSUMPTION: all the static generators are renewable energy sources
         self.observation_space = Box(low=np.zeros((2*self.NL+self.NsG, )), 
@@ -209,6 +218,16 @@ class PowerGrid(Env):
             grid.gen.drop(i, inplace = True)
             pp.create_sgen(grid, bus, p_mw=p_mw, q_mvar=0, max_p_mw=max_p_mw, min_p_mw=min_p_mw, max_q_mvar=max_q_mvar, min_q_mvar=min_q_mvar)
         return grid
+    
+    # add the EV element to the grid
+    def add_EV_storage(self, grid):
+        battery_capacity = 57.5/1000 # Tesla Model Y battery capacity in mWh
+        n_car = 100 # number of EVs allowed in each EV aggregator # ASSUMPTION: 100 is the max. allowed number of EVs in each EV aggregator
+        # add the EV storage to where the loads are
+        for i in grid.load.index:
+            bus = grid.load.loc[i, "bus"]
+            pp.create_storage(grid, bus=bus, p_mw=0, max_e_mwh= battery_capacity*n_car, soc_percent=0, min_e_mwh=0)
+
 
     # [if UseDataSource == False] assign the generation limit, load limit, voltage limit, line limit manually    
     def define_limit_manually(self):
