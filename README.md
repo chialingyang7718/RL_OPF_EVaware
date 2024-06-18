@@ -1,4 +1,4 @@
-# Master Thesis Title: Exploring Reinforcement Learning Solutions for EV-aware Optimal Power Flow Under Uncertainty
+# Exploring Reinforcement Learning Solutions for EV-aware Optimal Power Flow Under Uncertainty
 ## Project Description
 This project explores the use of reinforcement learning (RL) to solve the Optimal Power Flow (OPF) problem in electrical power systems. The goal is to determine the optimal settings of control variables to minimize the cost of power generation while satisfying system constraints. The project is dvided into two phases. At the first phase, a single-period version of OPF is considered. Later on, EV charging/discharging is integrated into the OPF problem, which is transformed into a multi-period OPF. 
 ### What is Optimal Power Flow (OPF)?
