@@ -1,15 +1,18 @@
 """
 This environment can be used to train a reinforcement learning agent to control the power grid. 
-Assumptions:
-- The environment is fully observable.
-- The environment is deterministic.
+Assumptions --- Grid and Generation
 - All the generators are static. (PQ bus)
 - There is no min. requirement of PV or wind generation.
 - There is no max. limitation of PV and wind curtailment.
-- All the EVs have the same capacity and charging efficiency.
-- All EV aggregators have the same number of max. allowed EVs. (100)
-- All EV aggregators connect to the same busses as the loads.
+Assumptions --- EV
+- The EVs are connected to the same bus as the loads.
+- The EVs connected to the same bus have the same driving profile.
+- The number of total EVs is 5 * total number of loads. (In average, 5 EVs per EV group)
+- The number of EV in a EV group is porportional to the nominal power of the loads.
 - EV model: Tesla Model Y is chosen as the EV model since it is the best seller in the world in Jan. 2024. (https://cleantechnica.com/2024/03/05/top-selling-electric-vehicles-in-the-world-january-2024/)
+Assumptions --- Environment
+- The environment is fully observable.
+- The environment is deterministic.
 - Actions: generation active power, generation reactive power (omitted ext. grid since it is typically not a direct control target)
 - States: load active power, load reactive power, active power generation from PV or wind 
 """
@@ -57,25 +60,30 @@ class PowerGrid(Env):
         self.UseSimbench = UseSimbench # whether to use the simbench data
         self.EVaware = EVaware # whether to consider the EV element
 
-        # implement EVaware
-        if self.EVaware == True:
-            self.add_EV_storage(self.net)
 
         # initialization
         self.pre_reward = 0 #initialize the previous reward
         self.violation = False #initialize the violation
         self.episode_length = self.dispatching_intervals #initialize the episode length
 
-        # define the action space: PsG, Qs, Pcharge, Pdischarge
-        self.action_space = Box(low = np.full((2*self.NsG, ), -1), 
-                                high = np.full((2*self.NsG, ), 1), 
-                                shape=(2*self.NsG, ))
+        # implement EVaware
+        if self.EVaware == True:
+            self.N_EV = self.NL #assume the number of EV aggregators is the same as the number of loads
+            self.n_car = 10 #assume the number of EVS is 10
+            self.add_EV_storage(self.net)
+        else:
+            self.N_EV = 0
+            
+        # define the action space: PsG, Qs, P_EV(positive for charging, negative for discharging)
+        self.action_space = Box(low = np.full((2*self.NsG+self.N_EV, ), -1), 
+                                high = np.full((2*self.NsG+self.N_EV, ), 1), 
+                                shape=(2*self.NsG+self.N_EV, ))
         ## Start from here
-        # define the observation space: PL, QL, P_renewable(max generation from renewable energy sources)
+        # define the observation space: PL, QL, P_renewable(max generation from renewable energy sources), SOC_EV
         # ASSUMPTION: all the static generators are renewable energy sources
-        self.observation_space = Box(low=np.zeros((2*self.NL+self.NsG, )), 
-                                    high=np.full((2*self.NL+self.NsG, ), 1), 
-                                    shape=(2*self.NL+self.NsG, ),
+        self.observation_space = Box(low=np.zeros((2*self.NL+self.NsG+self.N_EV, )), 
+                                    high=np.full((2*self.NL+self.NsG+self.N_EV, ), 1), 
+                                    shape=(2*self.NL+self.NsG+self.N_EV, ),
                                     dtype=np.float32)
         
         # assign the state based on whether to use the data source
@@ -84,6 +92,7 @@ class PowerGrid(Env):
             self.define_limit_manually()
             # initialize the state with existing single data saved in the grid
             self.state = self.read_state_from_grid()
+
         else:
             # load the data source profiles
             self.load_profiles()
@@ -218,15 +227,6 @@ class PowerGrid(Env):
             grid.gen.drop(i, inplace = True)
             pp.create_sgen(grid, bus, p_mw=p_mw, q_mvar=0, max_p_mw=max_p_mw, min_p_mw=min_p_mw, max_q_mvar=max_q_mvar, min_q_mvar=min_q_mvar)
         return grid
-    
-    # add the EV element to the grid
-    def add_EV_storage(self, grid):
-        battery_capacity = 57.5/1000 # Tesla Model Y battery capacity in mWh
-        n_car = 100 # number of EVs allowed in each EV aggregator # ASSUMPTION: 100 is the max. allowed number of EVs in each EV aggregator
-        # add the EV storage to where the loads are
-        for i in grid.load.index:
-            bus = grid.load.loc[i, "bus"]
-            pp.create_storage(grid, bus=bus, p_mw=0, max_e_mwh= battery_capacity*n_car, soc_percent=0, min_e_mwh=0)
 
 
     # [if UseDataSource == False] assign the generation limit, load limit, voltage limit, line limit manually    
@@ -306,7 +306,27 @@ class PowerGrid(Env):
                                                sampled_starting_time+self.dispatching_intervals-1, :].to_numpy()
         self.re_pmw_profile = re_pmw.loc[sampled_starting_time:
                                             sampled_starting_time+self.dispatching_intervals-1, :].to_numpy()
-        
+    
+    # add the EV element to the grid
+    def add_EV_storage(self, grid):
+        total_EV = self.N_EV * 5 # total number of EVs
+        EV_ID = []
+        # randomly extract EV ID list range from 0 to 199
+        for i in range(total_EV):
+            EV_ID.append(random.randint(0,199))
+        # assign the EV(ID) to the loads depending on the nominal power of the loads
+        ## Start from here
+
+
+        # load the EV driving profile
+        self.df_EV = pd.read_csv("../Data/German_EV/emobpy_timeseries_hourly.csv")
+
+        battery_capacity = 57.5/1000 # Tesla Model Y battery capacity in mWh
+        # add the EV storage to where the loads are
+        for i in grid.load.index:
+            bus = grid.load.loc[i, "bus"]
+            pp.create_storage(grid, bus=bus, p_mw=0, max_e_mwh= battery_capacity*self.n_car, soc_percent=0, min_e_mwh=0)
+
     # normalize the value to the range of space
     def normalize(self, value, max_value, min_value, max_space, min_space):
         denominator = (max_space - min_space) * (max_value - min_value)
