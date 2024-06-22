@@ -65,7 +65,7 @@ if __name__ == '__main__':
         return 2**(a + 1) # return the ceiling of the power of 2
     
     # choose a network size that is slightly larger than the observation space
-    NN_size = nearestPowerOf2(n_case * 2) # double of the number of buses is slightly larger the observation space which contains sgen_pmw, load_pmw, and load_qmvar
+    NN_size = nearestPowerOf2(n_case * 4) # 4 times of the number of buses is slightly larger the observation space which contains sgen_pmw, load_pmw, and load_qmvar
     
     # the policy network architecture
     policy_kwargs = dict(

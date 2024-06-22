@@ -7,9 +7,8 @@ Assumptions --- Grid and Generation
 Assumptions --- EV
 - The EVs are connected to the same bus as the loads.
 - The EVs connected to the same bus have the same driving profile.
-- The number of total EVs is 5 * total number of loads. (In average, 5 EVs per EV group)
-- The number of EV in a EV group is porportional to the nominal power of the loads.
-- EV model: Tesla Model Y is chosen as the EV model since it is the best seller in the world in Jan. 2024. (https://cleantechnica.com/2024/03/05/top-selling-electric-vehicles-in-the-world-january-2024/)
+- The number of EV in a EV group is 5 times of the nominal power of the loads.
+- The EVs in the same group have the same driving profile. 
 Assumptions --- Environment
 - The environment is fully observable.
 - The environment is deterministic.
@@ -68,9 +67,9 @@ class PowerGrid(Env):
 
         # implement EVaware
         if self.EVaware == True:
-            self.N_EV = self.NL #assume the number of EV aggregators is the same as the number of loads
-            self.n_car = 10 #assume the number of EVS is 10
-            self.add_EV_storage(self.net)
+            self.load_EV_spec_profiles()
+            self.N_EV = self.NL #assume the number of EV groups is the same as the number of loads
+            self.add_EV_group(self.net)
         else:
             self.N_EV = 0
             
@@ -254,12 +253,21 @@ class PowerGrid(Env):
         self.VGmin = 0.94 # ASSUMPTION: the min voltage is 0.94 pu
         self.VGmax = 1.06 # ASSUMPTION: the max voltage is 1.06 pu
         self.linemax = 100  # ASSUMPTION: the max line loading is 100%
+        if self.EVaware == True:
+            self.PEVmax = 0.001 * 150 * self.net.load.loc[:, "p_mw"] * 5 # The fastest charging speed is 150 kw and assumed all the EVs are connected in parallel
+            self.PEVmin = -self.PEVmax
+            self.SOCmax = 1
+            self.SOCmin = 0
 
     # [if UseDataSource == False] read the active and reactive power of the loads, active power of gen from self.net.load
     def read_state_from_grid(self):
         loads = self.net.load.loc[:, ['p_mw', 'q_mvar']].to_numpy() # reads the active and reactive power of the loads
         renewable = self.net.sgen.loc[:, ['p_mw']].to_numpy() # reads the active power of the static generators
-        state = np.concatenate((loads.flatten("F").astype(np.float32), renewable.flatten("F").astype(np.float32)), axis=None)
+        if self.EVaware == False:
+            state = np.concatenate((loads.flatten("F").astype(np.float32), renewable.flatten("F").astype(np.float32)), axis=None)
+        else:
+            soc = self.df_EV.loc[ 0, "GridDemand_Immediate_balanced.1_SoC"]  #start from here: this is only the SOC of the first EV group. need more work to extract for other EV groups.
+            state = np.concatenate((loads.flatten("F").astype(np.float32), renewable.flatten("F").astype(np.float32), ), axis=None)
         return state
 
     # [if UseDataSource == True] load the profiles from json file or simbench
@@ -306,26 +314,32 @@ class PowerGrid(Env):
                                                sampled_starting_time+self.dispatching_intervals-1, :].to_numpy()
         self.re_pmw_profile = re_pmw.loc[sampled_starting_time:
                                             sampled_starting_time+self.dispatching_intervals-1, :].to_numpy()
-    
-    # add the EV element to the grid
-    def add_EV_storage(self, grid):
-        total_EV = self.N_EV * 5 # total number of EVs
-        EV_ID = []
-        # randomly extract EV ID list range from 0 to 199
-        for i in range(total_EV):
-            EV_ID.append(random.randint(0,199))
-        # assign the EV(ID) to the loads depending on the nominal power of the loads
-        ## Start from here
-
+        
+    def load_EV_spec_profiles(self):
+        # Load the EV capacity 
+        rows_to_read = [0, 1069, 1070, 1071]  # Adjust for 0-based indexing, considering the header as row 0
+        self.df_EV_spec = pd.concat([pd.read_csv("../Data/German_EV/emobpy_input_data.csv", skiprows=lambda x: x not in rows_to_read and x != 0, header=0),
+                                                    pd.read_csv("../Data/German_EV/emobpy_input_data.csv", skiprows=lambda x: x < 1071, nrows=0)])
+        self.df_EV_spec.drop(columns = self.df_EV_spec.columns[0:4], inplace=True)
 
         # load the EV driving profile
         self.df_EV = pd.read_csv("../Data/German_EV/emobpy_timeseries_hourly.csv")
+        
+        # Modify column names by appending the content of the first row
+        new_column_names = [f"{col}_{self.df_EV.at[0, col]}" for col in self.df_EV.columns]
+        
+        # Assign the new column names to the DataFrame
+        self.df_EV.columns = new_column_names
 
-        battery_capacity = 57.5/1000 # Tesla Model Y battery capacity in mWh
-        # add the EV storage to where the loads are
+        # Drop the first and second rows
+        self.df_EV = self.df_EV.drop([0, 1]).reset_index(drop=True)
+
+    def add_EV_group(self, grid):
+        # add the EV group to where the loads are
         for i in grid.load.index:
             bus = grid.load.loc[i, "bus"]
-            pp.create_storage(grid, bus=bus, p_mw=0, max_e_mwh= battery_capacity*self.n_car, soc_percent=0, min_e_mwh=0)
+            n_car = grid.load.loc[i, "p_mw"] * 5 # number of EVs connected to the bus is assumed to be 5 times the nominal power of the loads
+            pp.create_storage(grid, bus=bus, p_mw=0, max_e_mwh= self.df_EV_spec.loc[0, str(i)] * n_car / 1000, soc_percent=50, min_e_mwh=0, evid = i)
 
     # normalize the value to the range of space
     def normalize(self, value, max_value, min_value, max_space, min_space):
@@ -422,3 +436,32 @@ class PowerGrid(Env):
             # print("No cost function found for generators. Assume the cost function is 0.1 * p_tot**2 + 40 * p_tot.")
         return gen_cost
     
+####################################
+# Unused Code
+####################################
+    # assign EV to load buses if we decide to differentiate the EV driving profile within the same group
+    def assign_EV_to_loads(self, grid):
+        total_EV = self.NL * 10 # total number of EVs is assumed to be 10 times the number of loads
+        EV_ID= []
+
+        # randomly extract EV ID list range from 0 to 199
+        for i in range(total_EV):
+            EV_ID.append(random.randint(0,199))
+
+        # assign the EV(ID) to the loads depending on the nominal power of the loads. If there are EV(ID) left, assign them to the loads with the highest nominal power
+        load_sum = grid.load.loc[:, 'p_mw'].sum()
+        grid.load['EV_ID'] = [[] for _ in grid.load.index]  # Initialize each cell with an empty list
+        for i in grid.load.index:
+            weight = grid.load.loc[i, 'p_mw']/load_sum
+            n_EV_bus = int(weight * total_EV) # number of EVs connected to the bus 
+
+            for _ in range(n_EV_bus):
+                if EV_ID:  # Check if there are still EV_IDs available
+                    grid.load.loc[i, 'EV_ID'].append(EV_ID.pop(0))  # Assign and remove the first available EV_ID
+                else:
+                    break  # No more EV_IDs to assign
+                
+        # assign the remaining EV_IDs to the load with the highest nominal power
+            max_load = grid.load['p_mw'].idxmax()
+            if EV_ID:
+                grid.load.loc[max_load, 'EV_ID'].extend(EV_ID)
