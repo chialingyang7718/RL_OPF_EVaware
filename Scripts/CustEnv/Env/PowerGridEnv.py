@@ -142,6 +142,7 @@ class PowerGrid(Env):
         self.pre_reward = reward
         # decrease the episode length
         self.episode_length -= 1
+        time_step = self.dispatching_intervals - self.episode_length
         # check if the episode is terminated in the case of reaching the end of the episode
         terminated = self.episode_length == 0
 
@@ -159,9 +160,19 @@ class PowerGrid(Env):
                 if self.EVaware == True:
                     for i in range(self.N_EV):
                         energy_b4charging = self.storage.loc[i, "max_e_mwh"] * self.storage.loc[i, "soc_percent"]
-                        energy_aftercharging = energy_b4charging + self.net.storage.loc[i, "p_mw"] # timestep = 1 hr
+                        energy_requirement = self.df_EV.loc[(i, time_step), "ChargingPowerImmediateBalanced_kW"] / 1000
+                        charging_efficiency = self.df_EV_spec[self.df_EV_spec["Parameter"] == "Battery_charging_efficiency"][str(i)]
+                        # discharge_efficiency = self.df_EV_spec[self.df_EV_spec["Parameter"] == "Battery_discharging_efficiency"][str(i)]
+                        if self.net.storage.loc[i, "p_mw"] >= 0: # charging with time step 1 hour
+                            energy_aftercharging = energy_b4charging + (self.net.storage.loc[i, "p_mw"] * charging_efficiency - energy_requirement) * self.net.storage.loc[i, "n_car"] 
+                        else: # discharging with time step 1 hour
+                            energy_aftercharging = energy_b4charging + (self.net.storage.loc[i, "p_mw"]  - energy_requirement) * self.net.storage.loc[i, "n_car"]
+
                         # start from here: address the issue of overcharging
-                        self.state[self.NL*2+self.NsG+i] = energy_aftercharging / self.net.storage.loc[i, "max_e_mwh"]
+                        if energy_aftercharging > self.net.storage.loc[i, "max_e_mwh"]:
+                            self.state[self.NL*2+self.NsG+i] = 1
+                        else:
+                            self.state[self.NL*2+self.NsG+i] = energy_aftercharging / self.net.storage.loc[i, "max_e_mwh"]
             else:
                 # update with the sampled profile 
                 self.state[0: self.NL] = self.load_pmw_profile[(self.dispatching_intervals - self.episode_length - 1)]
@@ -178,7 +189,7 @@ class PowerGrid(Env):
     def render(self):
         pass
 
-
+## Start from here: reset function needs to be compiled with EVaware 
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
         # initialization
@@ -329,9 +340,9 @@ class PowerGrid(Env):
     def load_EV_spec_profiles(self):
         # Load the EV specification
         rows_to_read = [0, 1069, 1070, 1071]  # Adjust for 0-based indexing, considering the header as row 0
-        self.df_EV_spec = pd.concat([pd.read_csv("../Data/German_EV/emobpy_input_data.csv", skiprows=lambda x: x not in rows_to_read and x != 0, header=0),
-                                                    pd.read_csv("../Data/German_EV/emobpy_input_data.csv", skiprows=lambda x: x < 1071, nrows=0)])
+        self.df_EV_spec = pd.read_csv("../Data/German_EV/emobpy_input_data.csv", skiprows=lambda x: x not in rows_to_read and x != 0, header=0)
         self.df_EV_spec.drop(columns = self.df_EV_spec.columns[0:4], inplace=True)
+        self.df_EV_spec.rename(columns = {"Level_3": "Parameter"}, inplace=True)
 
         # load the EV driving profile
         self.df_EV = pd.read_csv("../Data/German_EV/emobpy_timeseries_hourly.csv")
@@ -376,7 +387,9 @@ class PowerGrid(Env):
                                 "GridDemand_From_23_to_8_at_home_Load_kW":"ChargingPowerNight_kW",
                                 "GridDemand_From_23_to_8_at_home.1_SoC":"SOCNight"})
         self.df_EV = self.df_EV[self.df_EV["ID"] < self.net.load.index.size]
-        self.df_EV.set_index(['ID', 'Time'], inplace=True)
+        self.df_EV['Time'] = pd.to_datetime(self.df_EV['Time'])
+        self.df_EV["Time_step"] = (self.df_EV['Time'].astype('int64') - self.df_EV['Time'].astype('int64').min()) // (3600 * 10**9)
+        self.df_EV.set_index(['ID', 'Time_step'], inplace=True)
         # Now the df_EV is a two-level indexed DataFrame with the ID and Time as the indices in which only relevant IDs are extracted
 
     def add_EV_group(self, grid):
@@ -384,7 +397,7 @@ class PowerGrid(Env):
         for i in grid.load.index:
             bus = grid.load.loc[i, "bus"]
             n_car = grid.load.loc[i, "p_mw"] * 5 # number of EVs connected to the bus is assumed to be 5 times the nominal power of the loads
-            pp.create_storage(grid, bus=bus, p_mw=0, max_e_mwh= self.df_EV_spec.loc[0, str(i)] * n_car / 1000, soc_percent=50, min_e_mwh=0, evid = i)
+            pp.create_storage(grid, bus=bus, p_mw=0, max_e_mwh= self.df_EV_spec.loc[0, str(i)] * n_car / 1000, soc_percent=0.5, min_e_mwh=0, evid = i, n_car = n_car)
 
     # normalize the value to the range of space
     def normalize(self, value, max_value, min_value, max_space, min_space):
