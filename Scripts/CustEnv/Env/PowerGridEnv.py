@@ -9,7 +9,9 @@ Assumptions --- EV
 - The EVs connected to the same bus have the same driving profile.
 - The number of EV in a EV group is 5 times of the nominal power of the loads.
 - The EVs in the same group have the same driving profile. 
+
 Assumptions --- Environment
+- The timestep is one hour.
 - The environment is fully observable.
 - The environment is deterministic.
 - Actions: generation active power, generation reactive power (omitted ext. grid since it is typically not a direct control target)
@@ -111,8 +113,8 @@ class PowerGrid(Env):
         terminated = False
         truncated = False
 
-        # apply state to load
-        self.net = self.apply_state_to_load()
+        # apply state to load and EV groups
+        self.net = self.apply_state_to_load_EV()
 
         # apply action to net
         self.net = self.apply_action_to_net(action)
@@ -146,12 +148,20 @@ class PowerGrid(Env):
         if terminated == False:
             # update the next state if the episode is not terminated
             if self.UseDataSource == False:
-                 # add some noice
+                # add some noice
                 for i in range(self.NL):
                     self.state[i] += self.stdD * (np.random.randn()) 
                     self.state[i+self.NL] += self.stdD * (np.random.randn()) 
                 for i in range(self.NsG):
                     self.state[i + 2*self.NL] += self.stdD * (np.random.randn()) 
+                
+                # update SOC of the EVs
+                if self.EVaware == True:
+                    for i in range(self.N_EV):
+                        energy_b4charging = self.storage.loc[i, "max_e_mwh"] * self.storage.loc[i, "soc_percent"]
+                        energy_aftercharging = energy_b4charging + self.net.storage.loc[i, "p_mw"] # timestep = 1 hr
+                        # start from here: address the issue of overcharging
+                        self.state[self.NL*2+self.NsG+i] = energy_aftercharging / self.net.storage.loc[i, "max_e_mwh"]
             else:
                 # update with the sampled profile 
                 self.state[0: self.NL] = self.load_pmw_profile[(self.dispatching_intervals - self.episode_length - 1)]
@@ -254,10 +264,11 @@ class PowerGrid(Env):
         self.VGmax = 1.06 # ASSUMPTION: the max voltage is 1.06 pu
         self.linemax = 100  # ASSUMPTION: the max line loading is 100%
         if self.EVaware == True:
-            self.PEVmax = 0.001 * 150 * self.net.load.loc[:, "p_mw"] * 5 # The fastest charging speed is 150 kw and assumed all the EVs are connected in parallel
+            self.PEVmax = np.full(self.NL, 0.001 * 150 * self.net.load.loc[:, "p_mw"] * 5) # The fastest charging speed is 150 kw and assumed all the EVs are connected in parallel
             self.PEVmin = -self.PEVmax
-            self.SOCmax = 1
-            self.SOCmin = 0
+            # SOC limits are the same as observation space [0,1]. Therefore, no normalization is needed.
+            # self.SOCmax = np.full(self.NL, 1)
+            # self.SOCmin = np.zeros(self.NL)
 
     # [if UseDataSource == False] read the active and reactive power of the loads, active power of gen from self.net.load
     def read_state_from_grid(self):
@@ -266,8 +277,8 @@ class PowerGrid(Env):
         if self.EVaware == False:
             state = np.concatenate((loads.flatten("F").astype(np.float32), renewable.flatten("F").astype(np.float32)), axis=None)
         else:
-            soc = self.df_EV.loc[ 0, "GridDemand_Immediate_balanced.1_SoC"]  #start from here: this is only the SOC of the first EV group. need more work to extract for other EV groups.
-            state = np.concatenate((loads.flatten("F").astype(np.float32), renewable.flatten("F").astype(np.float32), ), axis=None)
+            initial_soc = self.df_EV.groupby(level='ID').first()["SOCImmediateBalanced"].to_numpy() # read the initial SOC of the EVs under ImmediateBalanced condition
+            state = np.concatenate((loads.flatten("F").astype(np.float32), renewable.flatten("F").astype(np.float32), initial_soc.flatten("F").astype(np.float32)), axis=None)
         return state
 
     # [if UseDataSource == True] load the profiles from json file or simbench
@@ -316,7 +327,7 @@ class PowerGrid(Env):
                                             sampled_starting_time+self.dispatching_intervals-1, :].to_numpy()
         
     def load_EV_spec_profiles(self):
-        # Load the EV capacity 
+        # Load the EV specification
         rows_to_read = [0, 1069, 1070, 1071]  # Adjust for 0-based indexing, considering the header as row 0
         self.df_EV_spec = pd.concat([pd.read_csv("../Data/German_EV/emobpy_input_data.csv", skiprows=lambda x: x not in rows_to_read and x != 0, header=0),
                                                     pd.read_csv("../Data/German_EV/emobpy_input_data.csv", skiprows=lambda x: x < 1071, nrows=0)])
@@ -325,6 +336,7 @@ class PowerGrid(Env):
         # load the EV driving profile
         self.df_EV = pd.read_csv("../Data/German_EV/emobpy_timeseries_hourly.csv")
         
+        # Following is the preprossing of df_EV:
         # Modify column names by appending the content of the first row
         new_column_names = [f"{col}_{self.df_EV.at[0, col]}" for col in self.df_EV.columns]
         
@@ -333,6 +345,39 @@ class PowerGrid(Env):
 
         # Drop the first and second rows
         self.df_EV = self.df_EV.drop([0, 1]).reset_index(drop=True)
+
+        # Define a conversion function to convert values into float or int
+        def convert_to_float_int(value):
+            try:
+                # Try to convert to float
+                float_val = float(value)
+                # If the float value is equivalent to an int, return as int
+                if float_val.is_integer():
+                    return int(float_val)
+                else:
+                    return float_val
+            except ValueError:
+                # Return the original value if conversion fails
+                return value
+
+        # Apply the conversion function to each element in the DataFrame
+        self.df_EV = self.df_EV.map(convert_to_float_int)
+        self.df_EV = self.df_EV.rename(columns={"Unnamed: 0_nan":"Time", 
+                                "ID_ID":"ID", 
+                                "VehicleMobility_Distance_km":"Distance_km", 
+                                "DrivingConsumption_Consumption_kWh":"DrivingConsumption_kWh",
+                                "GridAvailability_PowerRating_kW":"ChargingAvailability_kW",
+                                "GridDemand_Immediate_full_capacity_Load_kW":"ChargingPowerImmediateFull_kW",
+                                "GridDemand_Immediate_full_capacity.1_SoC":"SOCImmediateFull",
+                                "GridDemand_Immediate_balanced_Load_kW":"ChargingPowerImmediateBalanced_kW",
+                                "GridDemand_Immediate_balanced.1_SoC":"SOCImmediateBalanced",
+                                "GridDemand_From_0_to_24_at_home_Load_kW":"ChargingPowerHome_kW",
+                                "GridDemand_From_0_to_24_at_home.1_SoC":"SOCHome",
+                                "GridDemand_From_23_to_8_at_home_Load_kW":"ChargingPowerNight_kW",
+                                "GridDemand_From_23_to_8_at_home.1_SoC":"SOCNight"})
+        self.df_EV = self.df_EV[self.df_EV["ID"] < self.net.load.index.size]
+        self.df_EV.set_index(['ID', 'Time'], inplace=True)
+        # Now the df_EV is a two-level indexed DataFrame with the ID and Time as the indices in which only relevant IDs are extracted
 
     def add_EV_group(self, grid):
         # add the EV group to where the loads are
@@ -367,6 +412,8 @@ class PowerGrid(Env):
             normalized_obs.append(self.normalize(self.state[i+self.NL], self.QLmax[i], self.QLmin[i], 1, 0))
         for i in range(self.NsG):
             normalized_obs.append(self.normalize(self.state[i+2*self.NL], self.PsGmax[i], self.PsGmin[i], 1, 0))
+        # directly assign the SOC of the EVs to the observation
+        normalized_obs.append(self.state[self.NL*2+self.NsG: ])
         return np.array(normalized_obs).astype(np.float32)
 
     # Apply the action to the net
@@ -381,14 +428,22 @@ class PowerGrid(Env):
             self.net.sgen.loc[i, 'q_mvar'] = self.denormalize(action[i+self.NsG], self.QsGmax[i], self.QsGmin[i], 1, -1)
         # for i in range(self.NxG): # external grid (slack bus)
         #     self.net.ext_grid.loc[i, 'vm_pu'] = self.denormalize(action[i+2*self.NsG], self.VGmax, self.VGmin, 1, -1)
+        if self.EVaware == True:
+            for i in range(self.N_EV):
+                self.net.storage.loc[i, 'p_mw'] = self.denormalize(action[i+2*self.NsG+self.N_EV], self.PEVmax[i], self.PEVmin[i], 1, -1)
         return self.net
 
     # Apply the state to the load
-    def apply_state_to_load(self): 
+    def apply_state_to_load_EV(self): 
         for i in self.net.load.index: # load (PQ bus)
             self.net.load.loc[i, 'p_mw'] = self.state[i]
             self.net.load.loc[i, 'q_mvar'] = self.state[i+self.NL]
+        if self.EVaware == True:
+            for i in self.net.storage.index:
+                self.net.storage.loc[i, 'soc_percent'] = self.state[i+2*self.NL+self.NsG]
         return self.net
+
+
 
 
     # calculate the reward 
