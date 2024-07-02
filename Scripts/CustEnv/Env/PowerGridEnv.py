@@ -121,8 +121,9 @@ class PowerGrid(Env):
 
         # run the power flow
         try:
+            pp.runpp(self.net)
             # pp.runpp(self.net, algorithm='gs')
-            control.run_control(self.net, max_iter=30)
+            # control.run_control(self.net, max_iter=30)
         except:
             # output the diagnostic report when the power flow does not converge
             print("Power flow does not converge!")
@@ -168,7 +169,7 @@ class PowerGrid(Env):
                         else: # discharging with time step 1 hour
                             energy_aftercharging = energy_b4charging + (self.net.storage.loc[i, "p_mw"]  - energy_requirement) * self.net.storage.loc[i, "n_car"]
 
-                        # start from here: address the issue of overcharging
+                        # address the issue of overcharging
                         if energy_aftercharging > self.net.storage.loc[i, "max_e_mwh"]:
                             self.state[self.NL*2+self.NsG+i] = 1
                         else:
@@ -199,8 +200,11 @@ class PowerGrid(Env):
 
         # assign initial state of the upcoming episode
         if self.UseDataSource == False:
-            # add some noice
-            self.state += self.stdD * (np.random.randn(2*self.NL + self.NsG, ))
+            # add some noice to load and generation states
+            self.state[0:2*self.NL + self.NsG] += self.stdD * (np.random.randn(2*self.NL + self.NsG, ))
+            if self.EVaware == True:
+                # reselect another day for the EV profile randomly
+                self.state[self.NL*2+self.NsG:] = self.select_randomly_day_EV_profile()
         else:
             # sampling the startpoint from the load profile
             self.load_ts_sampling()
@@ -288,7 +292,7 @@ class PowerGrid(Env):
         if self.EVaware == False:
             state = np.concatenate((loads.flatten("F").astype(np.float32), renewable.flatten("F").astype(np.float32)), axis=None)
         else:
-            initial_soc = self.df_EV.groupby(level='ID').first()["SOCImmediateBalanced"].to_numpy() # read the initial SOC of the EVs under ImmediateBalanced condition
+            initial_soc = self.select_randomly_day_EV_profile() # randomly select SOC of the EVs under ImmediateBalanced condition as the initial SOC
             state = np.concatenate((loads.flatten("F").astype(np.float32), renewable.flatten("F").astype(np.float32), initial_soc.flatten("F").astype(np.float32)), axis=None)
         return state
 
@@ -340,12 +344,12 @@ class PowerGrid(Env):
     def load_EV_spec_profiles(self):
         # Load the EV specification
         rows_to_read = [0, 1069, 1070, 1071]  # Adjust for 0-based indexing, considering the header as row 0
-        self.df_EV_spec = pd.read_csv("../Data/German_EV/emobpy_input_data.csv", skiprows=lambda x: x not in rows_to_read and x != 0, header=0)
+        self.df_EV_spec = pd.read_csv("Data/German_EV/emobpy_input_data.csv", skiprows=lambda x: x not in rows_to_read and x != 0, header=0)
         self.df_EV_spec.drop(columns = self.df_EV_spec.columns[0:4], inplace=True)
         self.df_EV_spec.rename(columns = {"Level_3": "Parameter"}, inplace=True)
 
         # load the EV driving profile
-        self.df_EV = pd.read_csv("../Data/German_EV/emobpy_timeseries_hourly.csv")
+        self.df_EV = pd.read_csv("Data/German_EV/emobpy_timeseries_hourly.csv")
         
         # Following is the preprossing of df_EV:
         # Modify column names by appending the content of the first row
@@ -399,6 +403,11 @@ class PowerGrid(Env):
             n_car = grid.load.loc[i, "p_mw"] * 5 # number of EVs connected to the bus is assumed to be 5 times the nominal power of the loads
             pp.create_storage(grid, bus=bus, p_mw=0, max_e_mwh= self.df_EV_spec.loc[0, str(i)] * n_car / 1000, soc_percent=0.5, min_e_mwh=0, evid = i, n_car = n_car)
 
+    def select_randomly_day_EV_profile(self):
+        # randomly select the EV profile from the df_EV
+        selected_day = random.randint(0, 364) * 24
+        return self.df_EV.loc[(slice(None), selected_day), "SOCImmediateBalanced"].to_numpy()
+    
     # normalize the value to the range of space
     def normalize(self, value, max_value, min_value, max_space, min_space):
         denominator = (max_space - min_space) * (max_value - min_value)
@@ -455,8 +464,6 @@ class PowerGrid(Env):
             for i in self.net.storage.index:
                 self.net.storage.loc[i, 'soc_percent'] = self.state[i+2*self.NL+self.NsG]
         return self.net
-
-
 
 
     # calculate the reward 
