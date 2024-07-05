@@ -61,19 +61,21 @@ class PowerGrid(Env):
         self.UseSimbench = UseSimbench # whether to use the simbench data
         self.EVaware = EVaware # whether to consider the EV element
 
+       # implement EVaware
+        if self.EVaware == True:
+            self.load_EV_spec_profiles()
+            self.N_EV = self.NL #assume the number of EV groups is the same as the number of loads
+            if self.net.storage.index.size == 0:
+                self.add_EV_group(self.net)
+        else:
+            self.N_EV = 0
 
         # initialization
         self.pre_reward = 0 #initialize the previous reward
         self.violation = False #initialize the violation
         self.episode_length = self.dispatching_intervals #initialize the episode length
 
-        # implement EVaware
-        if self.EVaware == True:
-            self.load_EV_spec_profiles()
-            self.N_EV = self.NL #assume the number of EV groups is the same as the number of loads
-            self.add_EV_group(self.net)
-        else:
-            self.N_EV = 0
+
             
         # define the action space: PsG, Qs, P_EV(positive for charging, negative for discharging)
         self.action_space = Box(low = np.full((2*self.NsG+self.N_EV, ), -1), 
@@ -86,7 +88,6 @@ class PowerGrid(Env):
                                     high=np.full((2*self.NL+self.NsG+self.N_EV, ), 1), 
                                     shape=(2*self.NL+self.NsG+self.N_EV, ),
                                     dtype=np.float32)
-        
         # assign the state based on whether to use the data source
         if self.UseDataSource == False:
             # assign generation limit, load limit, volatage limit, line limit manually
@@ -121,6 +122,7 @@ class PowerGrid(Env):
 
         # run the power flow
         try:
+
             pp.runpp(self.net)
             # pp.runpp(self.net, algorithm='gs')
             # control.run_control(self.net, max_iter=30)
@@ -150,30 +152,37 @@ class PowerGrid(Env):
         if terminated == False:
             # update the next state if the episode is not terminated
             if self.UseDataSource == False:
-                # add some noice
-                for i in range(self.NL):
-                    self.state[i] += self.stdD * (np.random.randn()) 
-                    self.state[i+self.NL] += self.stdD * (np.random.randn()) 
-                for i in range(self.NsG):
-                    self.state[i + 2*self.NL] += self.stdD * (np.random.randn()) 
-                
+                # add some noice to load and renewable generation
+                self.state[0:2*self.NL + self.NsG] += self.stdD * (np.random.randn(2*self.NL + self.NsG, ))
                 # update SOC of the EVs
                 if self.EVaware == True:
                     for i in range(self.N_EV):
-                        energy_b4charging = self.storage.loc[i, "max_e_mwh"] * self.storage.loc[i, "soc_percent"]
-                        energy_requirement = self.df_EV.loc[(i, time_step), "ChargingPowerImmediateBalanced_kW"] / 1000
+                        energy_b4 = self.net.storage.loc[i, "max_e_mwh"] * self.net.storage.loc[i, "soc_percent"]
+                        energy_requirement = self.df_EV.loc[(i, time_step), "ChargingPowerImmediateBalanced_kW"] / 1000 # power requirement per car in MW
+                        
+                        
+                        
+                        ##### Start from here: change the charging_efficiency type into float rather than a pandas series
+                        
                         charging_efficiency = self.df_EV_spec[self.df_EV_spec["Parameter"] == "Battery_charging_efficiency"][str(i)]
                         # discharge_efficiency = self.df_EV_spec[self.df_EV_spec["Parameter"] == "Battery_discharging_efficiency"][str(i)]
-                        if self.net.storage.loc[i, "p_mw"] >= 0: # charging with time step 1 hour
-                            energy_aftercharging = energy_b4charging + (self.net.storage.loc[i, "p_mw"] * charging_efficiency - energy_requirement) * self.net.storage.loc[i, "n_car"] 
+                        if self.net.res_storage.loc[i, "p_mw"] >= 0: # charging with time step 1 hour
+                            energy_aftercharging = energy_b4 + self.net.res_storage.loc[i, "p_mw"] * charging_efficiency - energy_requirement * self.net.storage.loc[i, "n_car"] 
+                            print("1 type: ", type(energy_aftercharging), "2 type: ", type(self.net.storage.loc[i, "max_e_mwh"]))
+                            if energy_aftercharging >=0 and self.net.storage.loc[i, "max_e_mwh"] < energy_aftercharging:
+                                print("Overcharging!")
+                                self.state[self.NL*2+self.NsG+i] = 1
+                            else:
+                                self.state[self.NL*2+self.NsG+i] = energy_aftercharging / self.net.storage.loc[i, "max_e_mwh"]
                         else: # discharging with time step 1 hour
-                            energy_aftercharging = energy_b4charging + (self.net.storage.loc[i, "p_mw"]  - energy_requirement) * self.net.storage.loc[i, "n_car"]
-
-                        # address the issue of overcharging
-                        if energy_aftercharging > self.net.storage.loc[i, "max_e_mwh"]:
-                            self.state[self.NL*2+self.NsG+i] = 1
-                        else:
-                            self.state[self.NL*2+self.NsG+i] = energy_aftercharging / self.net.storage.loc[i, "max_e_mwh"]
+                            energy_afterdischarging = energy_b4 + self.net.res_storage.loc[i, "p_mw"]  - energy_requirement * self.net.storage.loc[i, "n_car"]
+                            print("b4: ", energy_b4, "charge_power ", self.net.res_storage.loc[i, "p_mw"], "energy_afterdischarging ", energy_afterdischarging)
+                            print("type: ", type(energy_afterdischarging))
+                            if energy_afterdischarging >= 0:
+                                self.state[self.NL*2+self.NsG+i] = energy_afterdischarging / self.net.storage.loc[i, "max_e_mwh"]
+                            else:
+                                self.state[self.NL*2+self.NsG+i] = 0
+                                print("Negative SOC!")
             else:
                 # update with the sampled profile 
                 self.state[0: self.NL] = self.load_pmw_profile[(self.dispatching_intervals - self.episode_length - 1)]
@@ -182,7 +191,8 @@ class PowerGrid(Env):
 
         # get observation for the next state
         observation = self._get_observation()
-        
+
+
         info = {}
         return observation, reward, terminated, truncated, info
 
@@ -190,21 +200,19 @@ class PowerGrid(Env):
     def render(self):
         pass
 
-## Start from here: reset function needs to be compiled with EVaware 
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
         # initialization
         self.pre_reward = 0 #initialize the previous reward
         self.violation = False #initialize the violation
         self.episode_length = self.dispatching_intervals #initialize the episode length
-
         # assign initial state of the upcoming episode
         if self.UseDataSource == False:
             # add some noice to load and generation states
             self.state[0:2*self.NL + self.NsG] += self.stdD * (np.random.randn(2*self.NL + self.NsG, ))
             if self.EVaware == True:
                 # reselect another day for the EV profile randomly
-                self.state[self.NL*2+self.NsG:] = self.select_randomly_day_EV_profile()
+                self.state[2*self.NL + self.NsG:] = self.select_randomly_day_EV_profile()
         else:
             # sampling the startpoint from the load profile
             self.load_ts_sampling()
@@ -252,8 +260,7 @@ class PowerGrid(Env):
             pp.create_sgen(grid, bus, p_mw=p_mw, q_mvar=0, max_p_mw=max_p_mw, min_p_mw=min_p_mw, max_q_mvar=max_q_mvar, min_q_mvar=min_q_mvar)
         return grid
 
-
-    # [if UseDataSource == False] assign the generation limit, load limit, voltage limit, line limit manually    
+    # [if UseDataSource == False] assign the generation limit, load limit, voltage limit, line limit, EV charging limit manually    
     def define_limit_manually(self):
         # assign the static generator limits (PQ bus)
         if 'max_p_mw' not in self.net.sgen:
@@ -279,12 +286,18 @@ class PowerGrid(Env):
         self.VGmax = 1.06 # ASSUMPTION: the max voltage is 1.06 pu
         self.linemax = 100  # ASSUMPTION: the max line loading is 100%
         if self.EVaware == True:
-            self.PEVmax = np.full(self.NL, 0.001 * 150 * self.net.load.loc[:, "p_mw"] * 5) # The fastest charging speed is 150 kw and assumed all the EVs are connected in parallel
-            self.PEVmin = -self.PEVmax
-            # SOC limits are the same as observation space [0,1]. Therefore, no normalization is needed.
-            # self.SOCmax = np.full(self.NL, 1)
-            # self.SOCmin = np.zeros(self.NL)
+            self.PEVmax = np.zeros(self.N_EV)
+            self.PEVmin = np.zeros(self.N_EV)
+            self.update_EV_limit()
 
+    def update_EV_limit(self):
+        discharge_max = self.net.storage.loc[:, "max_e_mwh"] * self.net.storage.loc[:, "soc_percent"]
+        charging_max = self.net.storage.loc[:, "max_e_mwh"] * (1 - self.net.storage.loc[:, "soc_percent"])
+        for i in range(self.N_EV):
+             # The fastest charging speed is 150 kw and assumed all the EVs are connected in parallel
+            self.PEVmax[i] = min(0.001 * 150 * self.net.load.loc[i, "p_mw"].astype(int), charging_max[i])
+            self.PEVmin[i] = -min(0.001 * 150 * self.net.load.loc[i, "p_mw"].astype(int), discharge_max[i])
+    
     # [if UseDataSource == False] read the active and reactive power of the loads, active power of gen from self.net.load
     def read_state_from_grid(self):
         loads = self.net.load.loc[:, ['p_mw', 'q_mvar']].to_numpy() # reads the active and reactive power of the loads
@@ -400,8 +413,9 @@ class PowerGrid(Env):
         # add the EV group to where the loads are
         for i in grid.load.index:
             bus = grid.load.loc[i, "bus"]
-            n_car = grid.load.loc[i, "p_mw"] * 5 # number of EVs connected to the bus is assumed to be 5 times the nominal power of the loads
+            n_car = int(grid.load.loc[i, "p_mw"]) # number of EVs connected to the bus is assumed to be integer of nominal power of the loads
             pp.create_storage(grid, bus=bus, p_mw=0, max_e_mwh= self.df_EV_spec.loc[0, str(i)] * n_car / 1000, soc_percent=0.5, min_e_mwh=0, evid = i, n_car = n_car)
+
 
     def select_randomly_day_EV_profile(self):
         # randomly select the EV profile from the df_EV
@@ -435,7 +449,8 @@ class PowerGrid(Env):
         for i in range(self.NsG):
             normalized_obs.append(self.normalize(self.state[i+2*self.NL], self.PsGmax[i], self.PsGmin[i], 1, 0))
         # directly assign the SOC of the EVs to the observation
-        normalized_obs.append(self.state[self.NL*2+self.NsG: ])
+        if self.EVaware == True:
+            normalized_obs.extend(self.state[self.NL*2+self.NsG: ])
         return np.array(normalized_obs).astype(np.float32)
 
     # Apply the action to the net
@@ -448,11 +463,11 @@ class PowerGrid(Env):
             else:
                 self.net.sgen.loc[i,'p_mw'] = denormalized_p
             self.net.sgen.loc[i, 'q_mvar'] = self.denormalize(action[i+self.NsG], self.QsGmax[i], self.QsGmin[i], 1, -1)
-        # for i in range(self.NxG): # external grid (slack bus)
-        #     self.net.ext_grid.loc[i, 'vm_pu'] = self.denormalize(action[i+2*self.NsG], self.VGmax, self.VGmin, 1, -1)
         if self.EVaware == True:
+            # update the EV charging limit
+            self.update_EV_limit()
             for i in range(self.N_EV):
-                self.net.storage.loc[i, 'p_mw'] = self.denormalize(action[i+2*self.NsG+self.N_EV], self.PEVmax[i], self.PEVmin[i], 1, -1)
+                self.net.storage.loc[i, 'p_mw'] = self.denormalize(action[i+2*self.NsG], self.PEVmax[i], self.PEVmin[i], 1, -1)
         return self.net
 
     # Apply the state to the load

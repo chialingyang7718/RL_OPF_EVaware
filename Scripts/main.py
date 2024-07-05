@@ -22,9 +22,9 @@ import math
 
 
 # initialize the vectorized environment
-def make_env(env_id, net, dispatching_interval, UseDataSource, UseSimbench, rank):
+def make_env(env_id, net, dispatching_interval, UseDataSource, UseSimbench, EVaware, rank):
     def _init():
-        env = gym.make(env_id, net=net, dispatching_intervals=dispatching_interval, UseDataSource=UseDataSource, UseSimbench=UseSimbench)
+        env = gym.make(env_id, net=net, dispatching_intervals=dispatching_interval, UseDataSource=UseDataSource, UseSimbench=UseSimbench, EVaware=EVaware)
         env.reset(seed = rank)
         env = Monitor(env)
         return env
@@ -47,14 +47,15 @@ if __name__ == '__main__':
     # Create the vectorized environment
     env = SubprocVecEnv([make_env(env_id, 
                                   net=grid, 
-                                  dispatching_interval=10, 
+                                  dispatching_interval=24, 
                                   UseDataSource=False, 
-                                  UseSimbench=False, 
+                                  UseSimbench=False,
+                                  EVaware=True,
                                   rank=i) for i in range(num_envs)])
 
 
     # create the log path
-    log_path = os.path.join('Training', 'Logs')
+    # log_path = os.path.join('Training', 'Logs')
 
     # custom MLP policy: network depends on the observation space, indirectly, the number of buses
     # first, we need to find the nearest power of 2 to the number of buses
@@ -65,7 +66,7 @@ if __name__ == '__main__':
         return 2**(a + 1) # return the ceiling of the power of 2
     
     # choose a network size that is slightly larger than the observation space
-    NN_size = nearestPowerOf2(n_case * 4) # 4 times of the number of buses is slightly larger the observation space which contains sgen_pmw, load_pmw, and load_qmvar
+    NN_size = nearestPowerOf2(n_case * 4) # 4 times of the number of buses is slightly larger the observation space which contains sgen_pmw, load_pmw, and load_qmvar & SOC
     
     # the policy network architecture
     policy_kwargs = dict(
@@ -75,14 +76,14 @@ if __name__ == '__main__':
     # create the agent
     model = PPO(policy="MlpPolicy", 
                 env = env, 
-                n_steps = 10, 
+                n_steps = 12, 
                 verbose=1, 
-                policy_kwargs = policy_kwargs, 
-                tensorboard_log=log_path)
+                policy_kwargs = policy_kwargs)#, 
+                # tensorboard_log=log_path)
 
 
     # train the agent
-    model.learn(total_timesteps= 60, progress_bar=True)
+    model.learn(total_timesteps= 96, progress_bar=True)
 
     # save the model
     # model.save("Training/Model/%s" % grid_code)
@@ -95,7 +96,7 @@ if __name__ == '__main__':
 # DONE: include generation uncertainties into the observation -- added action limit at the step function
 # DONE: vectorize the environment -- register the env and make vectorized env
 # DONE: omit ext grid -- cannot omit it otherwise no reference bus is available
-# TODO: integrate EV charging: EV charging & discharging limits (action space), SOC limits (observation space), EV driving profile implementation
+# TODO: integrate EV charging: discharging efficiency, address negative power in storage
 # TODO: manually defined limits need to be adapted to the grid size e.g. q_g_mvar
 # TODO: implement safe reinforcement learning
 # TODO: generate instances (loads and max. power generations) of the enironment
