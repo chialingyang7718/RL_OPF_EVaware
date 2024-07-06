@@ -154,35 +154,37 @@ class PowerGrid(Env):
             if self.UseDataSource == False:
                 # add some noice to load and renewable generation
                 self.state[0:2*self.NL + self.NsG] += self.stdD * (np.random.randn(2*self.NL + self.NsG, ))
+
+
+                # continue here: the update of SOC is not correct since SOC is not related between each time step
+
                 # update SOC of the EVs
                 if self.EVaware == True:
                     for i in range(self.N_EV):
                         energy_b4 = self.net.storage.loc[i, "max_e_mwh"] * self.net.storage.loc[i, "soc_percent"]
                         energy_requirement = self.df_EV.loc[(i, time_step), "ChargingPowerImmediateBalanced_kW"] / 1000 # power requirement per car in MW
-                        
-                        
-                        
-                        ##### Start from here: change the charging_efficiency type into float rather than a pandas series
-                        
-                        charging_efficiency = self.df_EV_spec[self.df_EV_spec["Parameter"] == "Battery_charging_efficiency"][str(i)]
+                        df_charging_eff = self.df_EV_spec[self.df_EV_spec["Parameter"] == "Battery_charging_efficiency"].set_index("Parameter")
+                        charging_efficiency = df_charging_eff[str(i)].values
                         # discharge_efficiency = self.df_EV_spec[self.df_EV_spec["Parameter"] == "Battery_discharging_efficiency"][str(i)]
                         if self.net.res_storage.loc[i, "p_mw"] >= 0: # charging with time step 1 hour
                             energy_aftercharging = energy_b4 + self.net.res_storage.loc[i, "p_mw"] * charging_efficiency - energy_requirement * self.net.storage.loc[i, "n_car"] 
-                            print("1 type: ", type(energy_aftercharging), "2 type: ", type(self.net.storage.loc[i, "max_e_mwh"]))
+                            print("Car_ID: ", i, "b4: ", energy_b4, "charge_power ", self.net.res_storage.loc[i, "p_mw"], "energy_aftercharging ", energy_aftercharging)                            
                             if energy_aftercharging >=0 and self.net.storage.loc[i, "max_e_mwh"] < energy_aftercharging:
                                 print("Overcharging!")
-                                self.state[self.NL*2+self.NsG+i] = 1
+                                self.net.storage.loc[i, "soc_percent"] = 1
                             else:
-                                self.state[self.NL*2+self.NsG+i] = energy_aftercharging / self.net.storage.loc[i, "max_e_mwh"]
+                                self.net.storage.loc[i, "soc_percent"] = energy_aftercharging / self.net.storage.loc[i, "max_e_mwh"]
+                            print("SOC: ", self.net.storage.loc[i, "soc_percent"])
                         else: # discharging with time step 1 hour
                             energy_afterdischarging = energy_b4 + self.net.res_storage.loc[i, "p_mw"]  - energy_requirement * self.net.storage.loc[i, "n_car"]
-                            print("b4: ", energy_b4, "charge_power ", self.net.res_storage.loc[i, "p_mw"], "energy_afterdischarging ", energy_afterdischarging)
-                            print("type: ", type(energy_afterdischarging))
+                            print("Car_ID: ", i, "b4: ", energy_b4, "discharge_power ", self.net.res_storage.loc[i, "p_mw"], "energy_afterdischarging ", energy_afterdischarging)
                             if energy_afterdischarging >= 0:
-                                self.state[self.NL*2+self.NsG+i] = energy_afterdischarging / self.net.storage.loc[i, "max_e_mwh"]
+                                self.net.storage.loc[i, "soc_percent"] = energy_afterdischarging / self.net.storage.loc[i, "max_e_mwh"]
                             else:
-                                self.state[self.NL*2+self.NsG+i] = 0
+                                self.net.storage.loc[i, "soc_percent"] = 0
                                 print("Negative SOC!")
+                            print("SOC: ", self.net.storage.loc[i, "soc_percent"])
+                        self.state[self.NL*2+self.NsG+i] = self.net.storage.loc[i, "soc_percent"]
             else:
                 # update with the sampled profile 
                 self.state[0: self.NL] = self.load_pmw_profile[(self.dispatching_intervals - self.episode_length - 1)]
@@ -294,9 +296,10 @@ class PowerGrid(Env):
         discharge_max = self.net.storage.loc[:, "max_e_mwh"] * self.net.storage.loc[:, "soc_percent"]
         charging_max = self.net.storage.loc[:, "max_e_mwh"] * (1 - self.net.storage.loc[:, "soc_percent"])
         for i in range(self.N_EV):
-             # The fastest charging speed is 150 kw and assumed all the EVs are connected in parallel
-            self.PEVmax[i] = min(0.001 * 150 * self.net.load.loc[i, "p_mw"].astype(int), charging_max[i])
-            self.PEVmin[i] = -min(0.001 * 150 * self.net.load.loc[i, "p_mw"].astype(int), discharge_max[i])
+             # The fastest charging speed is 150 kw and assume all the EVs are connected in parallel
+            self.PEVmax[i] = min(0.001 * 150 * self.net.storage.loc[i, "n_car"], charging_max[i]) 
+            self.PEVmin[i] = -min(0.001 * 150 * self.net.storage.loc[i, "n_car"], discharge_max[i])
+            # self.PEVmin[i] = -min(0.001 * 150 * self.net.load.loc[i, "p_mw"].astype(int), discharge_max[i])
     
     # [if UseDataSource == False] read the active and reactive power of the loads, active power of gen from self.net.load
     def read_state_from_grid(self):
@@ -362,7 +365,7 @@ class PowerGrid(Env):
         self.df_EV_spec.rename(columns = {"Level_3": "Parameter"}, inplace=True)
 
         # load the EV driving profile
-        self.df_EV = pd.read_csv("Data/German_EV/emobpy_timeseries_hourly.csv")
+        self.df_EV = pd.read_csv("Data/German_EV/emobpy_timeseries_hourly.csv", low_memory=False)
         
         # Following is the preprossing of df_EV:
         # Modify column names by appending the content of the first row
@@ -451,6 +454,8 @@ class PowerGrid(Env):
         # directly assign the SOC of the EVs to the observation
         if self.EVaware == True:
             normalized_obs.extend(self.state[self.NL*2+self.NsG: ])
+            # update the EV charging limit
+            self.update_EV_limit()
         return np.array(normalized_obs).astype(np.float32)
 
     # Apply the action to the net
