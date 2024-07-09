@@ -4,24 +4,25 @@ Assumptions --- Grid and Generation
 - All the generators are static. (PQ bus)
 - There is no min. requirement of PV or wind generation.
 - There is no max. limitation of PV and wind curtailment.
+
 Assumptions --- EV
 - The EVs are connected to the same bus as the loads.
-- The EVs connected to the same bus have the same driving profile.
-- The number of EV in a EV group is 5 times of the nominal power of the loads.
-- The EVs in the same group have the same driving profile. 
+- The number of EV in a EV group is the integer of nominal power of the loads.
+- The EVs in the same group have the same spec (max_mwh, dis/charging eff.) and driving profile: SOCImmediateBalanced
 
 Assumptions --- Environment
 - The timestep is one hour.
 - The environment is fully observable.
 - The environment is deterministic.
-- Actions: generation active power, generation reactive power (omitted ext. grid since it is typically not a direct control target)
-- States: load active power, load reactive power, active power generation from PV or wind 
+- Actions: generation active power, generation reactive power (omitted ext. grid since it is typically not a direct control target),
+EV (dis)charging power
+- States: load active power, load reactive power, active power generation from PV or wind, EV SOC
 """
 
 #Import pandapower stuff
 import pandapower as pp
 import pandapower.toolbox as tb
-import pandapower.control as control
+
 
 #Import simbench stuff
 import simbench as sb
@@ -34,6 +35,7 @@ from gymnasium.spaces import Box
 import numpy as np
 import random
 import pandas as pd
+
 
 #Create a custom environment
 class PowerGrid(Env):
@@ -50,7 +52,6 @@ class PowerGrid(Env):
 
         # read the number of gen & loads
         self.NL = self.net.load.index.size # NL: number of loads
-        # self.NxG = self.net.ext_grid.index.size  # NxG: number of ext. grids
         self.NsG = self.net.sgen.index.size #NsG: number of static generators 
         
 
@@ -74,14 +75,12 @@ class PowerGrid(Env):
         self.pre_reward = 0 #initialize the previous reward
         self.violation = False #initialize the violation
         self.episode_length = self.dispatching_intervals #initialize the episode length
-
-
             
         # define the action space: PsG, Qs, P_EV(positive for charging, negative for discharging)
         self.action_space = Box(low = np.full((2*self.NsG+self.N_EV, ), -1), 
                                 high = np.full((2*self.NsG+self.N_EV, ), 1), 
                                 shape=(2*self.NsG+self.N_EV, ))
-        ## Start from here
+
         # define the observation space: PL, QL, P_renewable(max generation from renewable energy sources), SOC_EV
         # ASSUMPTION: all the static generators are renewable energy sources
         self.observation_space = Box(low=np.zeros((2*self.NL+self.NsG+self.N_EV, )), 
@@ -120,9 +119,9 @@ class PowerGrid(Env):
         # apply action to net
         self.net = self.apply_action_to_net(action)
 
+
         # run the power flow
         try:
-
             pp.runpp(self.net)
             # pp.runpp(self.net, algorithm='gs')
             # control.run_control(self.net, max_iter=30)
@@ -155,36 +154,31 @@ class PowerGrid(Env):
                 # add some noice to load and renewable generation
                 self.state[0:2*self.NL + self.NsG] += self.stdD * (np.random.randn(2*self.NL + self.NsG, ))
 
-
-                # continue here: the update of SOC is not correct since SOC is not related between each time step
-
-                # update SOC of the EVs
                 if self.EVaware == True:
+                    # update SOC of the EVs
                     for i in range(self.N_EV):
                         energy_b4 = self.net.storage.loc[i, "max_e_mwh"] * self.net.storage.loc[i, "soc_percent"]
-                        energy_requirement = self.df_EV.loc[(i, time_step), "ChargingPowerImmediateBalanced_kW"] / 1000 # power requirement per car in MW
+                        energy_requirement = self.df_EV.loc[(i, time_step), "ChargingPowerImmediateBalanced_kW"] * self.net.storage.loc[i, "n_car"] / 1000 # power requirement from cars in MW
                         df_charging_eff = self.df_EV_spec[self.df_EV_spec["Parameter"] == "Battery_charging_efficiency"].set_index("Parameter")
                         charging_efficiency = df_charging_eff[str(i)].values
-                        # discharge_efficiency = self.df_EV_spec[self.df_EV_spec["Parameter"] == "Battery_discharging_efficiency"][str(i)]
+                        
                         if self.net.res_storage.loc[i, "p_mw"] >= 0: # charging with time step 1 hour
-                            energy_aftercharging = energy_b4 + self.net.res_storage.loc[i, "p_mw"] * charging_efficiency - energy_requirement * self.net.storage.loc[i, "n_car"] 
-                            print("Car_ID: ", i, "b4: ", energy_b4, "charge_power ", self.net.res_storage.loc[i, "p_mw"], "energy_aftercharging ", energy_aftercharging)                            
+                            energy_aftercharging = energy_b4 + self.net.res_storage.loc[i, "p_mw"] * charging_efficiency - energy_requirement         
                             if energy_aftercharging >=0 and self.net.storage.loc[i, "max_e_mwh"] < energy_aftercharging:
                                 print("Overcharging!")
                                 self.net.storage.loc[i, "soc_percent"] = 1
                             else:
                                 self.net.storage.loc[i, "soc_percent"] = energy_aftercharging / self.net.storage.loc[i, "max_e_mwh"]
-                            print("SOC: ", self.net.storage.loc[i, "soc_percent"])
                         else: # discharging with time step 1 hour
-                            energy_afterdischarging = energy_b4 + self.net.res_storage.loc[i, "p_mw"]  - energy_requirement * self.net.storage.loc[i, "n_car"]
-                            print("Car_ID: ", i, "b4: ", energy_b4, "discharge_power ", self.net.res_storage.loc[i, "p_mw"], "energy_afterdischarging ", energy_afterdischarging)
+                            energy_afterdischarging = energy_b4 + self.net.res_storage.loc[i, "p_mw"]  - energy_requirement 
+                            
                             if energy_afterdischarging >= 0:
                                 self.net.storage.loc[i, "soc_percent"] = energy_afterdischarging / self.net.storage.loc[i, "max_e_mwh"]
                             else:
                                 self.net.storage.loc[i, "soc_percent"] = 0
                                 print("Negative SOC!")
-                            print("SOC: ", self.net.storage.loc[i, "soc_percent"])
                         self.state[self.NL*2+self.NsG+i] = self.net.storage.loc[i, "soc_percent"]
+                
             else:
                 # update with the sampled profile 
                 self.state[0: self.NL] = self.load_pmw_profile[(self.dispatching_intervals - self.episode_length - 1)]
@@ -193,7 +187,6 @@ class PowerGrid(Env):
 
         # get observation for the next state
         observation = self._get_observation()
-
 
         info = {}
         return observation, reward, terminated, truncated, info
@@ -231,7 +224,7 @@ class PowerGrid(Env):
     
 
     def close(self):
-        print("Close this episode! The episode length is: ", self.episode_length)
+        super().close()  # If the parent class has a close method
 
     # convert the generation into static generator
     def change_gen_into_sgen(self, grid):
@@ -299,7 +292,7 @@ class PowerGrid(Env):
              # The fastest charging speed is 150 kw and assume all the EVs are connected in parallel
             self.PEVmax[i] = min(0.001 * 150 * self.net.storage.loc[i, "n_car"], charging_max[i]) 
             self.PEVmin[i] = -min(0.001 * 150 * self.net.storage.loc[i, "n_car"], discharge_max[i])
-            # self.PEVmin[i] = -min(0.001 * 150 * self.net.load.loc[i, "p_mw"].astype(int), discharge_max[i])
+
     
     # [if UseDataSource == False] read the active and reactive power of the loads, active power of gen from self.net.load
     def read_state_from_grid(self):
@@ -454,7 +447,7 @@ class PowerGrid(Env):
         # directly assign the SOC of the EVs to the observation
         if self.EVaware == True:
             normalized_obs.extend(self.state[self.NL*2+self.NsG: ])
-            # update the EV charging limit
+            # update the EV charging limit since the SOC is updated
             self.update_EV_limit()
         return np.array(normalized_obs).astype(np.float32)
 
@@ -472,7 +465,8 @@ class PowerGrid(Env):
             # update the EV charging limit
             self.update_EV_limit()
             for i in range(self.N_EV):
-                self.net.storage.loc[i, 'p_mw'] = self.denormalize(action[i+2*self.NsG], self.PEVmax[i], self.PEVmin[i], 1, -1)
+                discharge_efficiency = self.df_EV_spec[self.df_EV_spec["Parameter"] == "Battery_discharging_efficiency"][str(i)].values
+                self.net.storage.loc[i, 'p_mw'] = discharge_efficiency * self.denormalize(action[i+2*self.NsG], self.PEVmax[i], self.PEVmin[i], 1, -1)
         return self.net
 
     # Apply the state to the load
@@ -480,9 +474,9 @@ class PowerGrid(Env):
         for i in self.net.load.index: # load (PQ bus)
             self.net.load.loc[i, 'p_mw'] = self.state[i]
             self.net.load.loc[i, 'q_mvar'] = self.state[i+self.NL]
-        if self.EVaware == True:
-            for i in self.net.storage.index:
-                self.net.storage.loc[i, 'soc_percent'] = self.state[i+2*self.NL+self.NsG]
+        # if self.EVaware == True:
+        #     for i in self.net.storage.index:
+        #         self.net.storage.loc[i, 'soc_percent'] = self.state[i+2*self.NL+self.NsG]
         return self.net
 
 
@@ -530,6 +524,10 @@ class PowerGrid(Env):
             gen_cost =  0.1 * total_gen**2 + 40 * total_gen
             # print("No cost function found for generators. Assume the cost function is 0.1 * p_tot**2 + 40 * p_tot.")
         return gen_cost
+    
+    # fetch SOC state
+    def get_soc(self):
+        return self.net.storage["soc_percent"].values
     
 ####################################
 # Unused Code

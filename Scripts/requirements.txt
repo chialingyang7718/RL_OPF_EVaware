@@ -1,6 +1,6 @@
 gymnasium==0.29.1
-numpy==1.26.4
-pandapower==2.14.6
+numpy==2.0.0
+pandapower==2.14.9
 pandas==2.2.2
 simbench==1.5.3
 stable_baselines3==2.3.2

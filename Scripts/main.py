@@ -6,9 +6,11 @@ import gymnasium as gym
 #Import the registered environment
 import CustEnv
 
-
 #Import the grid loader
 from grid_loader import load_test_case_grid, load_simple_grid, load_simbench_grid
+
+#Import the callback
+from callback import SOCCallback
 
 #Import stable baselines stuff
 from stable_baselines3 import PPO
@@ -43,6 +45,7 @@ if __name__ == '__main__':
     # Parameters
     env_id = 'PowerGrid-v0'
     num_envs = 4
+    EV_aware = True
 
     # Create the vectorized environment
     env = SubprocVecEnv([make_env(env_id, 
@@ -50,12 +53,12 @@ if __name__ == '__main__':
                                   dispatching_interval=24, 
                                   UseDataSource=False, 
                                   UseSimbench=False,
-                                  EVaware=True,
+                                  EVaware=EV_aware,
                                   rank=i) for i in range(num_envs)])
 
 
     # create the log path
-    # log_path = os.path.join('Training', 'Logs')
+    log_path = os.path.join('Training', 'Logs')
 
     # custom MLP policy: network depends on the observation space, indirectly, the number of buses
     # first, we need to find the nearest power of 2 to the number of buses
@@ -73,17 +76,25 @@ if __name__ == '__main__':
         activation_fn=th.nn.Tanh, net_arch=dict(pi=[NN_size, NN_size], vf=[NN_size, NN_size])
     )
 
+    # initialize callback
+    soc_log_path = os.path.join(log_path, 'SOC')
+    soc_callback = SOCCallback(log_dir=soc_log_path)
+    # soc_callback = SOCCallback()
+
     # create the agent
     model = PPO(policy="MlpPolicy", 
                 env = env, 
-                n_steps = 12, 
+                n_steps = 24, # update every day
                 verbose=1, 
-                policy_kwargs = policy_kwargs)#, 
-                # tensorboard_log=log_path)
+                policy_kwargs = policy_kwargs, 
+                tensorboard_log=log_path)
+    
 
 
     # train the agent
-    model.learn(total_timesteps= 96, progress_bar=True)
+    if EV_aware:
+        model.learn(total_timesteps= 35040, callback=[soc_callback], progress_bar=True)
+    # model.learn(total_timesteps= 96, progress_bar=True)
 
     # save the model
     # model.save("Training/Model/%s" % grid_code)
@@ -96,7 +107,7 @@ if __name__ == '__main__':
 # DONE: include generation uncertainties into the observation -- added action limit at the step function
 # DONE: vectorize the environment -- register the env and make vectorized env
 # DONE: omit ext grid -- cannot omit it otherwise no reference bus is available
-# TODO: integrate EV charging: discharging efficiency, address negative power in storage, address the disconnetion of SOC
+# TODO: integrate EV charging: discharging efficiency, address negative power in storage
 # TODO: manually defined limits need to be adapted to the grid size e.g. q_g_mvar
 # TODO: implement safe reinforcement learning
 # TODO: generate instances (loads and max. power generations) of the enironment
