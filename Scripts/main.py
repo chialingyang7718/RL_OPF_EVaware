@@ -97,7 +97,7 @@ if __name__ == '__main__':
     # model.learn(total_timesteps= 96, progress_bar=True)
 
     # save the model
-    # model.save("Training/Model/%s" % grid_code)
+    model.save("Training/Model/Case%s_EV" % n_case)
 
 
 # DONE: why the model does not end -- Ans: the n_steps was much larger than total_timesteps
