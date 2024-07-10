@@ -26,5 +26,5 @@ Reinforcement Learning (RL) is a type of machine learning where an agent learns 
   - text_env.py: a script to test whether the environment works as it should.
 + Training: This is where the trained log files and models are saved.
 + Literature_Review.xlsx: This contains a table of all the related literatures for this project.
-
+## EV Profile Data Source: https://zenodo.org/records/4514928
 **This Project is still in progress. Therefore, there are still some vital components missing.**
