@@ -12,7 +12,6 @@ Assumptions --- EV
 
 Assumptions --- Environment
 - The timestep is one hour.
-- The environment is fully observable.
 - The environment is deterministic.
 - Actions: generation active power, generation reactive power (omitted ext. grid since it is typically not a direct control target),
 EV (dis)charging power
@@ -95,6 +94,7 @@ class PowerGrid(Env):
 
         # initialize the state with existing single data saved in the grid
         self.state = self.read_state_from_grid()
+        self.add_noice_load_sgen_state()
         
         
 
@@ -102,6 +102,9 @@ class PowerGrid(Env):
         # intialize the terminated and truncated
         terminated = False
         truncated = False
+
+        # calculate the current time step
+        time_step = self.dispatching_intervals - self.episode_length
 
         # apply state to load
         self.net = self.apply_state_to_load()
@@ -123,7 +126,7 @@ class PowerGrid(Env):
             reward = -5000
         else:
             # calculate the reward in the case of the power flow converges
-            reward = self.calculate_reward()
+            reward = self.calculate_reward(time_step)
 
             # check if terminated in the case of no violation
             if self.violation == False:
@@ -137,7 +140,7 @@ class PowerGrid(Env):
         # save the reward for the current step
         self.pre_reward = reward
         
-        # decrease the episode length
+        # decrease the episode length and update time step
         self.episode_length -= 1
         time_step = self.dispatching_intervals - self.episode_length
         
@@ -147,7 +150,7 @@ class PowerGrid(Env):
         # update the next state if the episode is not terminated
         if terminated == False:
                 # add some noice to load and renewable generation
-                self.state[0:2*self.NL + self.NsG] += self.stdD * (np.random.randn(2*self.NL + self.NsG, ))
+                self.add_noice_load_sgen_state()        
                 
                 # update EV state
                 if self.EVaware == True:
@@ -172,7 +175,7 @@ class PowerGrid(Env):
         time_step = 0
 
         # assign initial states for load and generation states by adding noice
-        self.state[0:2*self.NL + self.NsG] += self.stdD * (np.random.randn(2*self.NL + self.NsG, ))
+        self.add_noice_load_sgen_state()        
 
         # assign initial state for EV SOC
         if self.EVaware == True:
@@ -266,22 +269,50 @@ class PowerGrid(Env):
             self.PEVmax[i] = min(0.001 * 150 * self.net.storage.loc[i, "n_car"], charging_max[i]) 
             self.PEVmin[i] = -min(0.001 * 150 * self.net.storage.loc[i, "n_car"], discharge_max[i])
     
+    def add_noice_load_sgen_state(self):
+    # add some noice to PL and QL
+        for i in self.net.load.index:
+            while True:
+                random_PL = np.random.normal(self.mu_PL[i], self.stdD)
+                if self.PLmin[i] <= random_PL <= self.PLmax[i]:
+                    self.state[i] = random_PL
+                    break
+            while True:
+                random_QL = np.random.normal(self.mu_QL[i], self.stdD)
+                if self.QLmin[i] <= random_QL <= self.QLmax[i]:
+                    self.state[i+self.NL] = random_QL
+                    break
+        # add some noice to PsG
+        for i in self.net.sgen.index:
+            while True:
+                random_PsG = np.random.normal(self.mu_renewable[i], self.stdD)
+                if self.PsGmin[i] <= random_PsG <= self.PsGmax[i]:
+                    self.state[i+2*self.NL] = random_PsG
+                    break
+    
+
     # read the active and reactive power of the loads, active power of gen from self.net.load
     def read_state_from_grid(self):
         # read the active and reactive power of the loads
-        loads = self.net.load.loc[:, ['p_mw', 'q_mvar']].to_numpy()
+        self.mu_PL = self.net.load.loc[:, ['p_mw']].to_numpy()
+        self.mu_QL = self.net.load.loc[:, ['q_mvar']].to_numpy()
 
         # read the active power of the static generators
-        renewable = self.net.sgen.loc[:, ['p_mw']].to_numpy()
+        self.mu_renewable = self.net.sgen.loc[:, ['p_mw']].to_numpy()
 
         # concatenate state
         if self.EVaware == False:
-            state = np.concatenate((loads.flatten("F").astype(np.float32), renewable.flatten("F").astype(np.float32)), axis=None)
+            state = np.concatenate((self.mu_PL.flatten("F").astype(np.float32),
+                                    self.mu_QL.flatten("F").astype(np.float32),
+                                    self.mu_renewable.flatten("F").astype(np.float32)), axis=None)
         else:
             # randomly select SOC of the EVs under ImmediateBalanced condition as the initial SOC
             initial_soc = self.select_randomly_day_EV_profile()
             self.net.storage.loc[:, "soc_percent"] = initial_soc
-            state = np.concatenate((loads.flatten("F").astype(np.float32), renewable.flatten("F").astype(np.float32), initial_soc.flatten("F").astype(np.float32)), axis=None)
+            state = np.concatenate((self.mu_PL.flatten("F").astype(np.float32),
+                                    self.mu_QL.flatten("F").astype(np.float32), 
+                                    self.mu_renewable.flatten("F").astype(np.float32), 
+                                    initial_soc.flatten("F").astype(np.float32)), axis=None)
         return state
         
     def update_EV_state(self, time_step):
@@ -401,7 +432,6 @@ class PowerGrid(Env):
         else:
             return (value - min_space) / (max_space - min_space) * (max_value - min_value)  + min_value
 
-
     # convert state into obeservation with normalization
     def _get_observation(self): 
         normalized_obs = []
@@ -448,19 +478,46 @@ class PowerGrid(Env):
         return self.net
 
     # calculate the reward 
-    def calculate_reward(self):
-        # check the violation
-        violated_buses = tb.violated_buses(self.net, self.VGmin, self.VGmax) # bus voltage violation 
-        violated_lines = tb.overloaded_lines(self.net, self.linemax) #line overload violation
-        
-        # assign rewards based on the violation condition and generation cost
-        if violated_buses.size != 0 or violated_lines.size != 0 : 
-            self.violation = True
-            return -100*(len(violated_buses) + len(violated_lines))
-        else:
-            return 1000 - 0.1 * self.calculate_gen_cost() #TODO: reference to the paper
+    def calculate_reward(self, time_step):
+        # check the violation in the grid and assign penalty
+        violated_buses = tb.violated_buses(self.net, self.VGmin, self.VGmax) 
+        overload_lines = tb.overloaded_lines(self.net, self.linemax) 
+        penalty_voltage = 0
+        penalty_line = 0
 
-            
+        # bus voltage violation 
+        if violated_buses.size != 0:
+            self.violation = True
+            for violated_bus in violated_buses:
+                if self.net.res_bus.loc[violated_bus, "vm_pu"] < self.VGmin:
+                    penalty_voltage += (self.net.res_bus.loc[violated_bus, "vm_pu"] - self.VGmin) * 100
+                else:
+                    penalty_voltage += (self.VGmax - self.net.res_bus.loc[violated_bus, "vm_pu"]) * 100
+        #line overload violation
+        elif overload_lines.size != 0:
+            self.violation = True
+            for overload_line in overload_lines:
+                penalty_line += (self.linemax - self.net.res_line.loc[overload_line, "loading_percent"]) * 100
+
+        # check the violation in the EVs and assign penalty
+        penalty_EV = 0
+        if self.EVaware:
+            for i in range(self.N_EV):
+                SOC_threshold = self.df_EV.loc[(i, time_step), "SOCImmediateBalanced"]
+                SOC_value = self.net.storage.loc[i, "soc_percent"]
+                if SOC_threshold > SOC_value:
+                    self.violation = True
+                    penalty_EV -= (SOC_threshold - SOC_value) * 100
+
+
+        # assign rewards based on the violation condition and generation cost
+        if self.violation == True:
+            reward = penalty_voltage + penalty_line + penalty_EV
+        else:
+            reward = 1000 - 0.01 * self.calculate_gen_cost() #TODO: reference to the paper
+        
+        return reward
+
     # calculate the generation cost
     def calculate_gen_cost(self):
         gen_cost = 0
