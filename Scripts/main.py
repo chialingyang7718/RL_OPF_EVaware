@@ -24,9 +24,9 @@ import math
 
 
 # initialize the vectorized environment
-def make_env(env_id, net, dispatching_interval, UseDataSource, UseSimbench, EVaware, rank):
+def make_env(env_id, net, dispatching_interval, EVaware, rank):
     def _init():
-        env = gym.make(env_id, net=net, dispatching_intervals=dispatching_interval, UseDataSource=UseDataSource, UseSimbench=UseSimbench, EVaware=EVaware)
+        env = gym.make(env_id, net=net, dispatching_intervals=dispatching_interval, EVaware=EVaware)
         env.reset(seed = rank)
         env = Monitor(env)
         return env
@@ -50,9 +50,7 @@ if __name__ == '__main__':
     # Create the vectorized environment
     env = SubprocVecEnv([make_env(env_id, 
                                   net=grid, 
-                                  dispatching_interval=24, 
-                                  UseDataSource=False, 
-                                  UseSimbench=False,
+                                  dispatching_interval=24,
                                   EVaware=EV_aware,
                                   rank=i) for i in range(num_envs)])
 
@@ -79,7 +77,7 @@ if __name__ == '__main__':
     # initialize callback
     soc_log_path = os.path.join(log_path, 'SOC')
     soc_callback = SOCCallback(log_dir=soc_log_path)
-    # soc_callback = SOCCallback()
+
 
     # create the agent
     model = PPO(policy="MlpPolicy", 
@@ -94,10 +92,10 @@ if __name__ == '__main__':
     # train the agent
     if EV_aware:
         model.learn(total_timesteps= 35040, callback=[soc_callback], progress_bar=True)
-    # model.learn(total_timesteps= 96, progress_bar=True)
+    # model.learn(total_timesteps= 96, callback=[soc_callback], progress_bar=True)
 
     # save the model
-    model.save("Training/Model/Case%s_EV" % n_case)
+    # model.save("Training/Model/Case%s_EV" % n_case)
 
 
 # DONE: why the model does not end -- Ans: the n_steps was much larger than total_timesteps
