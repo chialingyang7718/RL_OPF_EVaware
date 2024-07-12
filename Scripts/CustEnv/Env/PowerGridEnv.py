@@ -132,7 +132,7 @@ class PowerGrid(Env):
                 terminated = abs(reward-self.pre_reward) <= 0.01
 
         # output the current episode length, reward, terminated, truncated
-        print("episode length: ", self.episode_length, "Reward:", reward, "; Terminated:", terminated, "; Truncated:", truncated)
+        # print("episode length: ", self.episode_length, "Reward:", reward, "; Terminated:", terminated, "; Truncated:", truncated)
         
         # save the reward for the current step
         self.pre_reward = reward
