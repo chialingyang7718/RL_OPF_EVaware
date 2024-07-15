@@ -12,7 +12,7 @@ class SOCCallback(BaseCallback):
     def _on_step(self) -> bool:
         # Use env_method to call the get_soc_percentages method across all environments
         all_soc_percentages = self.training_env.env_method('get_soc')
-        
+
         # Iterate through each set of soc_percentages returned by the environments
         for idx, soc_percentages in enumerate(all_soc_percentages):
             # Log each SOC value individually or aggregate them

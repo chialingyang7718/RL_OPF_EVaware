@@ -490,14 +490,14 @@ class PowerGrid(Env):
             self.violation = True
             for violated_bus in violated_buses:
                 if self.net.res_bus.loc[violated_bus, "vm_pu"] < self.VGmin:
-                    penalty_voltage += (self.net.res_bus.loc[violated_bus, "vm_pu"] - self.VGmin) * 100
+                    penalty_voltage += (self.net.res_bus.loc[violated_bus, "vm_pu"] - self.VGmin) * 1000
                 else:
-                    penalty_voltage += (self.VGmax - self.net.res_bus.loc[violated_bus, "vm_pu"]) * 100
+                    penalty_voltage += (self.VGmax - self.net.res_bus.loc[violated_bus, "vm_pu"]) * 1000
         #line overload violation
         elif overload_lines.size != 0:
             self.violation = True
             for overload_line in overload_lines:
-                penalty_line += (self.linemax - self.net.res_line.loc[overload_line, "loading_percent"]) * 100
+                penalty_line += (self.linemax - self.net.res_line.loc[overload_line, "loading_percent"]) * 1000
 
         # check the violation in the EVs and assign penalty
         penalty_EV = 0
@@ -507,7 +507,7 @@ class PowerGrid(Env):
                 SOC_value = self.net.storage.loc[i, "soc_percent"]
                 if SOC_threshold > SOC_value:
                     self.violation = True
-                    penalty_EV -= (SOC_threshold - SOC_value) * 100
+                    penalty_EV += (SOC_value - SOC_threshold) * 1000
 
 
         # assign rewards based on the violation condition and generation cost

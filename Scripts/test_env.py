@@ -23,7 +23,6 @@ if __name__ == '__main__':
     truncated = False
 
     # test the environment by randomly selecting actions
-    # def test_env():
     episodes = 10
     for episode in range(1, episodes+1):
         state = env.reset()
