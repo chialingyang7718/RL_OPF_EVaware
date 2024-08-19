@@ -208,7 +208,7 @@ class PowerGrid(Env):
         # get observation of the states
         observation = self._get_observation() 
         return observation, info
-    
+    # TODO: AttributeError: 'PowerGrid' object has no attribute 'EV_power_demand'
 
     def close(self):
         pass

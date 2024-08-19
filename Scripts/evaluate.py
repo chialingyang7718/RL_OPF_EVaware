@@ -43,7 +43,7 @@ def evaluate_PPO_model(n_case=14, model=None):
         rewards.append(reward)
         # actions.append(action)
         # observations.append(obs)
-        infos.append(info)
+        # infos.append(info)
         
         if terminated or truncated:
             print(f"Episode finished after {step + 1} steps")
@@ -62,8 +62,9 @@ plt.plot(rewards, '-o')
 plt.title('Reward at Each Time Step')
 plt.xlabel('Time Steps')
 plt.ylabel('Reward')
+for i in range(len(rewards)):                       
+    plt.annotate('%s' % rewards[i], xy=(i,rewards[i]), textcoords='data')
 plt.show()
-
 # mean_reward, std_reward = evaluate_policy(model, eval_env, n_eval_episodes=1, deterministic=True, return_episode_rewards=False)
 # reward_list, episode_len = evaluate_policy(model, eval_env, n_eval_episodes=1, callback=, deterministic=True, return_episode_rewards=True)
 
