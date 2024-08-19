@@ -36,7 +36,7 @@ import simbench as sb
 
 #Create a custom environment
 class PowerGrid(Env):
-    def __init__(self, net, stdD = 0.03, dispatching_intervals = 96, EVaware = True):
+    def __init__(self, net, stdD = 0.03, dispatching_intervals = 24, EVaware = True): # assuming dispatching intervals = number of hours in a day
         # inheritance from the parent class gymnasium.Env
         super(PowerGrid, self).__init__()
 
@@ -52,7 +52,7 @@ class PowerGrid(Env):
         self.NsG = self.net.sgen.index.size #NsG: number of static generators 
         
         # assign other parameters
-        self.stdD = stdD # standard deviation of the consumption
+        self.stdD = stdD # standard deviation of any random normal distribution
         self.dispatching_intervals = dispatching_intervals #number of dispatching intervals
         self.EVaware = EVaware # whether to consider the EV element
 
@@ -128,18 +128,28 @@ class PowerGrid(Env):
             # calculate the reward in the case of the power flow converges
             reward = self.calculate_reward(time_step)
 
-            # check if terminated in the case of no violation
-            if self.violation == False:
+            # # check if terminated in the case of no violation
+            # if self.violation == False:
 
-                #terminate the episode if the reward is close to the previous reward (converged)
-                terminated = abs(reward-self.pre_reward) <= 0.01
+            #     #terminate the episode if the reward is close to the previous reward (converged)
+            #     terminated = abs(reward-self.pre_reward) <= 0.01
 
         # output the current episode length, reward, terminated, truncated
         # print("episode length: ", self.episode_length, "Reward:", reward, "; Terminated:", terminated, "; Truncated:", truncated)
         
         # save the reward for the current step
-        self.pre_reward = reward
+        # self.pre_reward = reward
         
+        # update the info 
+        info = {
+            "load P(MW)": self.net.load.loc[:, ['p_mw']],
+            "load Q(MVar)": self.net.load.loc[:, ['q_mvar']],
+            "generation P(MW)": self.net.res_sgen.loc[:, ['p_mw']],
+            "generation Q(MVar)": self.net.res_sgen.loc[:, ['q_mvar']],
+            "voltage": self.net.res_bus.loc[:, ['vm_pu']],
+            "line loading": self.net.res_line.loc[:, ['loading_percent']]
+        }
+
         # decrease the episode length and update time step
         self.episode_length -= 1
         time_step = self.dispatching_intervals - self.episode_length
@@ -155,12 +165,13 @@ class PowerGrid(Env):
                 # update EV state
                 if self.EVaware == True:
                     self.update_EV_state(time_step)
+                    info["EV SOC"] = self.net.storage.loc[:, "soc_percent"]
+                    info["EV P(MW)"] = self.net.res_storage.loc[:, "p_mw"]
     
                 
         # get observation for the next state
         observation = self._get_observation()
 
-        info = {}
         return observation, reward, terminated, truncated, info
 
 
@@ -169,13 +180,19 @@ class PowerGrid(Env):
 
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
-        self.pre_reward = 0
+        # self.pre_reward = 0
         self.violation = False 
         self.episode_length = self.dispatching_intervals
         time_step = 0
 
         # assign initial states for load and generation states by adding noice
-        self.add_noice_load_sgen_state()        
+        self.add_noice_load_sgen_state()
+
+        # update load states in the info
+        info = {
+            "load P(MW)": self.net.load.loc[:, ['p_mw']],
+            "load Q(MVar)": self.net.load.loc[:, ['q_mvar']]
+        }       
 
         # assign initial state for EV SOC
         if self.EVaware == True:
@@ -184,10 +201,12 @@ class PowerGrid(Env):
             self.state[2*self.NL + self.NsG:] = self.net.storage.loc[:, "soc_percent"]
             # update the EV (dis)charging limit since SOC is changed
             self.update_EV_limit(time_step)
+            # update info with EV related info
+            info["EV SOC"] = self.net.storage.loc[:, "soc_percent"]
+            info["EV Demand(MW)"] = self.EV_power_demand
 
         # get observation of the states
         observation = self._get_observation() 
-        info = {}
         return observation, info
     
 
@@ -290,7 +309,6 @@ class PowerGrid(Env):
                     self.state[i+2*self.NL] = random_PsG
                     break
     
-
     # read the active and reactive power of the loads, active power of gen from self.net.load
     def read_state_from_grid(self):
         # read the active and reactive power of the loads
@@ -324,7 +342,8 @@ class PowerGrid(Env):
             
             # fetch EV power demand from the EV profile
             EV_power_demand = self.df_EV.loc[(i, time_step), "ChargingPowerImmediateBalanced_kW"] * self.net.storage.loc[i, "n_car"] / 1000 # power requirement from cars in MW
-            
+            self.EV_power_demand = EV_power_demand
+
             # fetch charging efficiency from the EV spec
             df_charging_eff = self.df_EV_spec[self.df_EV_spec["Parameter"] == "Battery_charging_efficiency"].set_index("Parameter")
             charging_efficiency = df_charging_eff[str(i)].values
@@ -490,14 +509,14 @@ class PowerGrid(Env):
             self.violation = True
             for violated_bus in violated_buses:
                 if self.net.res_bus.loc[violated_bus, "vm_pu"] < self.VGmin:
-                    penalty_voltage += (self.net.res_bus.loc[violated_bus, "vm_pu"] - self.VGmin) * 1000
+                    penalty_voltage += (self.net.res_bus.loc[violated_bus, "vm_pu"] - self.VGmin) * 10000
                 else:
-                    penalty_voltage += (self.VGmax - self.net.res_bus.loc[violated_bus, "vm_pu"]) * 1000
+                    penalty_voltage += (self.VGmax - self.net.res_bus.loc[violated_bus, "vm_pu"]) * 10000
         #line overload violation
         elif overload_lines.size != 0:
             self.violation = True
             for overload_line in overload_lines:
-                penalty_line += (self.linemax - self.net.res_line.loc[overload_line, "loading_percent"]) * 1000
+                penalty_line += (self.linemax - self.net.res_line.loc[overload_line, "loading_percent"]) * 10000
 
         # check the violation in the EVs and assign penalty
         penalty_EV = 0
@@ -507,14 +526,14 @@ class PowerGrid(Env):
                 SOC_value = self.net.storage.loc[i, "soc_percent"]
                 if SOC_threshold > SOC_value:
                     self.violation = True
-                    penalty_EV += (SOC_value - SOC_threshold) * 1000
+                    penalty_EV += (SOC_value - SOC_threshold) * 10000
 
 
         # assign rewards based on the violation condition and generation cost
         if self.violation == True:
             reward = penalty_voltage + penalty_line + penalty_EV
         else:
-            reward = 1000 - 0.01 * self.calculate_gen_cost() #TODO: reference to the paper
+            reward = 1000 - 0.01 * self.calculate_gen_cost() 
         
         return reward
 
