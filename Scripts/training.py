@@ -130,8 +130,9 @@ if __name__ == '__main__':
 # DONE: vectorize the environment -- register the env and make vectorized env
 # DONE: omit ext grid -- cannot omit it otherwise no reference bus is available
 # DONE: integrate EV charging: address negative power in storage -- need to add penalty for negative SOC
-# TODO: manually defined limits need to be adapted to the grid size e.g. q_g_mvar
-# TODO: implement safe reinforcement learning
 # DONE: generate instances (loads and max. power generations) of the enironment - randomly generate the loads and max. power generations
+# TODO: choose a proper std. for loads and max. power generations -5% for load
+# TODO: manually defined limits need to be adapted to the grid size e.g. q_g_mvar
 # TODO: output the report of divergence to the log fileS
 # TODO: choose a comparable benchmark: interior point method, etc.
+# TODO: implement safe reinforcement learning
