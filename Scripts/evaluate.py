@@ -28,7 +28,6 @@ def evaluate_PPO_model(n_case=14, model=None):
     rewards = []
     truncated = False
     terminated = False
-    # infos = {}
 
 
     # Evaluate the model
@@ -40,6 +39,7 @@ def evaluate_PPO_model(n_case=14, model=None):
         # Log the metrics
         # rewards
         rewards.append(round(reward,3))
+        
         # infos
         if step == 0:
             ### Convert the infos to a pandas dataframe
