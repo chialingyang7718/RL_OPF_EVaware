@@ -73,7 +73,6 @@ class PowerGrid(Env):
 
         # initialization
         self.pre_reward = 0
-        self.violation = False
         self.episode_length = self.dispatching_intervals
         time_step = 0
             
@@ -181,7 +180,6 @@ class PowerGrid(Env):
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
         # self.pre_reward = 0
-        self.violation = False 
         self.episode_length = self.dispatching_intervals
         time_step = 0
 
@@ -208,7 +206,7 @@ class PowerGrid(Env):
         # get observation of the states
         observation = self._get_observation() 
         return observation, info
-    # TODO: AttributeError: 'PowerGrid' object has no attribute 'EV_power_demand'
+    
 
     def close(self):
         pass
@@ -279,9 +277,11 @@ class PowerGrid(Env):
     def update_EV_limit(self, time_step):
         discharge_max = self.net.storage.loc[:, "max_e_mwh"] * self.net.storage.loc[:, "soc_percent"]
         charging_max = self.net.storage.loc[:, "max_e_mwh"] * (1 - self.net.storage.loc[:, "soc_percent"])
+        self.EV_power_demand = np.zeros(self.N_EV)
         for i in range(self.N_EV):
             # fetch EV power demand from the EV profile
             EV_power_demand = self.df_EV.loc[(i, time_step), "ChargingPowerImmediateBalanced_kW"] * self.net.storage.loc[i, "n_car"] / 1000 # power requirement from cars in MW
+            self.EV_power_demand[i] = EV_power_demand
             # reserve the power for EV demand (to avoid discharging too much that EVs demand is not fullfilled)
             discharge_max[i] -= EV_power_demand 
              # the fastest charging speed is 150 kw and assume all the EVs are connected in parallel
@@ -342,7 +342,7 @@ class PowerGrid(Env):
             
             # fetch EV power demand from the EV profile
             EV_power_demand = self.df_EV.loc[(i, time_step), "ChargingPowerImmediateBalanced_kW"] * self.net.storage.loc[i, "n_car"] / 1000 # power requirement from cars in MW
-            self.EV_power_demand = EV_power_demand
+            self.EV_power_demand[i] = EV_power_demand
 
             # fetch charging efficiency from the EV spec
             df_charging_eff = self.df_EV_spec[self.df_EV_spec["Parameter"] == "Battery_charging_efficiency"].set_index("Parameter")
@@ -503,20 +503,21 @@ class PowerGrid(Env):
         overload_lines = tb.overloaded_lines(self.net, self.linemax) 
         penalty_voltage = 0
         penalty_line = 0
+        self.violation = False 
 
         # bus voltage violation 
         if violated_buses.size != 0:
             self.violation = True
             for violated_bus in violated_buses:
                 if self.net.res_bus.loc[violated_bus, "vm_pu"] < self.VGmin:
-                    penalty_voltage += (self.net.res_bus.loc[violated_bus, "vm_pu"] - self.VGmin) * 10000
+                    penalty_voltage += (self.net.res_bus.loc[violated_bus, "vm_pu"] - self.VGmin) * 1000
                 else:
-                    penalty_voltage += (self.VGmax - self.net.res_bus.loc[violated_bus, "vm_pu"]) * 10000
+                    penalty_voltage += (self.VGmax - self.net.res_bus.loc[violated_bus, "vm_pu"]) * 1000
         #line overload violation
         elif overload_lines.size != 0:
             self.violation = True
             for overload_line in overload_lines:
-                penalty_line += (self.linemax - self.net.res_line.loc[overload_line, "loading_percent"]) * 10000
+                penalty_line += (self.linemax - self.net.res_line.loc[overload_line, "loading_percent"]) * 1000
 
         # check the violation in the EVs and assign penalty
         penalty_EV = 0
@@ -526,7 +527,7 @@ class PowerGrid(Env):
                 SOC_value = self.net.storage.loc[i, "soc_percent"]
                 if SOC_threshold > SOC_value:
                     self.violation = True
-                    penalty_EV += (SOC_value - SOC_threshold) * 10000
+                    penalty_EV += (SOC_value - SOC_threshold) * 1000
 
 
         # assign rewards based on the violation condition and generation cost
