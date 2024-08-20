@@ -144,14 +144,21 @@ class PowerGrid(Env):
         
         # update the info 
         info = {
-            "load P(MW)": self.net.load.loc[:, ['p_mw']],
-            "load Q(MVar)": self.net.load.loc[:, ['q_mvar']],
-            "renewable generation P(MW)": self.PsGcap,
-            "generation P(MW)": self.net.res_sgen.loc[:, ['p_mw']],
-            "generation Q(MVar)": self.net.res_sgen.loc[:, ['q_mvar']],
-            "bus voltage": self.net.res_bus.loc[:, ['vm_pu']],
-            "line loading": self.net.res_line.loc[:, ['loading_percent']]
+            "load_p": self.net.load.loc[:, ['p_mw']],
+            "load_q": self.net.load.loc[:, ['q_mvar']],
+            "renewable_p": self.PsGcap,
+            "generation_p": self.net.res_sgen.loc[:, ['p_mw']],
+            "generation_q": self.net.res_sgen.loc[:, ['q_mvar']],
+            "bus_voltage": self.net.res_bus.loc[:, ['vm_pu']],
+            "line_loading": self.net.res_line.loc[:, ['loading_percent']]
         }
+
+        if self.EVaware == True:
+            # record the EV related info
+            info["EV_demand"] = self.EV_power_demand
+            info["EV_p"] = self.net.res_storage.loc[:, "p_mw"]
+            info["EV_SOC_beginning"] = self.net.storage.loc[:, "soc_percent"]
+
 
         # decrease the episode length and update time step
         self.episode_length -= 1
@@ -165,13 +172,10 @@ class PowerGrid(Env):
                 # add some noice to load and renewable generation
                 self.add_noice_load_sgen_state()        
                 
-                # update EV state
+                # update EV state for the next time step
                 if self.EVaware == True:
                     self.update_EV_state(time_step)
-                    info["EV Demand(MW)"] = self.EV_power_demand
-                    info["EV SOC"] = self.net.storage.loc[:, "soc_percent"]
-                    info["EV P(MW)"] = self.net.res_storage.loc[:, "p_mw"]
-    
+
                 
         # get observation for the next state
         observation = self._get_observation()
@@ -193,12 +197,13 @@ class PowerGrid(Env):
 
 
 
-        # update load states in the info
-        info = {
-            "load P(MW)": self.net.load.loc[:, ['p_mw']],
-            "load Q(MVar)": self.net.load.loc[:, ['q_mvar']],
-            "renewable generation P(MW)": self.PsGcap,
-        }       
+        # # update load states in the info
+        info = {}
+        # info = {
+        #     "load_p": self.net.load.loc[:, ['p_mw']],
+        #     "load_q": self.net.load.loc[:, ['q_mvar']],
+        #     "renewable_p": self.PsGcap,
+        # }       
 
         # assign initial state for EV SOC
         if self.EVaware == True:
@@ -208,8 +213,8 @@ class PowerGrid(Env):
             # update the EV (dis)charging limit since SOC is changed
             self.update_EV_limit(time_step)
             # update info with EV related info
-            info["EV SOC"] = self.net.storage.loc[:, "soc_percent"]
-            info["EV Demand(MW)"] = self.EV_power_demand
+            # info["EV_SOC_init"] = self.net.storage.loc[:, "soc_percent"]
+            # info["EV_demand"] = self.EV_power_demand
         
         # get observation of the states
         observation = self._get_observation() 
