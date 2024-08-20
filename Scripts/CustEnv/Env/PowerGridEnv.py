@@ -4,6 +4,7 @@ Assumptions --- Grid and Generation
 - All the generators are static. (PQ bus)
 - There is no min. requirement of PV or wind generation.
 - There is no max. limitation of PV and wind curtailment.
+- std. deviation of the random normal distribution is 3% of the max. value of the load. As for renewable generation, it is 6% of the max. value.
 
 Assumptions --- EV
 - The EVs are connected to the same bus as the loads.
@@ -87,14 +88,19 @@ class PowerGrid(Env):
                                     shape=(2*self.NL+self.NsG+self.N_EV, ),
                                     dtype=np.float32)
         
-        
-        # assign state and action limits 
-        self.define_limit(time_step)
 
         # initialize the state with existing single data saved in the grid
         self.state = self.read_state_from_grid()
-        self.add_noice_load_sgen_state()
+
+        # assign state and action limits 
+        self.define_limit(time_step)
+
+        # # add some noice to load and renewable generation
+        # self.add_noice_load_sgen_state()
+
         
+
+
         
 
     def step(self, action):
@@ -186,6 +192,8 @@ class PowerGrid(Env):
         # assign initial states for load and generation states by adding noice
         self.add_noice_load_sgen_state()
 
+
+
         # update load states in the info
         info = {
             "load P(MW)": self.net.load.loc[:, ['p_mw']],
@@ -202,9 +210,10 @@ class PowerGrid(Env):
             # update info with EV related info
             info["EV SOC"] = self.net.storage.loc[:, "soc_percent"]
             info["EV Demand(MW)"] = self.EV_power_demand
-
+        
         # get observation of the states
         observation = self._get_observation() 
+
         return observation, info
     
 
@@ -253,7 +262,8 @@ class PowerGrid(Env):
         self.PsGmin = np.zeros(self.NsG) # ASSUMPTION: the min power generation from static generator is 0 MW
         self.QsGmax = np.full(self.NsG,self.net.sgen.loc[:,'max_q_mvar'].max())
         self.QsGmin = np.full(self.NsG, self.net.sgen.loc[:,'min_q_mvar'].min())
-        
+        self.PsGcap = self.mu_renewable.flatten("F").astype(np.float64) # set the max power generation for action space
+ 
         # assign the load limits (PQ bus)
         self.PLmax = np.full(self.NL, self.net.load.loc[:, 'p_mw'].max() * 1.5) # ASSUMPTION: the max active power consumption is 1.5 times the maximum value in the net
         self.PLmin = np.zeros(self.NL) # ASSUMPTION: the min active power consumption is 0 MW
@@ -274,6 +284,11 @@ class PowerGrid(Env):
             # update the EV (dis)charging limit
             self.update_EV_limit(time_step)
 
+    # update the action limit
+    def update_action_limit(self):
+        self.PsGcap = self.state[2*self.NL:].flatten("F").astype(np.float64)
+
+    # update EV (dis)charging limit
     def update_EV_limit(self, time_step):
         discharge_max = self.net.storage.loc[:, "max_e_mwh"] * self.net.storage.loc[:, "soc_percent"]
         charging_max = self.net.storage.loc[:, "max_e_mwh"] * (1 - self.net.storage.loc[:, "soc_percent"])
@@ -301,13 +316,17 @@ class PowerGrid(Env):
                 if self.QLmin[i] <= random_QL <= self.QLmax[i]:
                     self.state[i+self.NL] = random_QL
                     break
+        
         # add some noice to PsG
         for i in self.net.sgen.index:
             while True:
-                random_PsG = np.random.normal(self.mu_renewable[i], self.stdD)
+                random_PsG = np.random.normal(self.mu_renewable[i], self.stdD * 2) 
                 if self.PsGmin[i] <= random_PsG <= self.PsGmax[i]:
                     self.state[i+2*self.NL] = random_PsG
                     break
+
+        # update the action limit since the max renewable generation is changed
+        self.update_action_limit()
     
     # read the active and reactive power of the loads, active power of gen from self.net.load
     def read_state_from_grid(self):
@@ -456,20 +475,23 @@ class PowerGrid(Env):
         normalized_obs = []
         for i in range(self.NL):
             normalized_obs.append(self.normalize(self.state[i], self.PLmax[i], self.PLmin[i], 1, 0))
+
         for i in range(self.NL):
             normalized_obs.append(self.normalize(self.state[i+self.NL], self.QLmax[i], self.QLmin[i], 1, 0))
+
         for i in range(self.NsG):
             normalized_obs.append(self.normalize(self.state[i+2*self.NL], self.PsGmax[i], self.PsGmin[i], 1, 0))
+
         # directly assign the SOC of the EVs to the observation
         if self.EVaware == True:
             normalized_obs.extend(self.state[self.NL*2+self.NsG: ])
+
         return np.array(normalized_obs).astype(np.float32)
 
     # apply the action to the net
     def apply_action_to_net(self, action):
         for i in range(self.NsG): # static generator (PQ bus)
-            denormalized_p = self.denormalize(action[i], self.PsGmax[i], self.PsGmin[i], 1, -1)
-            
+            denormalized_p = self.denormalize(action[i], self.PsGcap[i], self.PsGmin[i], 1, -1)
             # set the power generation to the max value if the action is out of the limit
             if denormalized_p > self.state[i+2*self.NL]:
                 self.net.sgen.loc[i,'p_mw'] = self.state[i+2*self.NL]
