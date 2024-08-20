@@ -100,9 +100,6 @@ class PowerGrid(Env):
 
         
 
-
-        
-
     def step(self, action):
         # intialize the terminated and truncated
         terminated = False
@@ -149,9 +146,10 @@ class PowerGrid(Env):
         info = {
             "load P(MW)": self.net.load.loc[:, ['p_mw']],
             "load Q(MVar)": self.net.load.loc[:, ['q_mvar']],
+            "renewable generation P(MW)": self.PsGcap,
             "generation P(MW)": self.net.res_sgen.loc[:, ['p_mw']],
             "generation Q(MVar)": self.net.res_sgen.loc[:, ['q_mvar']],
-            "voltage": self.net.res_bus.loc[:, ['vm_pu']],
+            "bus voltage": self.net.res_bus.loc[:, ['vm_pu']],
             "line loading": self.net.res_line.loc[:, ['loading_percent']]
         }
 
@@ -170,6 +168,7 @@ class PowerGrid(Env):
                 # update EV state
                 if self.EVaware == True:
                     self.update_EV_state(time_step)
+                    info["EV Demand(MW)"] = self.EV_power_demand
                     info["EV SOC"] = self.net.storage.loc[:, "soc_percent"]
                     info["EV P(MW)"] = self.net.res_storage.loc[:, "p_mw"]
     
@@ -197,7 +196,8 @@ class PowerGrid(Env):
         # update load states in the info
         info = {
             "load P(MW)": self.net.load.loc[:, ['p_mw']],
-            "load Q(MVar)": self.net.load.loc[:, ['q_mvar']]
+            "load Q(MVar)": self.net.load.loc[:, ['q_mvar']],
+            "renewable generation P(MW)": self.PsGcap,
         }       
 
         # assign initial state for EV SOC
