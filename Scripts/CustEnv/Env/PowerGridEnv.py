@@ -513,15 +513,16 @@ class PowerGrid(Env):
                     penalty_voltage += (self.net.res_bus.loc[violated_bus, "vm_pu"] - self.VGmin) * 1000
                 else:
                     penalty_voltage += (self.VGmax - self.net.res_bus.loc[violated_bus, "vm_pu"]) * 1000
-        #line overload violation
-        elif overload_lines.size != 0:
+
+        # line overload violation
+        if overload_lines.size != 0:
             self.violation = True
             for overload_line in overload_lines:
                 penalty_line += (self.linemax - self.net.res_line.loc[overload_line, "loading_percent"]) * 1000
 
-        # check the violation in the EVs and assign penalty
-        penalty_EV = 0
+        # EV SOC violation
         if self.EVaware:
+            penalty_EV = 0
             for i in range(self.N_EV):
                 SOC_threshold = self.df_EV.loc[(i, time_step), "SOCImmediateBalanced"]
                 SOC_value = self.net.storage.loc[i, "soc_percent"]
