@@ -18,13 +18,12 @@ import json
 import os
 
 
-def evaluate_PPO_model(n_case=14, model=None):
+def evaluate_PPO_model(n_steps=24, n_case=14, model=None):
     # Load the environment
     grid = load_test_case_grid(n_case)
     eval_env = gym.make('PowerGrid-v0', net=grid, dispatching_intervals=24, EVaware=True)
 
-    # Initialize variables for tracking metrics
-    n_steps = 24  
+    # Initialize variables for tracking metrics 
     rewards = []
     truncated = False
     terminated = False
@@ -143,8 +142,9 @@ if __name__ == "__main__":
     model = PPO.load("Training/Model/Case14_EV")
 
     # Evaluate the model
-    rewards,  df_load_p, df_load_q, df_renewable, df_ev_demand, df_ev_soc, df_gen_p, df_gen_q, df_ev_action, df_voltage, df_line_loading = evaluate_PPO_model(n_case=14, model=model)
-
+    n_steps = 24
+    rewards,  df_load_p, df_load_q, df_renewable, df_ev_demand, df_ev_soc, df_gen_p, df_gen_q, df_ev_action, df_voltage, df_line_loading = evaluate_PPO_model(n_steps=n_steps, n_case=14, model=model)
+    print(f"Mean Reward: {sum(rewards)/n_steps}")
 
     # Plot rewards over time
     plt.plot(rewards, '-o')
@@ -158,4 +158,4 @@ if __name__ == "__main__":
     # reward_list, episode_len = evaluate_policy(model, eval_env, n_eval_episodes=1, callback=, deterministic=True, return_episode_rewards=True)
 
     # print(f"Mean reward: {mean_reward} +/- {std_reward}")
-    # print(f"{episode_len} hours of Reward: {reward_list}")
+  
