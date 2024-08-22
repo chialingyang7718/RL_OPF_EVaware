@@ -50,6 +50,7 @@ if __name__ == '__main__':
                                   net=grid, 
                                   dispatching_interval=24,
                                   EVaware=EV_aware,
+                                  Training = True,
                                   rank=i) for i in range(num_envs)])
 
 

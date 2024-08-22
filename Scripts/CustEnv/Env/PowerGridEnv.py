@@ -4,8 +4,7 @@ Assumptions --- Grid and Generation
 - All the generators are static. (PQ bus)
 - There is no min. requirement of PV or wind generation.
 - There is no max. limitation of PV and wind curtailment.
-- std. deviation of the random normal distribution is 3% of the max. value of the load. As for renewable generation, it is 6% of the max. value.
-
+- std. deviation of the random normal distribution is 1 for the load. As for renewable generation, it is 5.
 Assumptions --- EV
 - The EVs are connected to the same bus as the loads.
 - The number of EV in a EV group is the integer of nominal power of the loads.
@@ -37,7 +36,7 @@ import simbench as sb
 
 #Create a custom environment
 class PowerGrid(Env):
-    def __init__(self, net, stdD = 1, dispatching_intervals = 24, EVaware = True): # assuming dispatching intervals = number of hours in a day
+    def __init__(self, net, stdD = 1, dispatching_intervals = 24, EVaware = True, Training = False): # assuming dispatching intervals = number of hours in a day
         # inheritance from the parent class gymnasium.Env
         super(PowerGrid, self).__init__()
 
@@ -74,6 +73,7 @@ class PowerGrid(Env):
 
         # initialization
         self.pre_reward = 0
+        self.training = Training
         self.episode_length = self.dispatching_intervals
         time_step = 0
             
@@ -166,7 +166,8 @@ class PowerGrid(Env):
         
         # check if the episode is terminated in the case of reaching the end of the episode
         terminated = self.episode_length == 0
-        terminated = reward <= 0
+        if self.training == True:
+            terminated = reward <= 0
 
         # update the next state if the episode is not terminated
         if terminated == False:

@@ -16,7 +16,7 @@ grid = load_test_case_grid(14)
 
 if __name__ == '__main__':
     # initiate the environment for vectorizing
-    env_fns = [lambda: gym.make('PowerGrid-v0', net = grid, dispatching_intervals = 2, EVaware = True)] * 2
+    env_fns = [lambda: gym.make('PowerGrid-v0', net = grid, dispatching_intervals = 2, EVaware = True, Training = True)] * 2
     # vectorize the environment
     env = gym.vector.AsyncVectorEnv(env_fns, shared_memory=True)
     terminated = False
