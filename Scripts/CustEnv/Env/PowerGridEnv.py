@@ -37,7 +37,7 @@ import simbench as sb
 
 #Create a custom environment
 class PowerGrid(Env):
-    def __init__(self, net, stdD = 0.03, dispatching_intervals = 24, EVaware = True): # assuming dispatching intervals = number of hours in a day
+    def __init__(self, net, stdD = 1, dispatching_intervals = 24, EVaware = True): # assuming dispatching intervals = number of hours in a day
         # inheritance from the parent class gymnasium.Env
         super(PowerGrid, self).__init__()
 
@@ -166,6 +166,7 @@ class PowerGrid(Env):
         
         # check if the episode is terminated in the case of reaching the end of the episode
         terminated = self.episode_length == 0
+        terminated = reward <= 0
 
         # update the next state if the episode is not terminated
         if terminated == False:
@@ -325,7 +326,7 @@ class PowerGrid(Env):
         # add some noice to PsG
         for i in self.net.sgen.index:
             while True:
-                random_PsG = np.random.normal(self.mu_renewable[i], self.stdD * 2) 
+                random_PsG = np.random.normal(self.mu_renewable[i], self.stdD * 5) 
                 if self.PsGmin[i] <= random_PsG <= self.PsGmax[i]:
                     self.state[i+2*self.NL] = random_PsG
                     break

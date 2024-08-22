@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import json
 import os
+import seaborn as sns
 
 
 def evaluate_PPO_model(n_steps=24, n_case=14, model=None):
@@ -137,9 +138,13 @@ def evaluate_PPO_model(n_steps=24, n_case=14, model=None):
     eval_env.close()
     return rewards, df_load_p, df_load_q, df_renewable, df_ev_demand, df_ev_soc, df_gen_p, df_gen_q, df_ev_action, df_voltage, df_line_loading
 
+def visualization(df):
+    sns.lineplot(data=df)
+
+
 if __name__ == "__main__":
     # Load the trained model
-    model = PPO.load("Training/Model/Case14_EV")
+    model = PPO.load("Training/Model/Case14_EV_1000-0.1")
 
     # Evaluate the model
     n_steps = 24
