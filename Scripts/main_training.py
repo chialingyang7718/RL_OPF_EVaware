@@ -138,4 +138,5 @@ if __name__ == '__main__':
 # TODO: manually defined limits need to be adapted to the grid size e.g. q_g_mvar
 # TODO: output the report of divergence to the log fileS
 # TODO: choose a comparable benchmark: interior point method, etc.
+# TODO: implement for other test cases -- overloading issue by case39
 # TODO: implement safe reinforcement learning
