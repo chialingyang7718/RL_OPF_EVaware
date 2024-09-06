@@ -25,9 +25,9 @@ import math
 
 
 # initialize the vectorized environment
-def make_env(env_id, net, dispatching_interval, EVaware, rank):
+def make_env(env_id, net, dispatching_interval, EVaware, Training, rank):
     def _init():
-        env = gym.make(env_id, net=net, dispatching_intervals=dispatching_interval, EVaware=EVaware)
+        env = gym.make(env_id, net=net, dispatching_intervals=dispatching_interval, EVaware=EVaware, Training=Training)
         env.reset(seed = rank)
         env = Monitor(env)
         return env
@@ -44,6 +44,7 @@ if __name__ == '__main__':
     env_id = 'PowerGrid-v0'
     num_envs = 6
     EV_aware = True
+    Training = True
 
     # Create the vectorized environment
     env = SubprocVecEnv([make_env(env_id, 
@@ -70,7 +71,7 @@ if __name__ == '__main__':
     
     # the policy network architecture
     policy_kwargs = dict(
-        activation_fn=th.nn.Tanh, net_arch=dict(pi=[NN_size, NN_size], vf=[NN_size, NN_size])
+        activation_fn=th.nn.Tanh, net_arch=dict(pi=[NN_size, NN_size, NN_size], vf=[NN_size, NN_size, NN_size])
     )
     
     def create_unique_soc_log_path(base_log_dir):
@@ -118,7 +119,7 @@ if __name__ == '__main__':
     # model.learn(total_timesteps= 96, callback=[soc_callback], progress_bar=True)
 
     # save the model
-    model.save("Training/Model/Case%s_EV" % n_case)
+    model.save("Training/Model/Case%s_EV_3innerLayer" % n_case)
 
  
 
