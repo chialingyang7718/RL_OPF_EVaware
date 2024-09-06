@@ -43,13 +43,13 @@ class PowerGrid(Env):
         # assign the grid
         self.net = net
 
-        # convert the generator into static generator if there is any generator
-        if net.gen.index.size > 0:
-            self.net = self.change_gen_into_sgen(self.net)
+        # convert any static generator into generator
+        if net.sgen.index.size > 0:
+            self.net = self.change_sgen_into_gen(self.net)
 
         # read the number of gen & loads
         self.NL = self.net.load.index.size # NL: number of loads
-        self.NsG = self.net.sgen.index.size #NsG: number of static generators 
+        self.NG = self.net.gen.index.size # NG: number of generators 
         
         # assign other parameters
         self.stdD = stdD # standard deviation of any random normal distribution
@@ -77,15 +77,15 @@ class PowerGrid(Env):
         self.episode_length = self.dispatching_intervals
         time_step = 0
             
-        # define the action space: PsG, Qs, P_EV(positive for charging, negative for discharging)
-        self.action_space = Box(low = np.full((2*self.NsG+self.N_EV, ), -1), 
-                                high = np.full((2*self.NsG+self.N_EV, ), 1), 
-                                shape=(2*self.NsG+self.N_EV, ))
+        # define the action space: PG, VG, P_EV(positive for charging, negative for discharging)
+        self.action_space = Box(low = np.full((2*self.NG+self.N_EV, ), -1), 
+                                high = np.full((2*self.NG+self.N_EV, ), 1), 
+                                shape=(2*self.NG+self.N_EV, ))
 
         # define the observation space: PL, QL, P_renewable(max generation from renewable energy sources), SOC_EV
-        self.observation_space = Box(low=np.zeros((2*self.NL+self.NsG+self.N_EV, )), 
-                                    high=np.full((2*self.NL+self.NsG+self.N_EV, ), 1), 
-                                    shape=(2*self.NL+self.NsG+self.N_EV, ),
+        self.observation_space = Box(low=np.zeros((2*self.NL+self.NG+self.N_EV, )), 
+                                    high=np.full((2*self.NL+self.NG+self.N_EV, ), 1), 
+                                    shape=(2*self.NL+self.NG+self.N_EV, ),
                                     dtype=np.float32)
         
 
@@ -146,9 +146,10 @@ class PowerGrid(Env):
         info = {
             "load_p": self.net.load.loc[:, ['p_mw']],
             "load_q": self.net.load.loc[:, ['q_mvar']],
-            "renewable_p": self.PsGcap,
-            "generation_p": self.net.res_sgen.loc[:, ['p_mw']],
-            "generation_q": self.net.res_sgen.loc[:, ['q_mvar']],
+            "renewable_p": self.PGcap,
+            "generation_p": self.net.res_gen.loc[:, ['p_mw']],
+            "generation_p": self.net.res_gen.loc[:, ['q_mvar']],
+            "generation_v": self.net.res_gen.loc[:, ['vm_pu']],
             "bus_voltage": self.net.res_bus.loc[:, ['vm_pu']],
             "line_loading": self.net.res_line.loc[:, ['loading_percent']]
         }
@@ -172,7 +173,7 @@ class PowerGrid(Env):
         # update the next state if the episode is not terminated
         if terminated == False:
                 # add some noice to load and renewable generation
-                self.add_noice_load_sgen_state()        
+                self.add_noice_load_gen_state()        
                 
                 # update EV state for the next time step
                 if self.EVaware == True:
@@ -195,7 +196,7 @@ class PowerGrid(Env):
         time_step = 0
 
         # assign initial states for load and generation states by adding noice
-        self.add_noice_load_sgen_state()
+        self.add_noice_load_gen_state()
 
 
 
@@ -204,14 +205,14 @@ class PowerGrid(Env):
         # info = {
         #     "load_p": self.net.load.loc[:, ['p_mw']],
         #     "load_q": self.net.load.loc[:, ['q_mvar']],
-        #     "renewable_p": self.PsGcap,
+        #     "renewable_p": self.PGcap,
         # }       
 
         # assign initial state for EV SOC
         if self.EVaware == True:
             # reselect another day for the EV profile randomly
             self.net.storage.loc[:, "soc_percent"] = self.select_randomly_day_EV_profile()
-            self.state[2*self.NL + self.NsG:] = self.net.storage.loc[:, "soc_percent"]
+            self.state[2*self.NL + self.NG:] = self.net.storage.loc[:, "soc_percent"]
             # update the EV (dis)charging limit since SOC is changed
             self.update_EV_limit(time_step)
             # update info with EV related info
@@ -227,49 +228,49 @@ class PowerGrid(Env):
     def close(self):
         pass
 
-    # convert the generation into static generator
-    def change_gen_into_sgen(self, grid):
-        for i in grid.gen.index:
-            bus = grid.gen.loc[i, "bus"]
-            p_mw = grid.gen.loc[i, "p_mw"]
-            if "max_p_mw" not in grid.gen:
-                max_p_mw = grid.gen.loc[i, "p_mw"] * 1.5 # assume the max power output is 1.5 times the current power output if not specified
+    # convert the static generator into generator
+    def change_sgen_into_gen(self, grid):
+        for i in grid.sgen.index:
+            bus = grid.sgen.loc[i, "bus"]
+            p_mw = grid.sgen.loc[i, "p_mw"]
+            if "max_p_mw" not in grid.sgen:
+                max_p_mw = grid.sgen.loc[i, "p_mw"] * 1.5 # assume the max power output is 1.5 times the current power output if not specified
             else:
-                max_p_mw = grid.gen.loc[i, "max_p_mw"]
+                max_p_mw = grid.sgen.loc[i, "max_p_mw"]
             if "min_p_mw" not in grid.gen:
-                min_p_mw = grid.gen.loc[i, "p_mw"] * 0 # assume the min power output is 0 if not specified
+                min_p_mw = grid.sgen.loc[i, "p_mw"] * 0 # assume the min power output is 0 if not specified
             else:
-                min_p_mw = grid.gen.loc[i, "min_p_mw"]
-            if "max_q_mvar" not in grid.gen and "q_mvar" in grid.gen:
-                max_q_mvar = grid.gen.loc[i, "q_mvar"] * 1.5 # assume the max reactive power output is 1.5 times the current reactive power output if not specified
-            elif "q_mvar" not in grid.gen:
+                min_p_mw = grid.sgen.loc[i, "min_p_mw"]
+            if "max_q_mvar" not in grid.sgen and "q_mvar" in grid.sgen:
+                max_q_mvar = grid.sgen.loc[i, "q_mvar"] * 1.5 # assume the max reactive power output is 1.5 times the current reactive power output if not specified
+            elif "q_mvar" not in grid.sgen:
                 max_q_mvar = 100 # assume the max reactive power output is 100 MVar
             else:
-                max_q_mvar = grid.gen.loc[i, "max_q_mvar"]
-            if "min_q_mvar" not in grid.gen and "q_mvar" in grid.gen:
-                min_q_mvar = abs(grid.gen.loc[i, "q_mvar"]) * -1.5 # assume the min reactive power output is 1.5 times the current reactive power output if not specified
-            elif "q_mvar" not in grid.gen:
+                max_q_mvar = grid.sgen.loc[i, "max_q_mvar"]
+            if "min_q_mvar" not in grid.sgen and "q_mvar" in grid.sgen:
+                min_q_mvar = abs(grid.sgen.loc[i, "q_mvar"]) * -1.5 
+            elif "q_mvar" not in grid.sgen:
                 min_q_mvar = -100 # assume the min reactive power output is -100 MVar
             else:
-                min_q_mvar = grid.gen.loc[i, "min_q_mvar"]
-            grid.gen.drop(i, inplace = True)
-            pp.create_sgen(grid, bus, p_mw=p_mw, q_mvar=0, max_p_mw=max_p_mw, min_p_mw=min_p_mw, max_q_mvar=max_q_mvar, min_q_mvar=min_q_mvar)
+                min_q_mvar = grid.sgen.loc[i, "min_q_mvar"]
+            grid.sgen.drop(i, inplace = True)
+            pp.create_gen(grid, bus, p_mw=p_mw,  vm_pu=1.0, max_p_mw=max_p_mw, min_p_mw=min_p_mw, max_q_mvar=max_q_mvar, min_q_mvar=min_q_mvar)
         return grid
-
+    
     # assign the state and action limits
     def define_limit(self, time_step):
-        # assign the static generator limits (PQ bus)
-        if 'max_p_mw' not in self.net.sgen:
-            self.net.sgen.loc[:,"max_p_mw"] = self.net.sgen.loc[:,"p_mw"] * 1.5 # assume the max power output is 1.5 times the current power output if not specified
-        if 'max_q_mvar' not in self.net.sgen:
-            self.net.sgen.loc[:,"max_q_mvar"] = abs(self.net.sgen.loc[:,"q_mvar"]) * 1.5 # assume the max reactive power output is 1.5 times the current reactive power output if not specified
-        if 'min_q_mvar' not in self.net.sgen:
-            self.net.sgen.loc[:,"min_q_mvar"] = abs(self.net.sgen.loc[:,"q_mvar"]) * -1.5 # assume the min power output is 1.5 times the current power output if not specified
-        self.PsGmax = np.full(self.NsG, self.net.sgen.loc[:,'max_p_mw'].max()) # to avoid limitation of zero if any original value is zero
-        self.PsGmin = np.zeros(self.NsG) # ASSUMPTION: the min power generation from static generator is 0 MW
-        self.QsGmax = np.full(self.NsG,self.net.sgen.loc[:,'max_q_mvar'].max())
-        self.QsGmin = np.full(self.NsG, self.net.sgen.loc[:,'min_q_mvar'].min())
-        self.PsGcap = self.mu_renewable.flatten("F").astype(np.float64) # set the max power generation for action space
+        # assign the generator limits
+        if 'max_p_mw' not in self.net.gen:
+            self.net.gen.loc[:,"max_p_mw"] = self.net.gen.loc[:,"p_mw"] * 1.5 # assume the max power output is 1.5 times the current power output if not specified
+        if 'max_q_mvar' not in self.net.gen:
+            self.net.gen.loc[:,"max_q_mvar"] = abs(self.net.gen.loc[:,"q_mvar"]) * 1.5 # assume the max reactive power output is 1.5 times the current reactive power output if not specified
+        if 'min_q_mvar' not in self.net.gen:
+            self.net.gen.loc[:,"min_q_mvar"] = abs(self.net.gen.loc[:,"q_mvar"]) * -1.5 # assume the min power output is 1.5 times the current power output if not specified
+        self.PGmax = np.full(self.NG, self.net.gen.loc[:,'max_p_mw'].max()) # to avoid limitation of zero if any original value is zero
+        self.PGmin = np.zeros(self.NG) # ASSUMPTION: the min power generation from static generator is 0 MW
+        self.QGmax = np.full(self.NG,self.net.gen.loc[:,'max_q_mvar'].max())
+        self.QGmin = np.full(self.NG, self.net.gen.loc[:,'min_q_mvar'].min())
+        self.PGcap = self.mu_renewable.flatten("F").astype(np.float64) # set the max power generation for action space
  
         # assign the load limits (PQ bus)
         self.PLmax = np.full(self.NL, self.net.load.loc[:, 'p_mw'].max() * 1.5) # ASSUMPTION: the max active power consumption is 1.5 times the maximum value in the net
@@ -277,7 +278,7 @@ class PowerGrid(Env):
         self.QLmax = np.full(self.NL, abs(self.net.load.loc[:, 'q_mvar']).max() * 1.5) # ASSUMPTION: the max reactive power consumption is 1.5 times the maximum value in the net
         self.QLmin = -self.QLmax # ASSUMPTION: the reactive power consumption range is zero-centered
         
-        # assign the voltage and line loading limits (valid for all buses)
+        # assign the voltage and line loading limits (valid for all buses and generators)
         self.VGmin = 0.94 # ASSUMPTION: the min voltage is 0.94 pu
         self.VGmax = 1.06 # ASSUMPTION: the max voltage is 1.06 pu
         self.linemax = 100  # ASSUMPTION: the max line loading is 100%
@@ -293,7 +294,7 @@ class PowerGrid(Env):
 
     # update the action limit
     def update_action_limit(self):
-        self.PsGcap = self.state[2*self.NL:].flatten("F").astype(np.float64)
+        self.PGcap = self.state[2*self.NL:].flatten("F").astype(np.float64)
 
     # update EV (dis)charging limit
     def update_EV_limit(self, time_step):
@@ -310,7 +311,7 @@ class PowerGrid(Env):
             self.PEVmax[i] = min(0.001 * 150 * self.net.storage.loc[i, "n_car"], charging_max[i]) 
             self.PEVmin[i] = -min(0.001 * 150 * self.net.storage.loc[i, "n_car"], discharge_max[i])
     
-    def add_noice_load_sgen_state(self):
+    def add_noice_load_gen_state(self):
     # add some noice to PL and QL
         for i in self.net.load.index:
             while True:
@@ -324,12 +325,12 @@ class PowerGrid(Env):
                     self.state[i+self.NL] = random_QL
                     break
         
-        # add some noice to PsG
-        for i in self.net.sgen.index:
+        # add some noice to PG
+        for i in self.net.gen.index:
             while True:
-                random_PsG = np.random.normal(self.mu_renewable[i], self.stdD * 5) 
-                if self.PsGmin[i] <= random_PsG <= self.PsGmax[i]:
-                    self.state[i+2*self.NL] = random_PsG
+                random_PG = np.random.normal(self.mu_renewable[i], self.stdD * 5) 
+                if self.PGmin[i] <= random_PG <= self.PGmax[i]:
+                    self.state[i+2*self.NL] = random_PG
                     break
 
         # update the action limit since the max renewable generation is changed
@@ -341,8 +342,8 @@ class PowerGrid(Env):
         self.mu_PL = self.net.load.loc[:, ['p_mw']].to_numpy()
         self.mu_QL = self.net.load.loc[:, ['q_mvar']].to_numpy()
 
-        # read the active power of the static generators
-        self.mu_renewable = self.net.sgen.loc[:, ['p_mw']].to_numpy()
+        # read the active power of generators
+        self.mu_renewable = self.net.gen.loc[:, ['p_mw']].to_numpy()
 
         # concatenate state
         if self.EVaware == False:
@@ -389,7 +390,7 @@ class PowerGrid(Env):
                 else:
                     self.net.storage.loc[i, "soc_percent"] = 0
                     print("Negative SOC!")
-            self.state[self.NL*2+self.NsG+i] = self.net.storage.loc[i, "soc_percent"]
+            self.state[self.NL*2+self.NG+i] = self.net.storage.loc[i, "soc_percent"]
             
             # update the EV charging limit since SOC is changed
             self.update_EV_limit(time_step)
@@ -486,28 +487,29 @@ class PowerGrid(Env):
         for i in range(self.NL):
             normalized_obs.append(self.normalize(self.state[i+self.NL], self.QLmax[i], self.QLmin[i], 1, 0))
 
-        for i in range(self.NsG):
-            normalized_obs.append(self.normalize(self.state[i+2*self.NL], self.PsGmax[i], self.PsGmin[i], 1, 0))
+        for i in range(self.NG):
+            normalized_obs.append(self.normalize(self.state[i+2*self.NL], self.PGmax[i], self.PGmin[i], 1, 0))
 
         # directly assign the SOC of the EVs to the observation
         if self.EVaware == True:
-            normalized_obs.extend(self.state[self.NL*2+self.NsG: ])
+            normalized_obs.extend(self.state[self.NL*2+self.NG: ])
 
         return np.array(normalized_obs).astype(np.float32)
 
     # apply the action to the net
     def apply_action_to_net(self, action):
-        for i in range(self.NsG): # static generator (PQ bus)
-            denormalized_p = self.denormalize(action[i], self.PsGcap[i], self.PsGmin[i], 1, -1)
+        for i in range(self.NG): # Generator (PV bus)
+            denormalized_p = self.denormalize(action[i], self.PGcap[i], self.PGmin[i], 1, -1)
+
             # set the power generation to the max value if the action is out of the limit
             if denormalized_p > self.state[i+2*self.NL]:
-                self.net.sgen.loc[i,'p_mw'] = self.state[i+2*self.NL]
+                self.net.gen.loc[i,'p_mw'] = self.state[i+2*self.NL]
             else:
-                self.net.sgen.loc[i,'p_mw'] = denormalized_p
-            self.net.sgen.loc[i, 'q_mvar'] = self.denormalize(action[i+self.NsG], self.QsGmax[i], self.QsGmin[i], 1, -1)
+                self.net.gen.loc[i,'p_mw'] = denormalized_p
+            self.net.gen.loc[i, 'vm_pu'] = self.denormalize(action[i+self.NG], self.VGmax, self.VGmin, 1, -1)
 
             for i in range(self.N_EV):
-                denormalized_pEV = self.denormalize(action[i+2*self.NsG], self.PEVmax[i], self.PEVmin[i], 1, -1)
+                denormalized_pEV = self.denormalize(action[i+2*self.NG], self.PEVmax[i], self.PEVmin[i], 1, -1)
                 # set the EV power based on the action
                 if denormalized_pEV < 0:
                     # discharging
@@ -573,20 +575,20 @@ class PowerGrid(Env):
         gen_cost = 0
         #if the cost function is polynomial
         if self.net.poly_cost.index.size > 0:
-            for i in self.net.sgen.index:
-                gen_cost += self.net.res_sgen.p_mw[i]**2 * self.net.poly_cost.iat[i,4] + self.net.res_sgen.p_mw[i] * self.net.poly_cost.iat[i,3] + self.net.poly_cost.iat[i,2] \
-                            + self.net.poly_cost.iat[i,5] + self.net.poly_cost.iat[i,6] * self.net.res_sgen.q_mvar[i] + self.net.poly_cost.iat[i,7] * self.net.res_sgen.q_mvar[i]**2
+            for i in self.net.gen.index:
+                gen_cost += self.net.res_gen.p_mw[i]**2 * self.net.poly_cost.iat[i,4] + self.net.res_gen.p_mw[i] * self.net.poly_cost.iat[i,3] + self.net.poly_cost.iat[i,2] \
+                            + self.net.poly_cost.iat[i,5] + self.net.poly_cost.iat[i,6] * self.net.res_gen.q_mvar[i] + self.net.poly_cost.iat[i,7] * self.net.res_gen.q_mvar[i]**2
             for i in self.net.ext_grid.index:
                 gen_cost += self.net.res_ext_grid.p_mw[i]**2 * self.net.poly_cost.iat[i,4] + self.net.res_ext_grid.p_mw[i] * self.net.poly_cost.iat[i,3] + self.net.poly_cost.iat[i,2] \
                             + self.net.poly_cost.iat[i,5] + self.net.poly_cost.iat[i,6] * self.net.res_ext_grid.q_mvar[i] + self.net.poly_cost.iat[i,7] * self.net.res_ext_grid.q_mvar[i]**2
         #if the cost function is piecewise linear        
         elif self.net.pwl_cost.index.size > 0:
             points_list = self.net.pwl_cost.at[i, 'points']
-            for i in self.net.sgen.index:
+            for i in self.net.gen.index:
                 for points in points_list:
                     p0, p1, c01 = points
-                    if p0 <= self.net.res_sgen.p_mw[i] < p1:
-                        gen_cost += c01 * self.net.res_sgen.p_mw[i]
+                    if p0 <= self.net.res_gen.p_mw[i] < p1:
+                        gen_cost += c01 * self.net.res_gen.p_mw[i]
             for i in self.net.ext_grid.index:
                 for points in points_list:
                     p0, p1, c01 = points
@@ -594,7 +596,7 @@ class PowerGrid(Env):
                         gen_cost += c01 * self.net.res_ext_grid.p_mw[i]
         #if the cost function is missing 
         else:
-            total_gen = self.net.res_sgen['p_mw'].sum() + self.net.res_ext_grid['p_mw'].sum()
+            total_gen = self.net.res_gen['p_mw'].sum() + self.net.res_ext_grid['p_mw'].sum()
             gen_cost =  0.1 * total_gen**2 + 40 * total_gen
             # print("No cost function found for generators. Assume the cost function is 0.1 * p_tot**2 + 40 * p_tot.")
         return gen_cost
@@ -606,6 +608,35 @@ class PowerGrid(Env):
 ####################################
 # Unused Code
 ####################################
+
+    # convert the generator into static generator
+    def change_gen_into_sgen(self, grid):
+        for i in grid.gen.index:
+            bus = grid.gen.loc[i, "bus"]
+            p_mw = grid.gen.loc[i, "p_mw"]
+            if "max_p_mw" not in grid.gen:
+                max_p_mw = grid.gen.loc[i, "p_mw"] * 1.5 # assume the max power output is 1.5 times the current power output if not specified
+            else:
+                max_p_mw = grid.gen.loc[i, "max_p_mw"]
+            if "min_p_mw" not in grid.gen:
+                min_p_mw = grid.gen.loc[i, "p_mw"] * 0 # assume the min power output is 0 if not specified
+            else:
+                min_p_mw = grid.gen.loc[i, "min_p_mw"]
+            if "max_q_mvar" not in grid.gen and "q_mvar" in grid.gen:
+                max_q_mvar = grid.gen.loc[i, "q_mvar"] * 1.5 # assume the max reactive power output is 1.5 times the current reactive power output if not specified
+            elif "q_mvar" not in grid.gen:
+                max_q_mvar = 100 # assume the max reactive power output is 100 MVar
+            else:
+                max_q_mvar = grid.gen.loc[i, "max_q_mvar"]
+            if "min_q_mvar" not in grid.gen and "q_mvar" in grid.gen:
+                min_q_mvar = abs(grid.gen.loc[i, "q_mvar"]) * -1.5 # assume the min reactive power output is 1.5 times the current reactive power output if not specified
+            elif "q_mvar" not in grid.gen:
+                min_q_mvar = -100 # assume the min reactive power output is -100 MVar
+            else:
+                min_q_mvar = grid.gen.loc[i, "min_q_mvar"]
+            grid.gen.drop(i, inplace = True)
+            pp.create_sgen(grid, bus, p_mw=p_mw, q_mvar=0, max_p_mw=max_p_mw, min_p_mw=min_p_mw, max_q_mvar=max_q_mvar, min_q_mvar=min_q_mvar)
+        return grid
 
     # assign the state based on the data source
     def assign_state_with_datasource(self):
@@ -639,10 +670,10 @@ class PowerGrid(Env):
     # assign the limits based on the datasource profile
     def define_limit_with_profile(self):
         # assign the static generator limits (PQ bus)
-        self.PsGmax = self.profiles[('sgen','p_mw')].max() * 1.5 # ASSUMPTION: the max power generation from static generator is 1.5 times the max value in the profile
-        self.PsGmin = np.zeros(self.NsG) # ASSUMPTION: the min power generation from static generator is 0 MW
-        self.QsGmax = np.full((self.NsG, ), 10) # ASSUMPTION: the max reactive power generation from static generator is 10 MVar
-        self.QsGmin = -self.QsGmax # ASSUMPTION: the reactive power generation range is zero-centered
+        self.PGmax = self.profiles[('sgen','p_mw')].max() * 1.5 # ASSUMPTION: the max power generation from static generator is 1.5 times the max value in the profile
+        self.PGmin = np.zeros(self.NG) # ASSUMPTION: the min power generation from static generator is 0 MW
+        self.QGmax = np.full((self.NG, ), 10) # ASSUMPTION: the max reactive power generation from static generator is 10 MVar
+        self.QGmin = -self.QGmax # ASSUMPTION: the reactive power generation range is zero-centered
         # assign the load limits (PQ bus)
         self.PLmax = self.profiles[('load', 'p_mw')].max() * 10 # ASSUMPTION: the max active power consumption is 10 times the max value in the profile
         self.PLmin = np.zeros(self.NL) # ASSUMPTION: the min active power consumption is 0 MW

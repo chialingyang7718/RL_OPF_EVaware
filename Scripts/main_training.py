@@ -41,7 +41,8 @@ if __name__ == '__main__':
     grid = load_test_case_grid(n_case)
 
     # Parameters
-    env_id = 'PowerGrid-v0'
+    # env_id = 'PowerGrid-v0'
+    env_id = 'PowerGrid-v1'
     num_envs = 6
     EV_aware = True
     Training = True
@@ -56,7 +57,7 @@ if __name__ == '__main__':
 
 
     # create the log path
-    log_path = os.path.join('Training', 'Logs','10x')
+    log_path = os.path.join('Training', 'Logs','Env_v1')
 
     # custom MLP policy: network depends on the observation space, indirectly, the number of buses
     # first, we need to find the nearest power of 2 to the number of buses
@@ -119,7 +120,7 @@ if __name__ == '__main__':
     # model.learn(total_timesteps= 96, callback=[soc_callback], progress_bar=True)
 
     # save the model
-    model.save("Training/Model/Case%s_EV_3innerLayer" % n_case)
+    model.save("Training/Model/Env_v1/Case%s_EV_3innerLayer" % n_case)
 
  
 
