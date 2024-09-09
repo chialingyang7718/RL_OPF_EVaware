@@ -144,7 +144,7 @@ def visualization(df):
 
 if __name__ == "__main__":
     # Load the trained model
-    model = PPO.load("Training/Model/Case14_EV_1000-0.1")
+    model = PPO.load("Training/Model/Case14_EV_3innerLayer")
 
     # Evaluate the model
     n_steps = 24

@@ -116,11 +116,11 @@ if __name__ == '__main__':
 
     # train the agent
     if EV_aware:
-        model.learn(total_timesteps= 500000, callback=[soc_callback], progress_bar=True)
+        model.learn(total_timesteps= 1000000, callback=[soc_callback], progress_bar=True)
     # model.learn(total_timesteps= 96, callback=[soc_callback], progress_bar=True)
 
     # save the model
-    model.save("Training/Model/Env_v1/Case%s_EV_3innerLayer" % n_case)
+    # model.save("Training/Model/Env_v1/Case%s_EV_3innerLayer" % n_case)
 
  
 
