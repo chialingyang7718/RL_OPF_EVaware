@@ -57,7 +57,7 @@ if __name__ == '__main__':
 
 
     # create the log path
-    log_path = os.path.join('Training', 'Logs','Env_v1')
+    log_path = os.path.join('Training', 'Logs','EnvV1')
 
     # custom MLP policy: network depends on the observation space, indirectly, the number of buses
     # first, we need to find the nearest power of 2 to the number of buses
@@ -120,7 +120,7 @@ if __name__ == '__main__':
     # model.learn(total_timesteps= 96, callback=[soc_callback], progress_bar=True)
 
     # save the model
-    model.save("Training/Model/Env_v1/Case%s_EV_3innerLayer_EnvV1" % n_case)
+    model.save("Training/Model/Env_v1/Case%s_3innerLayer_EnvV1" % n_case)
 
  
 
