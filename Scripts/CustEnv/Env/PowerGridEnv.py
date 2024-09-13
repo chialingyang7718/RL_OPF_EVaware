@@ -166,8 +166,8 @@ class PowerGrid(Env):
         
         # check if the episode is terminated in the case of reaching the end of the episode
         terminated = self.episode_length == 0
-        if self.training == True:
-            terminated = reward <= 0
+        # if self.training == True:
+        #     terminated = reward <= 0
 
         # update the next state if the episode is not terminated
         if terminated == False:
@@ -547,7 +547,7 @@ class PowerGrid(Env):
         if overload_lines.size != 0:
             self.violation = True
             for overload_line in overload_lines:
-                penalty_line += (self.linemax - self.net.res_line.loc[overload_line, "loading_percent"]) * 1000
+                penalty_line += (self.linemax - self.net.res_line.loc[overload_line, "loading_percent"]) * 10
 
         # EV SOC violation
         if self.EVaware:
@@ -576,9 +576,9 @@ class PowerGrid(Env):
             for i in self.net.sgen.index:
                 gen_cost += self.net.res_sgen.p_mw[i]**2 * self.net.poly_cost.iat[i,4] + self.net.res_sgen.p_mw[i] * self.net.poly_cost.iat[i,3] + self.net.poly_cost.iat[i,2] \
                             + self.net.poly_cost.iat[i,5] + self.net.poly_cost.iat[i,6] * self.net.res_sgen.q_mvar[i] + self.net.poly_cost.iat[i,7] * self.net.res_sgen.q_mvar[i]**2
-            for i in self.net.ext_grid.index:
-                gen_cost += self.net.res_ext_grid.p_mw[i]**2 * self.net.poly_cost.iat[i,4] + self.net.res_ext_grid.p_mw[i] * self.net.poly_cost.iat[i,3] + self.net.poly_cost.iat[i,2] \
-                            + self.net.poly_cost.iat[i,5] + self.net.poly_cost.iat[i,6] * self.net.res_ext_grid.q_mvar[i] + self.net.poly_cost.iat[i,7] * self.net.res_ext_grid.q_mvar[i]**2
+            # for i in self.net.ext_grid.index:
+            #     gen_cost += self.net.res_ext_grid.p_mw[i]**2 * self.net.poly_cost.iat[i,4] + self.net.res_ext_grid.p_mw[i] * self.net.poly_cost.iat[i,3] + self.net.poly_cost.iat[i,2] \
+            #                 + self.net.poly_cost.iat[i,5] + self.net.poly_cost.iat[i,6] * self.net.res_ext_grid.q_mvar[i] + self.net.poly_cost.iat[i,7] * self.net.res_ext_grid.q_mvar[i]**2
         #if the cost function is piecewise linear        
         elif self.net.pwl_cost.index.size > 0:
             points_list = self.net.pwl_cost.at[i, 'points']
@@ -587,14 +587,14 @@ class PowerGrid(Env):
                     p0, p1, c01 = points
                     if p0 <= self.net.res_sgen.p_mw[i] < p1:
                         gen_cost += c01 * self.net.res_sgen.p_mw[i]
-            for i in self.net.ext_grid.index:
-                for points in points_list:
-                    p0, p1, c01 = points
-                    if p0 <= self.net.res_ext_grid.p_mw[i] < p1:
-                        gen_cost += c01 * self.net.res_ext_grid.p_mw[i]
+            # for i in self.net.ext_grid.index:
+            #     for points in points_list:
+            #         p0, p1, c01 = points
+            #         if p0 <= self.net.res_ext_grid.p_mw[i] < p1:
+            #             gen_cost += c01 * self.net.res_ext_grid.p_mw[i]
         #if the cost function is missing 
         else:
-            total_gen = self.net.res_sgen['p_mw'].sum() + self.net.res_ext_grid['p_mw'].sum()
+            total_gen = self.net.res_sgen['p_mw'].sum() #+ self.net.res_ext_grid['p_mw'].sum()
             gen_cost =  0.1 * total_gen**2 + 40 * total_gen
             # print("No cost function found for generators. Assume the cost function is 0.1 * p_tot**2 + 40 * p_tot.")
         return gen_cost

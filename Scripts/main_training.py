@@ -72,7 +72,8 @@ if __name__ == '__main__':
     
     # the policy network architecture
     policy_kwargs = dict(
-        activation_fn=th.nn.Tanh, net_arch=dict(pi=[NN_size, NN_size, NN_size], vf=[NN_size, NN_size, NN_size])
+        # activation_fn=th.nn.Tanh, net_arch=dict(pi=[NN_size, NN_size, NN_size], vf=[NN_size, NN_size, NN_size])
+        activation_fn=th.nn.Tanh, net_arch=dict(pi=[NN_size, NN_size], vf=[NN_size, NN_size])
     )
     
     def create_unique_soc_log_path(base_log_dir):
@@ -116,11 +117,11 @@ if __name__ == '__main__':
 
     # train the agent
     if EV_aware:
-        model.learn(total_timesteps= 1000000, callback=[soc_callback], progress_bar=True)
+        model.learn(total_timesteps= 500000, callback=[soc_callback], progress_bar=True)
     # model.learn(total_timesteps= 96, callback=[soc_callback], progress_bar=True)
 
     # save the model
-    model.save("Training/Model/Env_v1/Case%s_3innerLayer_EnvV1" % n_case)
+    model.save("Training/Model/Env_v1/Case%s_2innerLayer_EnvV1" % n_case)
 
  
 
@@ -134,9 +135,12 @@ if __name__ == '__main__':
 # DONE: omit ext grid -- cannot omit it otherwise no reference bus is available
 # DONE: integrate EV charging: address negative power in storage -- need to add penalty for negative SOC
 # DONE: generate instances (loads and max. power generations) of the enironment - randomly generate the loads and max. power generations
+# DONE: exclude slack bus from generation cost since the slack bus may represent a large external grid or network that is assumed to have sufficient capacity without a direct cost tied to its power output
+# DONE: seperate the vlimit of generator and other buses
 # TODO: choose a proper std. for loads and max. power generations -5% for load
 # TODO: manually defined limits need to be adapted to the grid size e.g. q_g_mvar
 # TODO: output the report of divergence to the log fileS
 # TODO: choose a comparable benchmark: interior point method, etc.
 # TODO: implement for other test cases -- overloading issue by case39
 # TODO: implement safe reinforcement learning
+
