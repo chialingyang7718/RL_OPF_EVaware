@@ -134,6 +134,7 @@ class PowerGrid(Env):
             # calculate the reward in the case of the power flow converges
             reward = self.calculate_reward(time_step)
 
+
             # # check if terminated in the case of no violation
             # if self.violation == False:
 
@@ -177,7 +178,7 @@ class PowerGrid(Env):
         # update the next state if the episode is not terminated
         if terminated == False:
                 # add some noice to load and renewable generation
-                self.add_noice_load_gen_state()        
+                self.add_noice_load_renew_state()        
                 
                 # update EV state for the next time step
                 if self.EVaware == True:
@@ -200,7 +201,7 @@ class PowerGrid(Env):
         time_step = 0
 
         # assign initial states for load and generation states by adding noice
-        self.add_noice_load_gen_state()
+        self.add_noice_load_renew_state()
 
 
 
@@ -319,7 +320,7 @@ class PowerGrid(Env):
             self.PEVmax[i] = min(0.001 * 150 * self.net.storage.loc[i, "n_car"], charging_max[i]) 
             self.PEVmin[i] = -min(0.001 * 150 * self.net.storage.loc[i, "n_car"], discharge_max[i])
     
-    def add_noice_load_gen_state(self):
+    def add_noice_load_renew_state(self):
     # add some noice to PL and QL
         for i in self.net.load.index:
             while True:
@@ -578,7 +579,7 @@ class PowerGrid(Env):
             costfunction_extgrid = self.net.poly_cost[self.net.poly_cost["et"] == "ext_grid"]
             for i in self.net.gen.index:
                 gen_cost += self.net.res_gen.p_mw[i]**2 * costfunction_generator.iat[i,4] + self.net.res_gen.p_mw[i] * costfunction_generator.iat[i,3] + costfunction_generator.iat[i,2] \
-                            + costfunction_generator[i,5] + costfunction_generator.iat[i,6] * self.net.res_gen.q_mvar[i] + costfunction_generator.iat[i,7] * self.net.res_gen.q_mvar[i]**2
+                            + costfunction_generator.iat[i,5] + costfunction_generator.iat[i,6] * self.net.res_gen.q_mvar[i] + costfunction_generator.iat[i,7] * self.net.res_gen.q_mvar[i]**2
             for i in self.net.ext_grid.index:
                 gen_cost += self.net.res_ext_grid.p_mw[i]**2 * costfunction_extgrid.iat[i,4] + self.net.res_ext_grid.p_mw[i] * costfunction_extgrid.iat[i,3] + costfunction_extgrid.iat[i,2] \
                             + costfunction_extgrid.iat[i,5] + costfunction_extgrid.iat[i,6] * self.net.res_ext_grid.q_mvar[i] + costfunction_extgrid.iat[i,7] * self.net.res_ext_grid.q_mvar[i]**2
