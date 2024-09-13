@@ -291,8 +291,8 @@ class PowerGrid(Env):
         
         # assign the voltage and line loading limits (valid for all buses other than generators)
         self.linemax = 100  # ASSUMPTION: the max line loading is 100%
-        self.Vmax = 1.02 # ASSUMPTION: the max voltage is 1.02 pu
-        self.Vmin = 0.98 # ASSUMPTION: the min voltage is 0.98 pu
+        self.Vmax = 1.06 # ASSUMPTION: the max voltage is 1.06 pu
+        self.Vmin = 0.94 # ASSUMPTION: the min voltage is 0.94 pu
 
         # assign the EV limits
         if self.EVaware == True:
