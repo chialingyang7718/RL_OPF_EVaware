@@ -574,12 +574,14 @@ class PowerGrid(Env):
         gen_cost = 0
         #if the cost function is polynomial
         if self.net.poly_cost.index.size > 0:
+            costfunction_generator = self.net.poly_cost[self.net.poly_cost["et"] == "gen"]
+            costfunction_extgrid = self.net.poly_cost[self.net.poly_cost["et"] == "ext_grid"]
             for i in self.net.gen.index:
-                gen_cost += self.net.res_gen.p_mw[i]**2 * self.net.poly_cost.iat[i,4] + self.net.res_gen.p_mw[i] * self.net.poly_cost.iat[i,3] + self.net.poly_cost.iat[i,2] \
-                            + self.net.poly_cost.iat[i,5] + self.net.poly_cost.iat[i,6] * self.net.res_gen.q_mvar[i] + self.net.poly_cost.iat[i,7] * self.net.res_gen.q_mvar[i]**2
-            # for i in self.net.ext_grid.index:
-            #     gen_cost += self.net.res_ext_grid.p_mw[i]**2 * self.net.poly_cost.iat[i,4] + self.net.res_ext_grid.p_mw[i] * self.net.poly_cost.iat[i,3] + self.net.poly_cost.iat[i,2] \
-            #                 + self.net.poly_cost.iat[i,5] + self.net.poly_cost.iat[i,6] * self.net.res_ext_grid.q_mvar[i] + self.net.poly_cost.iat[i,7] * self.net.res_ext_grid.q_mvar[i]**2
+                gen_cost += self.net.res_gen.p_mw[i]**2 * costfunction_generator.iat[i,4] + self.net.res_gen.p_mw[i] * costfunction_generator.iat[i,3] + costfunction_generator.iat[i,2] \
+                            + costfunction_generator[i,5] + costfunction_generator.iat[i,6] * self.net.res_gen.q_mvar[i] + costfunction_generator.iat[i,7] * self.net.res_gen.q_mvar[i]**2
+            for i in self.net.ext_grid.index:
+                gen_cost += self.net.res_ext_grid.p_mw[i]**2 * costfunction_extgrid.iat[i,4] + self.net.res_ext_grid.p_mw[i] * costfunction_extgrid.iat[i,3] + costfunction_extgrid.iat[i,2] \
+                            + costfunction_extgrid.iat[i,5] + costfunction_extgrid.iat[i,6] * self.net.res_ext_grid.q_mvar[i] + costfunction_extgrid.iat[i,7] * self.net.res_ext_grid.q_mvar[i]**2
         #if the cost function is piecewise linear        
         elif self.net.pwl_cost.index.size > 0:
             points_list = self.net.pwl_cost.at[i, 'points']
@@ -595,7 +597,7 @@ class PowerGrid(Env):
             #             gen_cost += c01 * self.net.res_ext_grid.p_mw[i]
         #if the cost function is missing 
         else:
-            total_gen = self.net.res_gen['p_mw'].sum() # + self.net.res_ext_grid['p_mw'].sum()
+            total_gen = self.net.res_gen['p_mw'].sum() + self.net.res_ext_grid['p_mw'].sum()
             gen_cost =  0.1 * total_gen**2 + 40 * total_gen
             # print("No cost function found for generators. Assume the cost function is 0.1 * p_tot**2 + 40 * p_tot.")
         return gen_cost

@@ -1,12 +1,19 @@
 import gurobipy as gp
 from gurobipy import GRB
 import math
+# from Matpower.powerNetwork import Input
+import grid_loader as gl
 
-# Define sets (example data)
-generators = ['g1', 'g2', 'g3']   # G
-time_periods = range(1, 25)       # T
-buses = ['b1', 'b2', 'b3', 'b4']  # B
-lines = [('b1', 'b2'), ('b2', 'b3'), ('b3', 'b4')]  # L
+
+# Define sets and cost function based on test case
+net = gl.load_test_case_grid(14)
+generators = net.gen
+buses = net.bus
+lines = net.line
+costs = net.polycost
+# buses, lines, generators, costs = Input("case14.m")
+
+time_periods = range(1, 25) # T
 neighbors = {
     'b1': ['b2'],
     'b2': ['b1', 'b3'],
