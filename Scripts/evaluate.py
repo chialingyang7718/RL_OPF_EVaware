@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import os
 import seaborn as sns
+import time
 
 
 def evaluate_PPO_model(n_steps=24, n_case=14, model=None):
@@ -32,10 +33,24 @@ def evaluate_PPO_model(n_steps=24, n_case=14, model=None):
 
     # Evaluate the model
     obs, info = eval_env.reset()
+
+    # Record EV battery capacity
+    df_EV_spec = info["EV_spec"]
+
+    # Initialize time list for RL model prediction
+    RLtime = []
+
     for step in range(n_steps):
+        # set start time for RL model prediction
+        start = time.process_time()
+
+        # Predict the action
         action, _state = model.predict(obs, deterministic=False)
         obs, reward, terminated, truncated, info = eval_env.step(action)
         
+        # Record the time taken for RL model prediction
+        RLtime.append(time.process_time() - start)
+
         # Log the metrics
         # rewards
         rewards.append(round(reward, 3))
@@ -68,10 +83,24 @@ def evaluate_PPO_model(n_steps=24, n_case=14, model=None):
             # Voltage
             df_voltage = pd.DataFrame(info["bus_voltage"]).transpose()
 
-
             # Line loading
             df_line_loading = pd.DataFrame(info["line_loading"]).transpose()
 
+            # Bus Violation
+            if info["bus_violation"]:
+                df_bus_violation = pd.DataFrame(info["bus_violation"]).transpose()
+            else:
+                df_bus_violation = pd.DataFrame([])
+
+            # Line Violation
+            if info["line_violation"]:
+                df_line_violation = pd.DataFrame(info["line_violation"]).transpose()
+            else:
+                df_line_violation = pd.DataFrame([])
+
+            # Generation Cost
+            generation_cost = [info["generation_cost"]]
+                
         else:
             ## State
             # Load
@@ -100,10 +129,24 @@ def evaluate_PPO_model(n_steps=24, n_case=14, model=None):
             # Voltage
             df_voltage = pd.concat([df_voltage, pd.DataFrame(info["bus_voltage"]).transpose()])
 
-
             # Line loading
             df_line_loading = pd.concat([df_line_loading, pd.DataFrame(info["line_loading"]).transpose()])
-        
+
+            # Bus Violation
+            if info["bus_violation"]:
+                df_bus_violation = pd.concat([df_bus_violation, pd.DataFrame(info["bus_violation"]).transpose()])
+            else:
+                df_bus_violation = pd.concat([df_bus_violation, pd.DataFrame([])])
+            
+            # Line Violation
+            if info["line_violation"]:
+                df_line_violation = pd.concat([df_line_violation, pd.DataFrame(info["line_violation"]).transpose()])
+            else:
+                df_line_violation = pd.concat([df_line_violation, pd.DataFrame([])])
+
+            # Generation Cost
+            generation_cost.append(info["generation_cost"])
+
 
         if terminated or truncated:
             print(f"Episode finished after {step + 1} steps")
@@ -120,13 +163,16 @@ def evaluate_PPO_model(n_steps=24, n_case=14, model=None):
             df_ev_action.reset_index(drop=True, inplace=True)
             df_voltage.reset_index(drop=True, inplace=True)
             df_line_loading.reset_index(drop=True, inplace=True)
-
+            df_bus_violation.reset_index(drop=True, inplace=True)
+            df_line_violation.reset_index(drop=True, inplace=True)
+            df_generation_cost = pd.DataFrame(generation_cost)
 
             # Create the directory if it does not exist
             if not os.path.exists("Evaluation/Case14_EV"):
                 os.makedirs("Evaluation/Case14_EV")
 
             # Save the dataframes to a csv file
+            df_EV_spec.to_csv("Evaluation/Case14_EV/EV_spec.csv", index=False)
             df_load_p.to_csv("Evaluation/Case14_EV/load_p.csv", index=False)
             df_load_q.to_csv("Evaluation/Case14_EV/load_q.csv", index=False)
             df_renewable.to_csv("Evaluation/Case14_EV/renewable.csv", index=False)
@@ -138,12 +184,18 @@ def evaluate_PPO_model(n_steps=24, n_case=14, model=None):
             df_ev_action.to_csv("Evaluation/Case14_EV/ev_action.csv", index=False)
             df_voltage.to_csv("Evaluation/Case14_EV/voltage.csv", index=False)
             df_line_loading.to_csv("Evaluation/Case14_EV/line_loading.csv", index=False)
+            df_bus_violation.to_csv("Evaluation/Case14_EV/bus_violation.csv", index=False)
+            df_line_violation.to_csv("Evaluation/Case14_EV/line_violation.csv", index=False)
+            df_generation_cost.to_csv("Evaluation/Case14_EV/generation_cost.csv", index=False)
 
             # Reset the environment for a new episode
             obs, info = eval_env.reset()
     eval_env.close()
     # return rewards, df_load_p, df_load_q, df_renewable, df_ev_demand, df_ev_soc, df_gen_p, df_gen_q, df_ev_action, df_voltage, df_line_loading
-    return rewards, df_load_p, df_load_q, df_renewable, df_ev_demand, df_ev_soc, df_gen_p, df_gen_v, df_ev_action, df_voltage, df_line_loading
+    # return rewards, df_load_p, df_load_q, df_renewable, df_ev_demand,\
+    #         df_ev_soc, df_gen_p, df_gen_v, df_ev_action, df_voltage, \
+    #         df_line_loading, df_bus_violation, df_line_violation, df_generation_cost, RLtime
+    return rewards, df_generation_cost, RLtime
 
 def visualization(df):
     sns.lineplot(data=df)
@@ -151,14 +203,18 @@ def visualization(df):
 
 if __name__ == "__main__":
     # Load the trained model
-    model = PPO.load("Training/Model/Case14_3innerLayer_EnvV1")
+    model = PPO.load("Training/Model/Case14_2innerLayer_EnvV1_converge")
 
     # Evaluate the model
     n_steps = 24
     # rewards,  df_load_p, df_load_q, df_renewable, df_ev_demand, df_ev_soc, df_gen_p, df_gen_q, df_ev_action, df_voltage, df_line_loading = evaluate_PPO_model(n_steps=n_steps, n_case=14, model=model)
-    rewards,  df_load_p, df_load_q, df_renewable, df_ev_demand, df_ev_soc, df_gen_p, df_gen_v, df_ev_action, df_voltage, df_line_loading = evaluate_PPO_model(n_steps=n_steps, n_case=14, model=model)
+    # rewards,  df_load_p, df_load_q, df_renewable, df_ev_demand,\
+    # df_ev_soc, df_gen_p, df_gen_v, df_ev_action, df_voltage,\
+    # df_line_loading, df_bus_vioation, df_line_violation, df_generation_cost, RLtime =\
+    rewards, df_generation_cost, RLtime = evaluate_PPO_model(n_steps=n_steps, n_case=14, model=model)
     
     print(f"Mean Reward: {sum(rewards)/n_steps}")
+    print(f"Total Time: {sum(RLtime)}")
 
     # Plot rewards over time
     plt.plot(rewards, '-o')

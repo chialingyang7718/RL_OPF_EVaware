@@ -3,34 +3,44 @@ from gurobipy import GRB
 import math
 # from Matpower.powerNetwork import Input
 import grid_loader as gl
+import pandas as pd
 
 
 # Define sets and cost function based on test case
 net = gl.load_test_case_grid(14)
-generators = net.gen
-buses = net.bus
-lines = net.line
-costs = net.polycost
+generators = net.gen.index
+ext_grid = net.ext_grid.index
+buses = net.bus.index
+lines = net.line.index
 # buses, lines, generators, costs = Input("case14.m")
 
 time_periods = range(1, 25) # T
-neighbors = {
-    'b1': ['b2'],
-    'b2': ['b1', 'b3'],
-    'b3': ['b2', 'b4'],
-    'b4': ['b3']
-}  # δ(i)
+
+neighbors = {}
+for i in buses.index:
+    neighbors[i] = lines[lines["from_bus"] == i]["to_bus"].to_list()  # δ(i)
 
 # Define parameters (example data)
-P_min = {'g1': 10, 'g2': 20, 'g3': 15}
-P_max = {'g1': 100, 'g2': 150, 'g3': 120}
-Q_min = {'g1': 5, 'g2': 10, 'g3': 7}
-Q_max = {'g1': 50, 'g2': 60, 'g3': 55}
-V_min = 0.95
-V_max = 1.05
-theta_max = math.radians(30)
-S_max = {('b1', 'b2'): 100, ('b2', 'b3'): 90, ('b3', 'b4'): 85}
-C = {'b1': 1.0, 'b2': 1.0, 'b3': 1.0, 'b4': 1.0}
+# TODO: fetch P_D, Q_D, P_renew from data
+PG_min = net.gen.loc[:, "min_p_mw"].to_dict()
+PG_max = net.gen.loc[:, "max_p_mw"].to_dict()
+Pex_min = net.ext_grid.loc[:, "min_p_mw"].to_dict()
+Pex_max = net.ext_grid.loc[:, "max_p_mw"].to_dict()
+Qex_min = net.ext_grid.loc[:, "min_q_mvar"].to_dict()
+Qex_max = net.ext_grid.loc[:, "max_q_mvar"].to_dict()
+QG_min = net.gen.loc[:, "min_q_mvar"].to_dict()
+QG_max = net.gen.loc[:, "max_q_mvar"].to_dict()
+V_min = 0.94
+V_max = 1.06
+
+theta_max = math.radians(30) # maximum phase angle difference
+
+S_max =(net.line.loc[:, "max_i_ka"]*net.line.loc[:, "df"]*net.line.loc[:, "parallel"]).to_dict() # maximum current flow to represent maximum apparent power flow
+
+df_EV_spec = pd.read_csv("Evaluation/Case14_EV/EV_spec.csv")
+C = (df_EV_spec.loc[:, "max_e_mwh"]/df_EV_spec.loc[:, "n_car"]).to_dict() # Battery capacity
+
+# TODO: fetch eta from data
 eta_d = 0.95  # Discharge efficiency
 eta_c = 0.95  # Charge efficiency
 
@@ -38,12 +48,16 @@ eta_c = 0.95  # Charge efficiency
 model = gp.Model("Multi-Period OPF")
 
 # Variables for generation (P_G for active power, Q_G for reactive power)
-P_G = model.addVars(generators, time_periods, lb=P_min, ub=P_max, name="P_G")
-Q_G = model.addVars(generators, time_periods, lb=Q_min, ub=Q_max, name="Q_G")
+P_G = model.addVars(generators, time_periods, lb=PG_min, ub=PG_max, name="P_G")
+Q_G = model.addVars(generators, time_periods, lb=QG_min, ub=QG_max, name="Q_G")
 
-# Voltage magnitude (V) and phase angle (theta)
+# Variables for external grid (P_ex for active power, Q_ex for reactive power)
+P_ex = model.addVars(ext_grid, time_periods, lb=Pex_min, ub=Pex_max, name="P_ex")
+Q_ex = model.addVars(ext_grid, time_periods, lb=Qex_min, ub=Qex_max, name="Q_ex")
+
+# Voltage magnitude (V) and phase angle difference (theta)
 V = model.addVars(buses, time_periods, lb=V_min, ub=V_max, name="V")
-theta = model.addVars(lines, time_periods, lb=-theta_max, ub=theta_max, name="theta")
+theta = model.addVars(lines, time_periods, lb=0, ub=theta_max, name="theta")
 
 # Power flow variables (P_ij for active power, Q_ij for reactive power)
 P_ij = model.addVars(lines, time_periods, name="P_ij")
@@ -57,13 +71,14 @@ P_c = model.addVars(buses, time_periods, ub=100, name="Charging")
 P_d = model.addVars(buses, time_periods, ub=100, name="Discharging")
 
 # Objective function
-# Example quadratic cost function
-a = {'g1': 10, 'g2': 12, 'g3': 15}
-b = {'g1': 0.1, 'g2': 0.2, 'g3': 0.15}
+costfunction_generator = net.poly_cost[net.poly_cost["et"] == "gen"]
+costfunction_extgrid = net.poly_cost[net.poly_cost["et"] == "ext_grid"]
 
 # Define objective (minimize generation cost)
-obj = gp.quicksum(a[i] * P_G[i, t] + b[i] * P_G[i, t] * P_G[i, t] 
-                  for i in generators for t in time_periods)
+obj = gp.quicksum(costfunction_generator.iat[i,4] * P_G[i, t]**2 + costfunction_generator.iat[i,3] * P_G[i, t] \
+                  + costfunction_generator.iat[i,2] for i in generators for t in time_periods) + \
+    gp.quicksum(costfunction_extgrid.iat[i,4] * P_ex[i, t]**2 + costfunction_extgrid.iat[i,3] * P_ex[i, t] \
+                + costfunction_extgrid.iat[i,2] for i in ext_grid for t in time_periods)
 
 model.setObjective(obj, GRB.MINIMIZE)
 # Active power balance

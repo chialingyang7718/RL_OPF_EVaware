@@ -209,8 +209,8 @@ class PowerGrid(Env):
 
 
 
-        # # update load states in the info
-        info = {}
+        # update EV spec in the info
+        info = {"EV_spec": self.net.storage}
         # info = {
         #     "load_p": self.net.load.loc[:, ['p_mw']],
         #     "load_q": self.net.load.loc[:, ['q_mvar']],
@@ -460,7 +460,9 @@ class PowerGrid(Env):
         for i in grid.load.index:
             bus = grid.load.loc[i, "bus"]
             n_car = int(grid.load.loc[i, "p_mw"]) # number of EVs connected to the bus is assumed to be integer of nominal power of the loads
-            pp.create_storage(grid, bus=bus, p_mw=0, max_e_mwh= self.df_EV_spec.loc[0, str(i)] * n_car / 1000, soc_percent=0.5, min_e_mwh=0, evid = i, n_car = n_car)
+            pp.create_storage(grid, bus=bus, p_mw=0, 
+                              max_e_mwh= self.df_EV_spec.loc[0, str(i)] * n_car / 1000, 
+                              soc_percent=0.5, min_e_mwh=0, evid = i, n_car = n_car)
 
     def select_randomly_day_EV_profile(self):
         # randomly select the EV profile from the df_EV

@@ -137,7 +137,8 @@ if __name__ == '__main__':
 # DONE: generate instances (loads and max. power generations) of the enironment - randomly generate the loads and max. power generations
 # DONE: exclude slack bus from generation cost since the slack bus may represent a large external grid or network that is assumed to have sufficient capacity without a direct cost tied to its power output
 # DONE: seperate the vlimit of generator and other buses
-# TODO: choose a proper std. for loads and max. power generations -5% for load
+
+# TODO: add phase angle difference limit into reward function
 # TODO: manually defined limits need to be adapted to the grid size e.g. q_g_mvar
 # TODO: output the report of divergence to the log fileS
 # TODO: choose a comparable benchmark: interior point method, etc.
