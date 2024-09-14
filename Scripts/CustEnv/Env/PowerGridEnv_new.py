@@ -132,7 +132,7 @@ class PowerGrid(Env):
             reward = -5000
         else:
             # calculate the reward in the case of the power flow converges
-            reward = self.calculate_reward(time_step)
+            reward, violated_bus, overload_lines = self.calculate_reward(time_step)
 
 
             # # check if terminated in the case of no violation
@@ -146,7 +146,8 @@ class PowerGrid(Env):
         
         # save the reward for the current step
         # self.pre_reward = reward
-        
+        gen_cost = self.calculate_gen_cost()
+
         # update the info 
         info = {
             "load_p": self.net.load.loc[:, ['p_mw']],
@@ -156,7 +157,10 @@ class PowerGrid(Env):
             "generation_q": self.net.res_gen.loc[:, ['q_mvar']],
             "generation_v": self.net.res_gen.loc[:, ['vm_pu']],
             "bus_voltage": self.net.res_bus.loc[:, ['vm_pu']],
-            "line_loading": self.net.res_line.loc[:, ['loading_percent']]
+            "line_loading": self.net.res_line.loc[:, ['loading_percent']],
+            "bus_violation": violated_bus.tolist(),
+            "line_violation": overload_lines.tolist(),
+            "generation_cost": gen_cost
         }
 
         if self.EVaware == True:
@@ -568,7 +572,7 @@ class PowerGrid(Env):
         else:
             reward = 1000 - 0.1 * self.calculate_gen_cost() 
         
-        return reward
+        return reward, violated_buses, overload_lines
 
     # calculate the generation cost
     def calculate_gen_cost(self):
