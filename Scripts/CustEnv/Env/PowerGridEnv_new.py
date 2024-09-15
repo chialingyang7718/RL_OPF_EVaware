@@ -565,7 +565,7 @@ class PowerGrid(Env):
         for i in self.net.res_line.index:
             if self.net.res_line["angle_diff"][i] > self.theata_max:
                 self.violation = True
-                penalty_phase_angle += (self.theta_max-self.net.res_line.loc[i, "angle_diff"]) * 100
+                penalty_phase_angle += (self.theta_max-self.net.res_line.loc[i, "angle_diff"]) * 10
 
         # EV SOC violation
         if self.EVaware:
