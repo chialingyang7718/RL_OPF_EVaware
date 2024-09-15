@@ -97,6 +97,12 @@ def evaluate_PPO_model(n_steps=24, n_case=14, model=None):
                 df_line_violation = pd.DataFrame(info["line_violation"]).transpose()
             else:
                 df_line_violation = pd.DataFrame([])
+            
+            # Phase Angle Violation
+            if info["phase_angle_violation"]:
+                df_phase_angle_violation = pd.DataFrame(info["phase_angle_violation"]).transpose()
+            else:
+                df_phase_angle_violation = pd.DataFrame([])
 
             # Generation Cost
             generation_cost = [info["generation_cost"]]
@@ -143,6 +149,12 @@ def evaluate_PPO_model(n_steps=24, n_case=14, model=None):
                 df_line_violation = pd.concat([df_line_violation, pd.DataFrame(info["line_violation"]).transpose()])
             else:
                 df_line_violation = pd.concat([df_line_violation, pd.DataFrame([])])
+            
+            # Phase Angle Violation
+            if info["phase_angle_violation"]:
+                df_phase_angle_violation = pd.concat([df_phase_angle_violation, pd.DataFrame(info["phase_angle_violation"]).transpose()])
+            else:
+                df_phase_angle_violation = pd.concat([df_phase_angle_violation, pd.DataFrame([])])
 
             # Generation Cost
             generation_cost.append(info["generation_cost"])
@@ -165,6 +177,7 @@ def evaluate_PPO_model(n_steps=24, n_case=14, model=None):
             df_line_loading.reset_index(drop=True, inplace=True)
             df_bus_violation.reset_index(drop=True, inplace=True)
             df_line_violation.reset_index(drop=True, inplace=True)
+            df_phase_angle_violation.reset_index(drop=True, inplace=True)
             df_generation_cost = pd.DataFrame(generation_cost)
 
             # Create the directory if it does not exist
@@ -186,6 +199,7 @@ def evaluate_PPO_model(n_steps=24, n_case=14, model=None):
             df_line_loading.to_csv("Evaluation/Case14_EV/line_loading.csv", index=False)
             df_bus_violation.to_csv("Evaluation/Case14_EV/bus_violation.csv", index=False)
             df_line_violation.to_csv("Evaluation/Case14_EV/line_violation.csv", index=False)
+            df_phase_angle_violation.to_csv("Evaluation/Case14_EV/phase_angle_violation.csv", index=False)
             df_generation_cost.to_csv("Evaluation/Case14_EV/generation_cost.csv", index=False)
 
             # Reset the environment for a new episode
@@ -203,7 +217,7 @@ def visualization(df):
 
 if __name__ == "__main__":
     # Load the trained model
-    model = PPO.load("Training/Model/Case14_2innerLayer_EnvV1_converge")
+    model = PPO.load("Training/Model/Case14_3innerLayer_angle")
 
     # Evaluate the model
     n_steps = 24

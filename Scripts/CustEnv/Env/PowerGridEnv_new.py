@@ -132,7 +132,7 @@ class PowerGrid(Env):
             reward = -5000
         else:
             # calculate the reward in the case of the power flow converges
-            reward, violated_bus, overload_lines = self.calculate_reward(time_step)
+            reward, violated_bus, overload_lines, violated_phase = self.calculate_reward(time_step)
 
 
             # # check if terminated in the case of no violation
@@ -160,6 +160,7 @@ class PowerGrid(Env):
             "line_loading": self.net.res_line.loc[:, ['loading_percent']],
             "bus_violation": violated_bus.tolist(),
             "line_violation": overload_lines.tolist(),
+            "phase_angle_violation": violated_phase,
             "generation_cost": gen_cost
         }
 
@@ -540,6 +541,7 @@ class PowerGrid(Env):
         # check the violation in the grid and assign penalty
         violated_buses = tb.violated_buses(self.net, self.Vmin, self.Vmax) 
         overload_lines = tb.overloaded_lines(self.net, self.linemax) 
+        violated_phase = []
         penalty_voltage = 0
         penalty_line = 0
         penalty_phase_angle = 0
@@ -565,6 +567,7 @@ class PowerGrid(Env):
         for i in self.net.res_line.index:
             if self.net.res_line["angle_diff"][i] > self.theata_max:
                 self.violation = True
+                violated_phase.append(i)
                 penalty_phase_angle += (self.theta_max-self.net.res_line.loc[i, "angle_diff"]) * 10
 
         # EV SOC violation
@@ -584,7 +587,7 @@ class PowerGrid(Env):
         else:
             reward = 1000 - 0.1 * self.calculate_gen_cost() 
         
-        return reward, violated_buses, overload_lines
+        return reward, violated_buses, overload_lines, violated_phase
 
     # calculate the generation cost
     def calculate_gen_cost(self):
