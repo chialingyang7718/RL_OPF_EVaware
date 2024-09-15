@@ -121,7 +121,7 @@ if __name__ == '__main__':
     # model.learn(total_timesteps= 96, callback=[soc_callback], progress_bar=True)
 
     # save the model
-    model.save("Training/Model/Env_v1/Case%s_3innerLayer_EnvV1" % n_case)
+    model.save("Training/Model/Env_v1/Case%s_3innerLayer_angle" % n_case)
 
  
 
@@ -138,7 +138,7 @@ if __name__ == '__main__':
 # DONE: exclude slack bus from generation cost since the slack bus may represent a large external grid or network that is assumed to have sufficient capacity without a direct cost tied to its power output
 # DONE: seperate the vlimit of generator and other buses
 
-# TODO: add phase angle difference limit into reward function
+# DONE: add phase angle difference limit into reward function
 # TODO: manually defined limits need to be adapted to the grid size e.g. q_g_mvar
 # TODO: output the report of divergence to the log fileS
 # TODO: choose a comparable benchmark: interior point method, etc.

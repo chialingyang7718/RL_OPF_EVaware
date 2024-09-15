@@ -298,6 +298,8 @@ class PowerGrid(Env):
         self.linemax = 100  # ASSUMPTION: the max line loading is 100%
         self.Vmax = 1.06 # ASSUMPTION: the max voltage is 1.06 pu
         self.Vmin = 0.94 # ASSUMPTION: the min voltage is 0.94 pu
+        self.theata_max = 30 # ASSUMPTION: the max phase angle difference is 30 degrees
+
 
         # assign the EV limits
         if self.EVaware == True:
@@ -540,6 +542,7 @@ class PowerGrid(Env):
         overload_lines = tb.overloaded_lines(self.net, self.linemax) 
         penalty_voltage = 0
         penalty_line = 0
+        penalty_phase_angle = 0
         self.violation = False 
 
         # bus voltage violation 
@@ -556,6 +559,13 @@ class PowerGrid(Env):
             self.violation = True
             for overload_line in overload_lines:
                 penalty_line += (self.linemax - self.net.res_line.loc[overload_line, "loading_percent"]) * 10
+
+        # phase angle violation
+        self.net.res_line["angle_diff"] = abs(self.net.res_line["va_from_degree"] - self.net.res_line["va_to_degree"])
+        for i in self.net.res_line.index:
+            if self.net.res_line["angle_diff"][i] > self.theata_max:
+                self.violation = True
+                penalty_phase_angle += (self.theta_max-self.net.res_line.loc[i, "angle_diff"]) * 100
 
         # EV SOC violation
         if self.EVaware:
