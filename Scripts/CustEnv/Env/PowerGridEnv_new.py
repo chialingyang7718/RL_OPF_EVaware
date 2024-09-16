@@ -208,15 +208,7 @@ class PowerGrid(Env):
         # assign initial states for load and generation states by adding noice
         self.add_noice_load_renew_state()
 
-
-
-        # update EV spec in the info
-        info = {"EV_spec": self.net.storage}
-        # info = {
-        #     "load_p": self.net.load.loc[:, ['p_mw']],
-        #     "load_q": self.net.load.loc[:, ['q_mvar']],
-        #     "renewable_p": self.PGcap,
-        # }       
+      
 
         # assign initial state for EV SOC
         if self.EVaware == True:
@@ -226,8 +218,9 @@ class PowerGrid(Env):
             # update the EV (dis)charging limit since SOC is changed
             self.update_EV_limit(time_step)
             # update info with EV related info
-            # info["EV_SOC_init"] = self.net.storage.loc[:, "soc_percent"]
-            # info["EV_demand"] = self.EV_power_demand
+            # update EV spec in the info
+            info = {"EV_spec": self.net.storage}
+      
         
         # get observation of the states
         observation = self._get_observation() 
@@ -382,7 +375,8 @@ class PowerGrid(Env):
             # fetch charging efficiency from the EV spec
             df_charging_eff = self.df_EV_spec[self.df_EV_spec["Parameter"] == "Battery_charging_efficiency"].set_index("Parameter")
             charging_efficiency = df_charging_eff[str(i)].values
-            
+            self.net.storage.loc[i, "eta_c"] = charging_efficiency
+
             # update the SOC of the EVs
             if self.net.res_storage.loc[i, "p_mw"] >= 0: # charging with time step 1 hour
                 energy_aftercharging = energy_b4 + self.net.res_storage.loc[i, "p_mw"] * charging_efficiency * 1 - EV_power_demand * 1     
@@ -519,10 +513,11 @@ class PowerGrid(Env):
 
             for i in range(self.N_EV):
                 denormalized_pEV = self.denormalize(action[i+2*self.NG], self.PEVmax[i], self.PEVmin[i], 1, -1)
+                discharge_efficiency = self.df_EV_spec[self.df_EV_spec["Parameter"] == "Battery_discharging_efficiency"][str(i)].values
+                self.net.storage.loc[i, "eta_d"] = discharge_efficiency
                 # set the EV power based on the action
                 if denormalized_pEV < 0:
                     # discharging
-                    discharge_efficiency = self.df_EV_spec[self.df_EV_spec["Parameter"] == "Battery_discharging_efficiency"][str(i)].values
                     self.net.storage.loc[i, 'p_mw'] = discharge_efficiency * denormalized_pEV
                 else:
                     # charging

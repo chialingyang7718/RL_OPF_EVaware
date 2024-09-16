@@ -1,28 +1,27 @@
 # Assumptions: 
 # 1. The admittance of the buses is not considered
 # 2. The power system frequency is assumed to be 50 Hz
-
+# 3. All test cases comes from https://labs.ece.uw.edu/pstca/
 
 import gurobipy as gp
 from gurobipy import GRB
-import math
-from Matpower.powerNetwork import Input
+from Matpower.powerNetwork import Input, get_rateA
 import grid_loader as gl
 import pandas as pd
+import numpy as np
 
 
-# Define sets and cost function based on test case
+
+"""Set"""
+# Define componets of Grid
 net = gl.load_test_case_grid(14)
-generators = net.gen.index
-ext_grid = net.ext_grid.index
+generators = net.gen["bus"].to_list()
+ext_grid = net.ext_grid["bus"].to_list()
 buses = net.bus.index
-loads = net.load.index
+loads = net.load["bus"].to_list()
 lines = []
 for i in net.line.index:
     lines.append((net.line.loc[i, "from_bus"], net.line.loc[i, "to_bus"]))
-
-
-time_periods = range(0, 24) # T
 
 neighbors = {} # δ(i)
 for line in lines:
@@ -31,30 +30,66 @@ for line in lines:
     else:
         neighbors[line[0]].append(line[1])
 
-# Define parameters
-df_load_p = pd.read_csv("Evaluation/Case14_EV/load_p.csv")
-df_load_q = pd.read_csv("Evaluation/Case14_EV/load_q.csv")
-df_renewable = pd.read_csv("Evaluation/Case14_EV/renewable.csv")
+# Define time periods
+time_periods = range(0, 24) # T
+time_periods_plus = range(0, 25) # T+1
 
 
-P_D = df_load_p.to_dict()
-P_D = {int(i): P_D[i] for i in P_D}
+
+"""Parameters"""
+
+# Get line data
+net.line["admittance"] = net.line["parallel"]/net.line["length_km"]/(net.line["r_ohm_per_km"] + 1j*net.line["x_ohm_per_km"])
+net.line["conductance"] = np.real(net.line["admittance"])
+net.line["susceptance"] = np.imag(net.line["admittance"])
+buses_data, lines_data, generators_data, costs_data = Input("Scripts/Matpower/case14.m")
+S_max = get_rateA(lines_data)
+
+
+# Get load data
+df_load_p = pd.read_csv("Evaluation/Case14_EV/load_p.csv").transpose()
+df_load_q = pd.read_csv("Evaluation/Case14_EV/load_q.csv").transpose()
+df_load_p["bus"] = loads
+df_load_q["bus"] = loads
+P_D = {}
+Q_D = {}
 for i in buses:
-    if i not in P_D:
-        P_D[i] = {t: 0 for t in time_periods}
+    if i in loads:
+        P_D[i] = df_load_p[df_load_p["bus"] == 1].drop("bus", axis=1).values[0]
+        Q_D[i] = df_load_q[df_load_q["bus"] == i].drop("bus", axis=1).values[0]
+    else:
+        P_D[i] = np.zeros(len(time_periods))
+        Q_D[i] = np.zeros(len(time_periods))
 
-Q_D = df_load_q.to_dict()
-Q_D = {int(i): Q_D[i] for i in Q_D}
+
+# Get renewable energy data
+df_renewable = pd.read_csv("Evaluation/Case14_EV/renewable.csv").transpose()
+df_renewable["bus"] = generators
+P_renew = {}
 for i in buses:
-    if i not in Q_D:
-        Q_D[i] = {t: 0 for t in time_periods}
+    if i in generators:
+        P_renew[i] = df_renewable[df_renewable["bus"] == i].drop("bus", axis=1).values[0]
+    else:
+        P_renew[i] = np.zeros(len(time_periods))
 
-P_renew = df_renewable.to_dict()
-P_renew = {int(i): P_renew[i] for i in P_renew}
+
+# Get EV data
+df_EV_spec = pd.read_csv("../Evaluation/Case14_EV/EV_spec.csv")
+df_EV_SOC = pd.read_csv("../Evaluation/Case14_EV/ev_soc.csv")
+C = (df_EV_spec.loc[:, "max_e_mwh"]/df_EV_spec.loc[:, "n_car"]).to_dict() # Battery capacity
+eta_d = {} # Discharge efficiency
+eta_c = {} # Charge efficiency
 for i in buses:
-    if i not in P_renew:
-        P_renew[i] = {t: 0 for t in time_periods}
+    if i in loads:
+        eta_d[i] = df_EV_spec[df_EV_spec.loc[:, "bus"]==i]["eta_d"].values[0]
+        eta_c[i] = df_EV_spec[df_EV_spec.loc[:, "bus"]==i]["eta_c"].values[0]
+    else:
+        eta_d[i] = 0
+        eta_c[i] = 0
+Z_init = df_EV_SOC.iloc[1].to_dict() # Initial SOC
 
+
+# Define limits
 PG_min = net.gen.loc[:, "min_p_mw"].to_dict()
 PG_max = net.gen.loc[:, "max_p_mw"].to_dict()
 Pex_min = net.ext_grid.loc[:, "min_p_mw"].to_dict()
@@ -63,35 +98,19 @@ Qex_min = net.ext_grid.loc[:, "min_q_mvar"].to_dict()
 Qex_max = net.ext_grid.loc[:, "max_q_mvar"].to_dict()
 QG_min = net.gen.loc[:, "min_q_mvar"].to_dict()
 QG_max = net.gen.loc[:, "max_q_mvar"].to_dict()
-V_min = 0.94
-V_max = 1.06
-
+V_min = net.bus.loc[:, "min_vm_pu"].to_dict()
+V_max = net.bus.loc[:, "max_vm_pu"].to_dict()
+V_max_sqrt = {i: V_max[i]**2 for i in V_max}
+V_max_sqrt_neg = {i: -V_max[i]**2 for i in V_max}
 theta_max = 30 # maximum phase angle difference
 
 
-df_EV_spec = pd.read_csv("Evaluation/Case14_EV/EV_spec.csv")
-C = (df_EV_spec.loc[:, "max_e_mwh"]/df_EV_spec.loc[:, "n_car"]).to_dict() # Battery capacity
-
-# TODO: fetch eta from data
-eta_d = 0.95  # Discharge efficiency
-eta_c = 0.95  # Charge efficiency
-
-# Line data
-buses_data, lines_data, generators_data, costs_data = Input("Scripts/Matpower/case14.m")
-conductance = []
-susceptance = []
-S_max = {}
-for i in range(len(lines_data)):
-    if lines_data[i].R != 0:
-        conductance.append(lines_data[i].R/(lines_data[i].X**2 + lines_data[i].R**2))
-        susceptance.append(-lines_data[i].X/(lines_data[i].X**2 + lines_data[i].R**2))
-        S_max[i] = lines_data[i].S_bar
-net.line["conductance"] = conductance
-net.line["susceptance"] = susceptance
-
+"""Model"""
 # Create a new model
 model = gp.Model("Multi-Period OPF")
 
+
+"""Decision Variables"""
 # Variables for generation (P_G for active power, Q_G for reactive power)
 P_G = model.addVars(buses, time_periods, lb=PG_min, ub=PG_max, name="P_G")
 Q_G = model.addVars(buses, time_periods, lb=QG_min, ub=QG_max, name="Q_G")
@@ -105,14 +124,31 @@ for i in buses:
 
 # Voltage magnitude (V) and phase angle difference (theta)
 V = model.addVars(buses, time_periods, lb=V_min, ub=V_max, name="V")
-theta = model.addVars(lines, time_periods, lb=0, ub=theta_max, name="theta")
+theta = model.addVars(buses, buses, time_periods, lb=0, ub=theta_max, name="theta")
 
-# Cosine and sine variables
-c_ijt = model.addVars(lines, time_periods, lb=0, ub=V_max**2, name="c_ijt")
-s_ijt = model.addVars(lines, time_periods, lb=-V_max**2, ub=0, name="s_ijt")
+# Cosine and sine related variables
+cos = model.addVars(buses, buses, time_periods, name="cosine")
+sin = model.addVars(buses, buses, time_periods, name="sine")
+c_ijt = model.addVars(buses, buses, time_periods, lb=0, ub=V_max_sqrt, name="c_ijt")
+s_ijt = model.addVars(buses, buses, time_periods, lb=V_max_sqrt_neg, ub=0, name="s_ijt")
+v_sqrt = model.addVars(buses, buses, time_periods, lb=0, ub=V_max, name="v_sqrt")
+
+# Set non-neighboring and non-self cosine and sine variables to zero
+for i in buses:
+    for j in buses:
+        for t in time_periods:
+            if i in neighbors and j not in neighbors[i] and j != i:
+                c_ijt[i, j, t] = 0
+                s_ijt[i, j, t] = 0
+
 
 # State of Charge (SOC) variables
-Z = model.addVars(buses, time_periods, lb=0, ub=1, name="SOC")
+Z = model.addVars(buses, time_periods_plus, lb=0, ub=1, name="SOC")
+# Set SOC to zero for non-load buses
+for i in buses:
+    for t in time_periods:
+        if i not in loads:
+            Z[i, t] = 0
 
 # Charging and discharging power
 P_c = model.addVars(buses, time_periods, ub=100, name="Charging")
@@ -134,17 +170,21 @@ Q_ex = model.addVars(ext_grid, time_periods, lb=Qex_min, ub=Qex_max, name="Q_ex"
 P_ijt = model.addVars(buses, buses, time_periods, name="P_ijt")
 Q_ijt = model.addVars(buses, buses, time_periods, name="Q_ijt")
 
-# Objective function
+
+"""Objective Function"""
+# Define the cost function
 costfunction_generator = net.poly_cost[net.poly_cost["et"] == "gen"]
 costfunction_extgrid = net.poly_cost[net.poly_cost["et"] == "ext_grid"]
 
-obj = gp.quicksum(costfunction_generator.iat[i,4] * P_G[i, t]**2 + costfunction_generator.iat[i,3] * P_G[i, t] \
-                  + costfunction_generator.iat[i,2] for i in generators for t in time_periods) + \
-    gp.quicksum(costfunction_extgrid.iat[i,4] * P_ex[i, t]**2 + costfunction_extgrid.iat[i,3] * P_ex[i, t] \
-                + costfunction_extgrid.iat[i,2] for i in ext_grid for t in time_periods)
+obj = gp.quicksum(costfunction_generator.iat[i,4] * P_G[generators[i], t]**2 + costfunction_generator.iat[i,3] * P_G[generators[i], t] \
+                  + costfunction_generator.iat[i,2] for i in range(len(generators)) for t in time_periods) + \
+    gp.quicksum(costfunction_extgrid.iat[i,4] * P_ex[ext_grid[i], t]**2 + costfunction_extgrid.iat[i,3] * P_ex[ext_grid[i], t] \
+                + costfunction_extgrid.iat[i,2] for i in range(len(ext_grid)) for t in time_periods)
 
 model.setObjective(obj, GRB.MINIMIZE)
 
+
+"""Constraints"""
 # Active power balance (3a)
 for i in buses:
     for t in time_periods:
@@ -174,23 +214,107 @@ for i in buses:
                 Q_G[i, t] - Q_D[i][t] == 0,
                 name=f"Power_balance_Q_{i}_{t}"
             )
+
+# Power flow constraints (3c and 3d)
+for (i, j) in lines:
+    for t in time_periods:
+
+        model.addConstr(
+            P_ijt[i, j, t] == net.line.loc[(net.line["from_bus"] == i) & (net.line["to_bus"] == j), "conductance"].values[0] * c_ijt[i, i, t]
+                            + net.line.loc[(net.line["from_bus"] == i) & (net.line["to_bus"] == j), "conductance"].values[0] * c_ijt[i, j, t]
+                            - net.line.loc[(net.line["from_bus"] == i) & (net.line["to_bus"] == j), "susceptance"].values[0] * s_ijt[i, j, t],
+            name=f"Power_flow_P_{i}_{j}_{t}"
+        )
+        
+        model.addConstr(
+            Q_ijt[i, j, t] == - net.line.loc[(net.line["from_bus"] == i) & (net.line["to_bus"] == j), "susceptance"].values[0] * c_ijt[i, i, t]
+                            - net.line.loc[(net.line["from_bus"] == i) & (net.line["to_bus"] == j), "susceptance"].values[0] * c_ijt[i, j, t]
+                            - net.line.loc[(net.line["from_bus"] == i) & (net.line["to_bus"] == j), "conductance"].values[0] * s_ijt[i, j, t],
+            name=f"Power_flow_Q_{i}_{j}_{t}"
+        )
+
+# Constraints to build up the cosine and sine variables
+for i in buses:
+    for j in buses:
+        for t in time_periods: 
+            model.addGenConstrCos(theta[i,j,t], cos[i, j, t])
+            model.addGenConstrSin(theta[i,j,t], sin[i, j, t])
+            model.addConstr(v_sqrt[i, j, t] == V[i, t] * V[j, t])
+            model.addConstr(c_ijt[i, j, t] == v_sqrt[i, j, t] * cos[i, j, t])
+            model.addConstr(s_ijt[i, j, t] == -1 * v_sqrt[i, j, t] * sin[i, j, t])
+
+for i in buses:
+    for t in time_periods:
+        model.addConstr(
+            V_min[i]**2 <= c_ijt[i, i, t],
+            name=f"cosine_lowerbound_{i}_{t}"
+        )
+        model.addConstr(
+            c_ijt[i, i, t] <= V_max[i]**2,
+            name=f"cosine_upperbound_{i}_{t}"
+        )
+        
+# SOCP relaxation constraint (5)
+for (i, j) in lines:
+    for t in time_periods:
+        model.addConstr(
+            c_ijt[i, j, t] ** 2 + s_ijt[i, j, t] ** 2 <= c_ijt[i, i, t] * c_ijt[j, j, t],
+            name=f"SOCP_{i}_{j}_{t}"
+        )
+
+# Generator constraints (1g and 1h)
+for i in generators:
+    for t in time_periods:
+        model.addConstr(
+            P_G[i, t] >= PG_min[i],
+            name=f"PG_lowerbound_{i}_{t}"
+        )
+        model.addConstr(
+            P_G[i, t] <= PG_max[i],
+            name=f"PG_upperbound_{i}_{t}"
+        )
+        model.addConstr(
+            Q_G[i, t] >= QG_min[i],
+            name=f"QG_lowerbound_{i}_{t}"
+        )
+        model.addConstr(
+            Q_G[i, t] <= QG_max[i],
+            name=f"QG_upperbound_{i}_{t}"
+        )
+
+# Line loading constraints (1i)
+for (i, j) in lines:
+    for t in time_periods:
+        model.addConstr(
+            P_ijt[i, j, t] ** 2 + Q_ijt[i, j, t] ** 2 <= S_max[(i, j)],
+            name=f"Line_loading_{i}_{j}_{t}"
+        )
+
+# Phase angle difference constraints (1j)
+for i in buses:
+    for j in buses:
+        for t in time_periods:
+            if i in neighbors and j in neighbors[i]:
+                # Add the constraints for both positive and negative bounds
+                model.addConstr(
+                    theta[i, j, t] <= theta_max,
+                    name=f"Phase_angle_diff_upper_{i}_{j}_{t}"
+                )
+                model.addConstr(
+                    theta[i, j, t] >= -theta_max,
+                    name=f"Phase_angle_diff_lower_{i}_{j}_{t}"
+                )
+
+# SOC balance equation (1k)
+for i in loads:
+    for t in time_periods:
+        model.addConstr(
+            Z[i, t+1] * C[i] == Z[i, t] * C[i] + eta_c * P_c[i, t] - P_d[i, t],
+            name=f"SOC_balance_{i}_{t}"
+        )
+
 # Start from here
-# # Voltage magnitude constraints
-# for i in buses:
-#     for t in time_periods:
-#         model.addConstr(V_min <= V[i, t] <= V_max, name=f"Voltage_limit_{i}_{t}")
 
-# # Generator power limits
-# for i in generators:
-#     for t in time_periods:
-#         model.addConstr(P_min[i] <= P_G[i, t] <= P_max[i], name=f"Generator_limit_P_{i}_{t}")
-#         model.addConstr(Q_min[i] <= Q_G[i, t] <= Q_max[i], name=f"Generator_limit_Q_{i}_{t}")
-
-# # SOCP constraints for line flow limits
-# for (i, j) in lines:
-#     for t in time_periods:
-#         model.addQConstr(P_ij[i, j, t] * P_ij[i, j, t] + Q_ij[i, j, t] * Q_ij[i, j, t] <= S_max[i, j] ** 2,
-#                          name=f"Line_limit_{i}_{j}_{t}")
 # # SOC balance equation
 # for i in buses:
 #     for t in time_periods[:-1]:  # Ensure this is not applied to the last period
