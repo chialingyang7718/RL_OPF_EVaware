@@ -55,11 +55,11 @@ P_D = {}
 Q_D = {}
 for i in buses:
     if i in loads:
-        P_D[i] = df_load_p[df_load_p["bus"] == 1].drop("bus", axis=1).values[0]
-        Q_D[i] = df_load_q[df_load_q["bus"] == i].drop("bus", axis=1).values[0]
+        P_D[i] = df_load_p[df_load_p["bus"] == 1].drop("bus", axis=1).values[0].tolist()
+        Q_D[i] = df_load_q[df_load_q["bus"] == i].drop("bus", axis=1).values[0].tolist()
     else:
-        P_D[i] = np.zeros(len(time_periods))
-        Q_D[i] = np.zeros(len(time_periods))
+        P_D[i] = [0] * len(time_periods)
+        Q_D[i] = [0] * len(time_periods)
 
 
 # Get renewable energy data
@@ -68,9 +68,9 @@ df_renewable["bus"] = generators
 P_renew = {}
 for i in buses:
     if i in generators:
-        P_renew[i] = df_renewable[df_renewable["bus"] == i].drop("bus", axis=1).values[0]
+        P_renew[i] = df_renewable[df_renewable["bus"] == i].drop("bus", axis=1).values[0].tolist()
     else:
-        P_renew[i] = np.zeros(len(time_periods))
+        P_renew[i] = [0] * len(time_periods)
 
 
 # Get EV data
