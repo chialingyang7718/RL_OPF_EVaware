@@ -2,9 +2,9 @@
 This environment can be used to train a reinforcement learning agent to control the power grid. 
 Assumptions --- Grid and Generation
 - All the generators PV bus.
-- There is no min. requirement of PV or wind generation.
+- There is no min. requirement of power generation.
 - There is no max. limitation of PV and wind curtailment.
-- std. deviation of the random normal distribution is 1 for the load.
+- std. deviation of the random normal distribution is 1 for the load sampling.
 _ The max. power capacity of the generators is uniformly distributed between PGmin and PGmax and updated every time step.
 
 Assumptions --- EV
