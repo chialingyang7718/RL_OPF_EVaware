@@ -235,8 +235,6 @@ for i in buses:
                 name=f"Zero_Discharging_{i}_{t}"
             )
 
-# TODO: Model infeasible. If commented constranint 3a and 3b, model is feasible.
-
 # Active power balance 3(a)
 for i in buses:
     for t in time_periods:
@@ -350,36 +348,36 @@ for i in buses:
 
 
 
-# # Line loading constraints (1i)
-# for (i, j) in lines:
-#     for t in time_periods:
-#         model.addConstr(
-#             P_ijt[i, j, t] ** 2 + Q_ijt[i, j, t] ** 2 <= S_max[(i, j)],
-#             name=f"Line_loading_{i}_{j}_{t}"
-#         )
+# Line loading constraints (1i)
+for (i, j) in lines:
+    for t in time_periods:
+        model.addConstr(
+            P_ijt[i, j, t] ** 2 + Q_ijt[i, j, t] ** 2 <= S_max[(i, j)],
+            name=f"Line_loading_{i}_{j}_{t}"
+        )
 
-# # Phase angle difference constraints (1j)
-# for i in buses:
-#     for j in buses:
-#         for t in time_periods:
-#             if i in neighbors and j in neighbors[i]:
-#                 # Add the constraints for both positive and negative bounds
-#                 model.addConstr(
-#                     theta[i, j, t] <= theta_max,
-#                     name=f"Phase_angle_diff_upper_{i}_{j}_{t}"
-#                 )
-#                 model.addConstr(
-#                     theta[i, j, t] >= -theta_max,
-#                     name=f"Phase_angle_diff_lower_{i}_{j}_{t}"
-#                 )
+# Phase angle difference constraints (1j)
+for i in buses:
+    for j in buses:
+        for t in time_periods:
+            if i in neighbors and j in neighbors[i]:
+                # Add the constraints for both positive and negative bounds
+                model.addConstr(
+                    theta[i, j, t] <= theta_max,
+                    name=f"Phase_angle_diff_upper_{i}_{j}_{t}"
+                )
+                model.addConstr(
+                    theta[i, j, t] >= -theta_max,
+                    name=f"Phase_angle_diff_lower_{i}_{j}_{t}"
+                )
 
-# # SOC balance equation (1k)
-# for i in buses:
-#     for t in time_periods:
-#         model.addConstr(
-#             Z[i, t+1] * C[i] == Z[i, t] * C[i] + eta_c[i] * P_c[i, t] - P_d[i, t] - EV_demand[i][t],
-#             name=f"SOC_balance_{i}_{t}"
-#         )
+# SOC balance equation (1k)
+for i in buses:
+    for t in time_periods:
+        model.addConstr(
+            Z[i, t+1] * C[i] == Z[i, t] * C[i] + eta_c[i] * P_c[i, t] - P_d[i, t] - EV_demand[i][t],
+            name=f"SOC_balance_{i}_{t}"
+        )
 # SOC limit constraints (1l)
 for i in buses:
     for t in time_periods:
@@ -413,11 +411,14 @@ for i in buses:
 
 # Optimize the model
 model.optimize()
-
 # Write the model to a file
 model.write("Multi-Period OPF.lp")
+
 # Check if the model solved successfully
 if model.status == GRB.OPTIMAL:
     print("Optimal solution found")
 else:
     print("Model did not solve to optimality")
+
+# TODO: Model infeasible during presolve already. If commented constranint 3a and 3b, model is feasible.
+# See https://support.gurobi.com/hc/en-us/articles/4402704428177-How-do-I-resolve-the-error-Model-is-infeasible-or-unbounded

@@ -34,13 +34,7 @@ Minimize
    + 0 theta[0,0,10] + 0 theta[0,0,11] + 0 theta[0,0,12] + 0 theta[0,0,13]
    + 0 theta[0,0,14] + 0 theta[0,0,15] + 0 theta[0,0,16] + 0 theta[0,0,17]
    + 0 theta[0,0,18] + 0 theta[0,0,19] + 0 theta[0,0,20] + 0 theta[0,0,21]
-   + 0 theta[0,0,22] + 0 theta[0,0,23] + 0 theta[0,1,0] + 0 theta[0,1,1]
-   + 0 theta[0,1,2] + 0 theta[0,1,3] + 0 theta[0,1,4] + 0 theta[0,1,5]
-   + 0 theta[0,1,6] + 0 theta[0,1,7] + 0 theta[0,1,8] + 0 theta[0,1,9]
-   + 0 theta[0,1,10] + 0 theta[0,1,11] + 0 theta[0,1,12] + 0 theta[0,1,13]
-   + 0 theta[0,1,14] + 0 theta[0,1,15] + 0 theta[0,1,16] + 0 theta[0,1,17]
-   + 0 theta[0,1,18] + 0 theta[0,1,19] + 0 theta[0,1,20] + 0 theta[0,1,21]
-   + 0 theta[0,1,22] + 0 theta[0,1,23] + 0 theta[0,2,0] + 0 theta[0,2,1]
+   + 0 theta[0,0,22] + 0 theta[0,0,23] + 0 theta[0,2,0] + 0 theta[0,2,1]
    + 0 theta[0,2,2] + 0 theta[0,2,3] + 0 theta[0,2,4] + 0 theta[0,2,5]
    + 0 theta[0,2,6] + 0 theta[0,2,7] + 0 theta[0,2,8] + 0 theta[0,2,9]
    + 0 theta[0,2,10] + 0 theta[0,2,11] + 0 theta[0,2,12] + 0 theta[0,2,13]
@@ -52,13 +46,7 @@ Minimize
    + 0 theta[0,3,10] + 0 theta[0,3,11] + 0 theta[0,3,12] + 0 theta[0,3,13]
    + 0 theta[0,3,14] + 0 theta[0,3,15] + 0 theta[0,3,16] + 0 theta[0,3,17]
    + 0 theta[0,3,18] + 0 theta[0,3,19] + 0 theta[0,3,20] + 0 theta[0,3,21]
-   + 0 theta[0,3,22] + 0 theta[0,3,23] + 0 theta[0,4,0] + 0 theta[0,4,1]
-   + 0 theta[0,4,2] + 0 theta[0,4,3] + 0 theta[0,4,4] + 0 theta[0,4,5]
-   + 0 theta[0,4,6] + 0 theta[0,4,7] + 0 theta[0,4,8] + 0 theta[0,4,9]
-   + 0 theta[0,4,10] + 0 theta[0,4,11] + 0 theta[0,4,12] + 0 theta[0,4,13]
-   + 0 theta[0,4,14] + 0 theta[0,4,15] + 0 theta[0,4,16] + 0 theta[0,4,17]
-   + 0 theta[0,4,18] + 0 theta[0,4,19] + 0 theta[0,4,20] + 0 theta[0,4,21]
-   + 0 theta[0,4,22] + 0 theta[0,4,23] + 0 theta[0,5,0] + 0 theta[0,5,1]
+   + 0 theta[0,3,22] + 0 theta[0,3,23] + 0 theta[0,5,0] + 0 theta[0,5,1]
    + 0 theta[0,5,2] + 0 theta[0,5,3] + 0 theta[0,5,4] + 0 theta[0,5,5]
    + 0 theta[0,5,6] + 0 theta[0,5,7] + 0 theta[0,5,8] + 0 theta[0,5,9]
    + 0 theta[0,5,10] + 0 theta[0,5,11] + 0 theta[0,5,12] + 0 theta[0,5,13]
@@ -129,25 +117,7 @@ Minimize
    + 0 theta[1,1,11] + 0 theta[1,1,12] + 0 theta[1,1,13] + 0 theta[1,1,14]
    + 0 theta[1,1,15] + 0 theta[1,1,16] + 0 theta[1,1,17] + 0 theta[1,1,18]
    + 0 theta[1,1,19] + 0 theta[1,1,20] + 0 theta[1,1,21] + 0 theta[1,1,22]
-   + 0 theta[1,1,23] + 0 theta[1,2,0] + 0 theta[1,2,1] + 0 theta[1,2,2]
-   + 0 theta[1,2,3] + 0 theta[1,2,4] + 0 theta[1,2,5] + 0 theta[1,2,6]
-   + 0 theta[1,2,7] + 0 theta[1,2,8] + 0 theta[1,2,9] + 0 theta[1,2,10]
-   + 0 theta[1,2,11] + 0 theta[1,2,12] + 0 theta[1,2,13] + 0 theta[1,2,14]
-   + 0 theta[1,2,15] + 0 theta[1,2,16] + 0 theta[1,2,17] + 0 theta[1,2,18]
-   + 0 theta[1,2,19] + 0 theta[1,2,20] + 0 theta[1,2,21] + 0 theta[1,2,22]
-   + 0 theta[1,2,23] + 0 theta[1,3,0] + 0 theta[1,3,1] + 0 theta[1,3,2]
-   + 0 theta[1,3,3] + 0 theta[1,3,4] + 0 theta[1,3,5] + 0 theta[1,3,6]
-   + 0 theta[1,3,7] + 0 theta[1,3,8] + 0 theta[1,3,9] + 0 theta[1,3,10]
-   + 0 theta[1,3,11] + 0 theta[1,3,12] + 0 theta[1,3,13] + 0 theta[1,3,14]
-   + 0 theta[1,3,15] + 0 theta[1,3,16] + 0 theta[1,3,17] + 0 theta[1,3,18]
-   + 0 theta[1,3,19] + 0 theta[1,3,20] + 0 theta[1,3,21] + 0 theta[1,3,22]
-   + 0 theta[1,3,23] + 0 theta[1,4,0] + 0 theta[1,4,1] + 0 theta[1,4,2]
-   + 0 theta[1,4,3] + 0 theta[1,4,4] + 0 theta[1,4,5] + 0 theta[1,4,6]
-   + 0 theta[1,4,7] + 0 theta[1,4,8] + 0 theta[1,4,9] + 0 theta[1,4,10]
-   + 0 theta[1,4,11] + 0 theta[1,4,12] + 0 theta[1,4,13] + 0 theta[1,4,14]
-   + 0 theta[1,4,15] + 0 theta[1,4,16] + 0 theta[1,4,17] + 0 theta[1,4,18]
-   + 0 theta[1,4,19] + 0 theta[1,4,20] + 0 theta[1,4,21] + 0 theta[1,4,22]
-   + 0 theta[1,4,23] + 0 theta[1,5,0] + 0 theta[1,5,1] + 0 theta[1,5,2]
+   + 0 theta[1,1,23] + 0 theta[1,5,0] + 0 theta[1,5,1] + 0 theta[1,5,2]
    + 0 theta[1,5,3] + 0 theta[1,5,4] + 0 theta[1,5,5] + 0 theta[1,5,6]
    + 0 theta[1,5,7] + 0 theta[1,5,8] + 0 theta[1,5,9] + 0 theta[1,5,10]
    + 0 theta[1,5,11] + 0 theta[1,5,12] + 0 theta[1,5,13] + 0 theta[1,5,14]
@@ -223,13 +193,7 @@ Minimize
    + 0 theta[2,2,11] + 0 theta[2,2,12] + 0 theta[2,2,13] + 0 theta[2,2,14]
    + 0 theta[2,2,15] + 0 theta[2,2,16] + 0 theta[2,2,17] + 0 theta[2,2,18]
    + 0 theta[2,2,19] + 0 theta[2,2,20] + 0 theta[2,2,21] + 0 theta[2,2,22]
-   + 0 theta[2,2,23] + 0 theta[2,3,0] + 0 theta[2,3,1] + 0 theta[2,3,2]
-   + 0 theta[2,3,3] + 0 theta[2,3,4] + 0 theta[2,3,5] + 0 theta[2,3,6]
-   + 0 theta[2,3,7] + 0 theta[2,3,8] + 0 theta[2,3,9] + 0 theta[2,3,10]
-   + 0 theta[2,3,11] + 0 theta[2,3,12] + 0 theta[2,3,13] + 0 theta[2,3,14]
-   + 0 theta[2,3,15] + 0 theta[2,3,16] + 0 theta[2,3,17] + 0 theta[2,3,18]
-   + 0 theta[2,3,19] + 0 theta[2,3,20] + 0 theta[2,3,21] + 0 theta[2,3,22]
-   + 0 theta[2,3,23] + 0 theta[2,4,0] + 0 theta[2,4,1] + 0 theta[2,4,2]
+   + 0 theta[2,2,23] + 0 theta[2,4,0] + 0 theta[2,4,1] + 0 theta[2,4,2]
    + 0 theta[2,4,3] + 0 theta[2,4,4] + 0 theta[2,4,5] + 0 theta[2,4,6]
    + 0 theta[2,4,7] + 0 theta[2,4,8] + 0 theta[2,4,9] + 0 theta[2,4,10]
    + 0 theta[2,4,11] + 0 theta[2,4,12] + 0 theta[2,4,13] + 0 theta[2,4,14]
@@ -317,13 +281,7 @@ Minimize
    + 0 theta[3,3,11] + 0 theta[3,3,12] + 0 theta[3,3,13] + 0 theta[3,3,14]
    + 0 theta[3,3,15] + 0 theta[3,3,16] + 0 theta[3,3,17] + 0 theta[3,3,18]
    + 0 theta[3,3,19] + 0 theta[3,3,20] + 0 theta[3,3,21] + 0 theta[3,3,22]
-   + 0 theta[3,3,23] + 0 theta[3,4,0] + 0 theta[3,4,1] + 0 theta[3,4,2]
-   + 0 theta[3,4,3] + 0 theta[3,4,4] + 0 theta[3,4,5] + 0 theta[3,4,6]
-   + 0 theta[3,4,7] + 0 theta[3,4,8] + 0 theta[3,4,9] + 0 theta[3,4,10]
-   + 0 theta[3,4,11] + 0 theta[3,4,12] + 0 theta[3,4,13] + 0 theta[3,4,14]
-   + 0 theta[3,4,15] + 0 theta[3,4,16] + 0 theta[3,4,17] + 0 theta[3,4,18]
-   + 0 theta[3,4,19] + 0 theta[3,4,20] + 0 theta[3,4,21] + 0 theta[3,4,22]
-   + 0 theta[3,4,23] + 0 theta[3,5,0] + 0 theta[3,5,1] + 0 theta[3,5,2]
+   + 0 theta[3,3,23] + 0 theta[3,5,0] + 0 theta[3,5,1] + 0 theta[3,5,2]
    + 0 theta[3,5,3] + 0 theta[3,5,4] + 0 theta[3,5,5] + 0 theta[3,5,6]
    + 0 theta[3,5,7] + 0 theta[3,5,8] + 0 theta[3,5,9] + 0 theta[3,5,10]
    + 0 theta[3,5,11] + 0 theta[3,5,12] + 0 theta[3,5,13] + 0 theta[3,5,14]
@@ -529,28 +487,7 @@ Minimize
    + 0 theta[5,9,11] + 0 theta[5,9,12] + 0 theta[5,9,13] + 0 theta[5,9,14]
    + 0 theta[5,9,15] + 0 theta[5,9,16] + 0 theta[5,9,17] + 0 theta[5,9,18]
    + 0 theta[5,9,19] + 0 theta[5,9,20] + 0 theta[5,9,21] + 0 theta[5,9,22]
-   + 0 theta[5,9,23] + 0 theta[5,10,0] + 0 theta[5,10,1] + 0 theta[5,10,2]
-   + 0 theta[5,10,3] + 0 theta[5,10,4] + 0 theta[5,10,5] + 0 theta[5,10,6]
-   + 0 theta[5,10,7] + 0 theta[5,10,8] + 0 theta[5,10,9] + 0 theta[5,10,10]
-   + 0 theta[5,10,11] + 0 theta[5,10,12] + 0 theta[5,10,13]
-   + 0 theta[5,10,14] + 0 theta[5,10,15] + 0 theta[5,10,16]
-   + 0 theta[5,10,17] + 0 theta[5,10,18] + 0 theta[5,10,19]
-   + 0 theta[5,10,20] + 0 theta[5,10,21] + 0 theta[5,10,22]
-   + 0 theta[5,10,23] + 0 theta[5,11,0] + 0 theta[5,11,1] + 0 theta[5,11,2]
-   + 0 theta[5,11,3] + 0 theta[5,11,4] + 0 theta[5,11,5] + 0 theta[5,11,6]
-   + 0 theta[5,11,7] + 0 theta[5,11,8] + 0 theta[5,11,9] + 0 theta[5,11,10]
-   + 0 theta[5,11,11] + 0 theta[5,11,12] + 0 theta[5,11,13]
-   + 0 theta[5,11,14] + 0 theta[5,11,15] + 0 theta[5,11,16]
-   + 0 theta[5,11,17] + 0 theta[5,11,18] + 0 theta[5,11,19]
-   + 0 theta[5,11,20] + 0 theta[5,11,21] + 0 theta[5,11,22]
-   + 0 theta[5,11,23] + 0 theta[5,12,0] + 0 theta[5,12,1] + 0 theta[5,12,2]
-   + 0 theta[5,12,3] + 0 theta[5,12,4] + 0 theta[5,12,5] + 0 theta[5,12,6]
-   + 0 theta[5,12,7] + 0 theta[5,12,8] + 0 theta[5,12,9] + 0 theta[5,12,10]
-   + 0 theta[5,12,11] + 0 theta[5,12,12] + 0 theta[5,12,13]
-   + 0 theta[5,12,14] + 0 theta[5,12,15] + 0 theta[5,12,16]
-   + 0 theta[5,12,17] + 0 theta[5,12,18] + 0 theta[5,12,19]
-   + 0 theta[5,12,20] + 0 theta[5,12,21] + 0 theta[5,12,22]
-   + 0 theta[5,12,23] + 0 theta[5,13,0] + 0 theta[5,13,1] + 0 theta[5,13,2]
+   + 0 theta[5,9,23] + 0 theta[5,13,0] + 0 theta[5,13,1] + 0 theta[5,13,2]
    + 0 theta[5,13,3] + 0 theta[5,13,4] + 0 theta[5,13,5] + 0 theta[5,13,6]
    + 0 theta[5,13,7] + 0 theta[5,13,8] + 0 theta[5,13,9] + 0 theta[5,13,10]
    + 0 theta[5,13,11] + 0 theta[5,13,12] + 0 theta[5,13,13]
@@ -787,13 +724,7 @@ Minimize
    + 0 theta[8,8,11] + 0 theta[8,8,12] + 0 theta[8,8,13] + 0 theta[8,8,14]
    + 0 theta[8,8,15] + 0 theta[8,8,16] + 0 theta[8,8,17] + 0 theta[8,8,18]
    + 0 theta[8,8,19] + 0 theta[8,8,20] + 0 theta[8,8,21] + 0 theta[8,8,22]
-   + 0 theta[8,8,23] + 0 theta[8,9,0] + 0 theta[8,9,1] + 0 theta[8,9,2]
-   + 0 theta[8,9,3] + 0 theta[8,9,4] + 0 theta[8,9,5] + 0 theta[8,9,6]
-   + 0 theta[8,9,7] + 0 theta[8,9,8] + 0 theta[8,9,9] + 0 theta[8,9,10]
-   + 0 theta[8,9,11] + 0 theta[8,9,12] + 0 theta[8,9,13] + 0 theta[8,9,14]
-   + 0 theta[8,9,15] + 0 theta[8,9,16] + 0 theta[8,9,17] + 0 theta[8,9,18]
-   + 0 theta[8,9,19] + 0 theta[8,9,20] + 0 theta[8,9,21] + 0 theta[8,9,22]
-   + 0 theta[8,9,23] + 0 theta[8,10,0] + 0 theta[8,10,1] + 0 theta[8,10,2]
+   + 0 theta[8,8,23] + 0 theta[8,10,0] + 0 theta[8,10,1] + 0 theta[8,10,2]
    + 0 theta[8,10,3] + 0 theta[8,10,4] + 0 theta[8,10,5] + 0 theta[8,10,6]
    + 0 theta[8,10,7] + 0 theta[8,10,8] + 0 theta[8,10,9] + 0 theta[8,10,10]
    + 0 theta[8,10,11] + 0 theta[8,10,12] + 0 theta[8,10,13]
@@ -814,14 +745,7 @@ Minimize
    + 0 theta[8,12,14] + 0 theta[8,12,15] + 0 theta[8,12,16]
    + 0 theta[8,12,17] + 0 theta[8,12,18] + 0 theta[8,12,19]
    + 0 theta[8,12,20] + 0 theta[8,12,21] + 0 theta[8,12,22]
-   + 0 theta[8,12,23] + 0 theta[8,13,0] + 0 theta[8,13,1] + 0 theta[8,13,2]
-   + 0 theta[8,13,3] + 0 theta[8,13,4] + 0 theta[8,13,5] + 0 theta[8,13,6]
-   + 0 theta[8,13,7] + 0 theta[8,13,8] + 0 theta[8,13,9] + 0 theta[8,13,10]
-   + 0 theta[8,13,11] + 0 theta[8,13,12] + 0 theta[8,13,13]
-   + 0 theta[8,13,14] + 0 theta[8,13,15] + 0 theta[8,13,16]
-   + 0 theta[8,13,17] + 0 theta[8,13,18] + 0 theta[8,13,19]
-   + 0 theta[8,13,20] + 0 theta[8,13,21] + 0 theta[8,13,22]
-   + 0 theta[8,13,23] + 0 theta[9,0,0] + 0 theta[9,0,1] + 0 theta[9,0,2]
+   + 0 theta[8,12,23] + 0 theta[9,0,0] + 0 theta[9,0,1] + 0 theta[9,0,2]
    + 0 theta[9,0,3] + 0 theta[9,0,4] + 0 theta[9,0,5] + 0 theta[9,0,6]
    + 0 theta[9,0,7] + 0 theta[9,0,8] + 0 theta[9,0,9] + 0 theta[9,0,10]
    + 0 theta[9,0,11] + 0 theta[9,0,12] + 0 theta[9,0,13] + 0 theta[9,0,14]
@@ -881,14 +805,7 @@ Minimize
    + 0 theta[9,9,11] + 0 theta[9,9,12] + 0 theta[9,9,13] + 0 theta[9,9,14]
    + 0 theta[9,9,15] + 0 theta[9,9,16] + 0 theta[9,9,17] + 0 theta[9,9,18]
    + 0 theta[9,9,19] + 0 theta[9,9,20] + 0 theta[9,9,21] + 0 theta[9,9,22]
-   + 0 theta[9,9,23] + 0 theta[9,10,0] + 0 theta[9,10,1] + 0 theta[9,10,2]
-   + 0 theta[9,10,3] + 0 theta[9,10,4] + 0 theta[9,10,5] + 0 theta[9,10,6]
-   + 0 theta[9,10,7] + 0 theta[9,10,8] + 0 theta[9,10,9] + 0 theta[9,10,10]
-   + 0 theta[9,10,11] + 0 theta[9,10,12] + 0 theta[9,10,13]
-   + 0 theta[9,10,14] + 0 theta[9,10,15] + 0 theta[9,10,16]
-   + 0 theta[9,10,17] + 0 theta[9,10,18] + 0 theta[9,10,19]
-   + 0 theta[9,10,20] + 0 theta[9,10,21] + 0 theta[9,10,22]
-   + 0 theta[9,10,23] + 0 theta[9,11,0] + 0 theta[9,11,1] + 0 theta[9,11,2]
+   + 0 theta[9,9,23] + 0 theta[9,11,0] + 0 theta[9,11,1] + 0 theta[9,11,2]
    + 0 theta[9,11,3] + 0 theta[9,11,4] + 0 theta[9,11,5] + 0 theta[9,11,6]
    + 0 theta[9,11,7] + 0 theta[9,11,8] + 0 theta[9,11,9] + 0 theta[9,11,10]
    + 0 theta[9,11,11] + 0 theta[9,11,12] + 0 theta[9,11,13]
@@ -1098,15 +1015,7 @@ Minimize
    + 0 theta[11,11,14] + 0 theta[11,11,15] + 0 theta[11,11,16]
    + 0 theta[11,11,17] + 0 theta[11,11,18] + 0 theta[11,11,19]
    + 0 theta[11,11,20] + 0 theta[11,11,21] + 0 theta[11,11,22]
-   + 0 theta[11,11,23] + 0 theta[11,12,0] + 0 theta[11,12,1]
-   + 0 theta[11,12,2] + 0 theta[11,12,3] + 0 theta[11,12,4]
-   + 0 theta[11,12,5] + 0 theta[11,12,6] + 0 theta[11,12,7]
-   + 0 theta[11,12,8] + 0 theta[11,12,9] + 0 theta[11,12,10]
-   + 0 theta[11,12,11] + 0 theta[11,12,12] + 0 theta[11,12,13]
-   + 0 theta[11,12,14] + 0 theta[11,12,15] + 0 theta[11,12,16]
-   + 0 theta[11,12,17] + 0 theta[11,12,18] + 0 theta[11,12,19]
-   + 0 theta[11,12,20] + 0 theta[11,12,21] + 0 theta[11,12,22]
-   + 0 theta[11,12,23] + 0 theta[11,13,0] + 0 theta[11,13,1]
+   + 0 theta[11,11,23] + 0 theta[11,13,0] + 0 theta[11,13,1]
    + 0 theta[11,13,2] + 0 theta[11,13,3] + 0 theta[11,13,4]
    + 0 theta[11,13,5] + 0 theta[11,13,6] + 0 theta[11,13,7]
    + 0 theta[11,13,8] + 0 theta[11,13,9] + 0 theta[11,13,10]
@@ -1209,15 +1118,7 @@ Minimize
    + 0 theta[12,12,14] + 0 theta[12,12,15] + 0 theta[12,12,16]
    + 0 theta[12,12,17] + 0 theta[12,12,18] + 0 theta[12,12,19]
    + 0 theta[12,12,20] + 0 theta[12,12,21] + 0 theta[12,12,22]
-   + 0 theta[12,12,23] + 0 theta[12,13,0] + 0 theta[12,13,1]
-   + 0 theta[12,13,2] + 0 theta[12,13,3] + 0 theta[12,13,4]
-   + 0 theta[12,13,5] + 0 theta[12,13,6] + 0 theta[12,13,7]
-   + 0 theta[12,13,8] + 0 theta[12,13,9] + 0 theta[12,13,10]
-   + 0 theta[12,13,11] + 0 theta[12,13,12] + 0 theta[12,13,13]
-   + 0 theta[12,13,14] + 0 theta[12,13,15] + 0 theta[12,13,16]
-   + 0 theta[12,13,17] + 0 theta[12,13,18] + 0 theta[12,13,19]
-   + 0 theta[12,13,20] + 0 theta[12,13,21] + 0 theta[12,13,22]
-   + 0 theta[12,13,23] + 0 theta[13,0,0] + 0 theta[13,0,1]
+   + 0 theta[12,12,23] + 0 theta[13,0,0] + 0 theta[13,0,1]
    + 0 theta[13,0,2] + 0 theta[13,0,3] + 0 theta[13,0,4] + 0 theta[13,0,5]
    + 0 theta[13,0,6] + 0 theta[13,0,7] + 0 theta[13,0,8] + 0 theta[13,0,9]
    + 0 theta[13,0,10] + 0 theta[13,0,11] + 0 theta[13,0,12]
@@ -2374,12 +2275,10 @@ Minimize
    + 0 Q_ijt[13,13,14] + 0 Q_ijt[13,13,15] + 0 Q_ijt[13,13,16]
    + 0 Q_ijt[13,13,17] + 0 Q_ijt[13,13,18] + 0 Q_ijt[13,13,19]
    + 0 Q_ijt[13,13,20] + 0 Q_ijt[13,13,21] + 0 Q_ijt[13,13,22]
-   + 0 Q_ijt[13,13,23] + 0 SOC[0,24] + 0 SOC[1,24] + 0 SOC[2,24]
-   + 0 SOC[3,24] + 0 SOC[4,24] + 0 SOC[5,24] + 0 SOC[6,24] + 0 SOC[7,24]
-   + 0 SOC[8,24] + 0 SOC[9,24] + 0 SOC[10,24] + 0 SOC[11,24] + 0 SOC[12,24]
-   + 0 SOC[13,24] + [ 0.5 P_G[1,0] ^2 + 0.5 P_G[1,1] ^2 + 0.5 P_G[1,2] ^2
-   + 0.5 P_G[1,3] ^2 + 0.5 P_G[1,4] ^2 + 0.5 P_G[1,5] ^2 + 0.5 P_G[1,6] ^2
-   + 0.5 P_G[1,7] ^2 + 0.5 P_G[1,8] ^2 + 0.5 P_G[1,9] ^2 + 0.5 P_G[1,10] ^2
+   + 0 Q_ijt[13,13,23] + 0 SOC[0,24] + 0 SOC[6,24] + 0 SOC[7,24] + [
+   0.5 P_G[1,0] ^2 + 0.5 P_G[1,1] ^2 + 0.5 P_G[1,2] ^2 + 0.5 P_G[1,3] ^2
+   + 0.5 P_G[1,4] ^2 + 0.5 P_G[1,5] ^2 + 0.5 P_G[1,6] ^2 + 0.5 P_G[1,7] ^2
+   + 0.5 P_G[1,8] ^2 + 0.5 P_G[1,9] ^2 + 0.5 P_G[1,10] ^2
    + 0.5 P_G[1,11] ^2 + 0.5 P_G[1,12] ^2 + 0.5 P_G[1,13] ^2
    + 0.5 P_G[1,14] ^2 + 0.5 P_G[1,15] ^2 + 0.5 P_G[1,16] ^2
    + 0.5 P_G[1,17] ^2 + 0.5 P_G[1,18] ^2 + 0.5 P_G[1,19] ^2
@@ -14291,6 +14190,1326 @@ Subject To
  Pex_upperbound_13_23: P_ex[13,23] <= 0
  Qex_lowerbound_13_23: Q_ex[13,23] >= 0
  Qex_upperbound_13_23: Q_ex[13,23] <= 0
+ Phase_angle_diff_upper_0_1_0: theta[0,1,0] <= 30
+ Phase_angle_diff_lower_0_1_0: theta[0,1,0] >= -30
+ Phase_angle_diff_upper_0_1_1: theta[0,1,1] <= 30
+ Phase_angle_diff_lower_0_1_1: theta[0,1,1] >= -30
+ Phase_angle_diff_upper_0_1_2: theta[0,1,2] <= 30
+ Phase_angle_diff_lower_0_1_2: theta[0,1,2] >= -30
+ Phase_angle_diff_upper_0_1_3: theta[0,1,3] <= 30
+ Phase_angle_diff_lower_0_1_3: theta[0,1,3] >= -30
+ Phase_angle_diff_upper_0_1_4: theta[0,1,4] <= 30
+ Phase_angle_diff_lower_0_1_4: theta[0,1,4] >= -30
+ Phase_angle_diff_upper_0_1_5: theta[0,1,5] <= 30
+ Phase_angle_diff_lower_0_1_5: theta[0,1,5] >= -30
+ Phase_angle_diff_upper_0_1_6: theta[0,1,6] <= 30
+ Phase_angle_diff_lower_0_1_6: theta[0,1,6] >= -30
+ Phase_angle_diff_upper_0_1_7: theta[0,1,7] <= 30
+ Phase_angle_diff_lower_0_1_7: theta[0,1,7] >= -30
+ Phase_angle_diff_upper_0_1_8: theta[0,1,8] <= 30
+ Phase_angle_diff_lower_0_1_8: theta[0,1,8] >= -30
+ Phase_angle_diff_upper_0_1_9: theta[0,1,9] <= 30
+ Phase_angle_diff_lower_0_1_9: theta[0,1,9] >= -30
+ Phase_angle_diff_upper_0_1_10: theta[0,1,10] <= 30
+ Phase_angle_diff_lower_0_1_10: theta[0,1,10] >= -30
+ Phase_angle_diff_upper_0_1_11: theta[0,1,11] <= 30
+ Phase_angle_diff_lower_0_1_11: theta[0,1,11] >= -30
+ Phase_angle_diff_upper_0_1_12: theta[0,1,12] <= 30
+ Phase_angle_diff_lower_0_1_12: theta[0,1,12] >= -30
+ Phase_angle_diff_upper_0_1_13: theta[0,1,13] <= 30
+ Phase_angle_diff_lower_0_1_13: theta[0,1,13] >= -30
+ Phase_angle_diff_upper_0_1_14: theta[0,1,14] <= 30
+ Phase_angle_diff_lower_0_1_14: theta[0,1,14] >= -30
+ Phase_angle_diff_upper_0_1_15: theta[0,1,15] <= 30
+ Phase_angle_diff_lower_0_1_15: theta[0,1,15] >= -30
+ Phase_angle_diff_upper_0_1_16: theta[0,1,16] <= 30
+ Phase_angle_diff_lower_0_1_16: theta[0,1,16] >= -30
+ Phase_angle_diff_upper_0_1_17: theta[0,1,17] <= 30
+ Phase_angle_diff_lower_0_1_17: theta[0,1,17] >= -30
+ Phase_angle_diff_upper_0_1_18: theta[0,1,18] <= 30
+ Phase_angle_diff_lower_0_1_18: theta[0,1,18] >= -30
+ Phase_angle_diff_upper_0_1_19: theta[0,1,19] <= 30
+ Phase_angle_diff_lower_0_1_19: theta[0,1,19] >= -30
+ Phase_angle_diff_upper_0_1_20: theta[0,1,20] <= 30
+ Phase_angle_diff_lower_0_1_20: theta[0,1,20] >= -30
+ Phase_angle_diff_upper_0_1_21: theta[0,1,21] <= 30
+ Phase_angle_diff_lower_0_1_21: theta[0,1,21] >= -30
+ Phase_angle_diff_upper_0_1_22: theta[0,1,22] <= 30
+ Phase_angle_diff_lower_0_1_22: theta[0,1,22] >= -30
+ Phase_angle_diff_upper_0_1_23: theta[0,1,23] <= 30
+ Phase_angle_diff_lower_0_1_23: theta[0,1,23] >= -30
+ Phase_angle_diff_upper_0_4_0: theta[0,4,0] <= 30
+ Phase_angle_diff_lower_0_4_0: theta[0,4,0] >= -30
+ Phase_angle_diff_upper_0_4_1: theta[0,4,1] <= 30
+ Phase_angle_diff_lower_0_4_1: theta[0,4,1] >= -30
+ Phase_angle_diff_upper_0_4_2: theta[0,4,2] <= 30
+ Phase_angle_diff_lower_0_4_2: theta[0,4,2] >= -30
+ Phase_angle_diff_upper_0_4_3: theta[0,4,3] <= 30
+ Phase_angle_diff_lower_0_4_3: theta[0,4,3] >= -30
+ Phase_angle_diff_upper_0_4_4: theta[0,4,4] <= 30
+ Phase_angle_diff_lower_0_4_4: theta[0,4,4] >= -30
+ Phase_angle_diff_upper_0_4_5: theta[0,4,5] <= 30
+ Phase_angle_diff_lower_0_4_5: theta[0,4,5] >= -30
+ Phase_angle_diff_upper_0_4_6: theta[0,4,6] <= 30
+ Phase_angle_diff_lower_0_4_6: theta[0,4,6] >= -30
+ Phase_angle_diff_upper_0_4_7: theta[0,4,7] <= 30
+ Phase_angle_diff_lower_0_4_7: theta[0,4,7] >= -30
+ Phase_angle_diff_upper_0_4_8: theta[0,4,8] <= 30
+ Phase_angle_diff_lower_0_4_8: theta[0,4,8] >= -30
+ Phase_angle_diff_upper_0_4_9: theta[0,4,9] <= 30
+ Phase_angle_diff_lower_0_4_9: theta[0,4,9] >= -30
+ Phase_angle_diff_upper_0_4_10: theta[0,4,10] <= 30
+ Phase_angle_diff_lower_0_4_10: theta[0,4,10] >= -30
+ Phase_angle_diff_upper_0_4_11: theta[0,4,11] <= 30
+ Phase_angle_diff_lower_0_4_11: theta[0,4,11] >= -30
+ Phase_angle_diff_upper_0_4_12: theta[0,4,12] <= 30
+ Phase_angle_diff_lower_0_4_12: theta[0,4,12] >= -30
+ Phase_angle_diff_upper_0_4_13: theta[0,4,13] <= 30
+ Phase_angle_diff_lower_0_4_13: theta[0,4,13] >= -30
+ Phase_angle_diff_upper_0_4_14: theta[0,4,14] <= 30
+ Phase_angle_diff_lower_0_4_14: theta[0,4,14] >= -30
+ Phase_angle_diff_upper_0_4_15: theta[0,4,15] <= 30
+ Phase_angle_diff_lower_0_4_15: theta[0,4,15] >= -30
+ Phase_angle_diff_upper_0_4_16: theta[0,4,16] <= 30
+ Phase_angle_diff_lower_0_4_16: theta[0,4,16] >= -30
+ Phase_angle_diff_upper_0_4_17: theta[0,4,17] <= 30
+ Phase_angle_diff_lower_0_4_17: theta[0,4,17] >= -30
+ Phase_angle_diff_upper_0_4_18: theta[0,4,18] <= 30
+ Phase_angle_diff_lower_0_4_18: theta[0,4,18] >= -30
+ Phase_angle_diff_upper_0_4_19: theta[0,4,19] <= 30
+ Phase_angle_diff_lower_0_4_19: theta[0,4,19] >= -30
+ Phase_angle_diff_upper_0_4_20: theta[0,4,20] <= 30
+ Phase_angle_diff_lower_0_4_20: theta[0,4,20] >= -30
+ Phase_angle_diff_upper_0_4_21: theta[0,4,21] <= 30
+ Phase_angle_diff_lower_0_4_21: theta[0,4,21] >= -30
+ Phase_angle_diff_upper_0_4_22: theta[0,4,22] <= 30
+ Phase_angle_diff_lower_0_4_22: theta[0,4,22] >= -30
+ Phase_angle_diff_upper_0_4_23: theta[0,4,23] <= 30
+ Phase_angle_diff_lower_0_4_23: theta[0,4,23] >= -30
+ Phase_angle_diff_upper_1_2_0: theta[1,2,0] <= 30
+ Phase_angle_diff_lower_1_2_0: theta[1,2,0] >= -30
+ Phase_angle_diff_upper_1_2_1: theta[1,2,1] <= 30
+ Phase_angle_diff_lower_1_2_1: theta[1,2,1] >= -30
+ Phase_angle_diff_upper_1_2_2: theta[1,2,2] <= 30
+ Phase_angle_diff_lower_1_2_2: theta[1,2,2] >= -30
+ Phase_angle_diff_upper_1_2_3: theta[1,2,3] <= 30
+ Phase_angle_diff_lower_1_2_3: theta[1,2,3] >= -30
+ Phase_angle_diff_upper_1_2_4: theta[1,2,4] <= 30
+ Phase_angle_diff_lower_1_2_4: theta[1,2,4] >= -30
+ Phase_angle_diff_upper_1_2_5: theta[1,2,5] <= 30
+ Phase_angle_diff_lower_1_2_5: theta[1,2,5] >= -30
+ Phase_angle_diff_upper_1_2_6: theta[1,2,6] <= 30
+ Phase_angle_diff_lower_1_2_6: theta[1,2,6] >= -30
+ Phase_angle_diff_upper_1_2_7: theta[1,2,7] <= 30
+ Phase_angle_diff_lower_1_2_7: theta[1,2,7] >= -30
+ Phase_angle_diff_upper_1_2_8: theta[1,2,8] <= 30
+ Phase_angle_diff_lower_1_2_8: theta[1,2,8] >= -30
+ Phase_angle_diff_upper_1_2_9: theta[1,2,9] <= 30
+ Phase_angle_diff_lower_1_2_9: theta[1,2,9] >= -30
+ Phase_angle_diff_upper_1_2_10: theta[1,2,10] <= 30
+ Phase_angle_diff_lower_1_2_10: theta[1,2,10] >= -30
+ Phase_angle_diff_upper_1_2_11: theta[1,2,11] <= 30
+ Phase_angle_diff_lower_1_2_11: theta[1,2,11] >= -30
+ Phase_angle_diff_upper_1_2_12: theta[1,2,12] <= 30
+ Phase_angle_diff_lower_1_2_12: theta[1,2,12] >= -30
+ Phase_angle_diff_upper_1_2_13: theta[1,2,13] <= 30
+ Phase_angle_diff_lower_1_2_13: theta[1,2,13] >= -30
+ Phase_angle_diff_upper_1_2_14: theta[1,2,14] <= 30
+ Phase_angle_diff_lower_1_2_14: theta[1,2,14] >= -30
+ Phase_angle_diff_upper_1_2_15: theta[1,2,15] <= 30
+ Phase_angle_diff_lower_1_2_15: theta[1,2,15] >= -30
+ Phase_angle_diff_upper_1_2_16: theta[1,2,16] <= 30
+ Phase_angle_diff_lower_1_2_16: theta[1,2,16] >= -30
+ Phase_angle_diff_upper_1_2_17: theta[1,2,17] <= 30
+ Phase_angle_diff_lower_1_2_17: theta[1,2,17] >= -30
+ Phase_angle_diff_upper_1_2_18: theta[1,2,18] <= 30
+ Phase_angle_diff_lower_1_2_18: theta[1,2,18] >= -30
+ Phase_angle_diff_upper_1_2_19: theta[1,2,19] <= 30
+ Phase_angle_diff_lower_1_2_19: theta[1,2,19] >= -30
+ Phase_angle_diff_upper_1_2_20: theta[1,2,20] <= 30
+ Phase_angle_diff_lower_1_2_20: theta[1,2,20] >= -30
+ Phase_angle_diff_upper_1_2_21: theta[1,2,21] <= 30
+ Phase_angle_diff_lower_1_2_21: theta[1,2,21] >= -30
+ Phase_angle_diff_upper_1_2_22: theta[1,2,22] <= 30
+ Phase_angle_diff_lower_1_2_22: theta[1,2,22] >= -30
+ Phase_angle_diff_upper_1_2_23: theta[1,2,23] <= 30
+ Phase_angle_diff_lower_1_2_23: theta[1,2,23] >= -30
+ Phase_angle_diff_upper_1_3_0: theta[1,3,0] <= 30
+ Phase_angle_diff_lower_1_3_0: theta[1,3,0] >= -30
+ Phase_angle_diff_upper_1_3_1: theta[1,3,1] <= 30
+ Phase_angle_diff_lower_1_3_1: theta[1,3,1] >= -30
+ Phase_angle_diff_upper_1_3_2: theta[1,3,2] <= 30
+ Phase_angle_diff_lower_1_3_2: theta[1,3,2] >= -30
+ Phase_angle_diff_upper_1_3_3: theta[1,3,3] <= 30
+ Phase_angle_diff_lower_1_3_3: theta[1,3,3] >= -30
+ Phase_angle_diff_upper_1_3_4: theta[1,3,4] <= 30
+ Phase_angle_diff_lower_1_3_4: theta[1,3,4] >= -30
+ Phase_angle_diff_upper_1_3_5: theta[1,3,5] <= 30
+ Phase_angle_diff_lower_1_3_5: theta[1,3,5] >= -30
+ Phase_angle_diff_upper_1_3_6: theta[1,3,6] <= 30
+ Phase_angle_diff_lower_1_3_6: theta[1,3,6] >= -30
+ Phase_angle_diff_upper_1_3_7: theta[1,3,7] <= 30
+ Phase_angle_diff_lower_1_3_7: theta[1,3,7] >= -30
+ Phase_angle_diff_upper_1_3_8: theta[1,3,8] <= 30
+ Phase_angle_diff_lower_1_3_8: theta[1,3,8] >= -30
+ Phase_angle_diff_upper_1_3_9: theta[1,3,9] <= 30
+ Phase_angle_diff_lower_1_3_9: theta[1,3,9] >= -30
+ Phase_angle_diff_upper_1_3_10: theta[1,3,10] <= 30
+ Phase_angle_diff_lower_1_3_10: theta[1,3,10] >= -30
+ Phase_angle_diff_upper_1_3_11: theta[1,3,11] <= 30
+ Phase_angle_diff_lower_1_3_11: theta[1,3,11] >= -30
+ Phase_angle_diff_upper_1_3_12: theta[1,3,12] <= 30
+ Phase_angle_diff_lower_1_3_12: theta[1,3,12] >= -30
+ Phase_angle_diff_upper_1_3_13: theta[1,3,13] <= 30
+ Phase_angle_diff_lower_1_3_13: theta[1,3,13] >= -30
+ Phase_angle_diff_upper_1_3_14: theta[1,3,14] <= 30
+ Phase_angle_diff_lower_1_3_14: theta[1,3,14] >= -30
+ Phase_angle_diff_upper_1_3_15: theta[1,3,15] <= 30
+ Phase_angle_diff_lower_1_3_15: theta[1,3,15] >= -30
+ Phase_angle_diff_upper_1_3_16: theta[1,3,16] <= 30
+ Phase_angle_diff_lower_1_3_16: theta[1,3,16] >= -30
+ Phase_angle_diff_upper_1_3_17: theta[1,3,17] <= 30
+ Phase_angle_diff_lower_1_3_17: theta[1,3,17] >= -30
+ Phase_angle_diff_upper_1_3_18: theta[1,3,18] <= 30
+ Phase_angle_diff_lower_1_3_18: theta[1,3,18] >= -30
+ Phase_angle_diff_upper_1_3_19: theta[1,3,19] <= 30
+ Phase_angle_diff_lower_1_3_19: theta[1,3,19] >= -30
+ Phase_angle_diff_upper_1_3_20: theta[1,3,20] <= 30
+ Phase_angle_diff_lower_1_3_20: theta[1,3,20] >= -30
+ Phase_angle_diff_upper_1_3_21: theta[1,3,21] <= 30
+ Phase_angle_diff_lower_1_3_21: theta[1,3,21] >= -30
+ Phase_angle_diff_upper_1_3_22: theta[1,3,22] <= 30
+ Phase_angle_diff_lower_1_3_22: theta[1,3,22] >= -30
+ Phase_angle_diff_upper_1_3_23: theta[1,3,23] <= 30
+ Phase_angle_diff_lower_1_3_23: theta[1,3,23] >= -30
+ Phase_angle_diff_upper_1_4_0: theta[1,4,0] <= 30
+ Phase_angle_diff_lower_1_4_0: theta[1,4,0] >= -30
+ Phase_angle_diff_upper_1_4_1: theta[1,4,1] <= 30
+ Phase_angle_diff_lower_1_4_1: theta[1,4,1] >= -30
+ Phase_angle_diff_upper_1_4_2: theta[1,4,2] <= 30
+ Phase_angle_diff_lower_1_4_2: theta[1,4,2] >= -30
+ Phase_angle_diff_upper_1_4_3: theta[1,4,3] <= 30
+ Phase_angle_diff_lower_1_4_3: theta[1,4,3] >= -30
+ Phase_angle_diff_upper_1_4_4: theta[1,4,4] <= 30
+ Phase_angle_diff_lower_1_4_4: theta[1,4,4] >= -30
+ Phase_angle_diff_upper_1_4_5: theta[1,4,5] <= 30
+ Phase_angle_diff_lower_1_4_5: theta[1,4,5] >= -30
+ Phase_angle_diff_upper_1_4_6: theta[1,4,6] <= 30
+ Phase_angle_diff_lower_1_4_6: theta[1,4,6] >= -30
+ Phase_angle_diff_upper_1_4_7: theta[1,4,7] <= 30
+ Phase_angle_diff_lower_1_4_7: theta[1,4,7] >= -30
+ Phase_angle_diff_upper_1_4_8: theta[1,4,8] <= 30
+ Phase_angle_diff_lower_1_4_8: theta[1,4,8] >= -30
+ Phase_angle_diff_upper_1_4_9: theta[1,4,9] <= 30
+ Phase_angle_diff_lower_1_4_9: theta[1,4,9] >= -30
+ Phase_angle_diff_upper_1_4_10: theta[1,4,10] <= 30
+ Phase_angle_diff_lower_1_4_10: theta[1,4,10] >= -30
+ Phase_angle_diff_upper_1_4_11: theta[1,4,11] <= 30
+ Phase_angle_diff_lower_1_4_11: theta[1,4,11] >= -30
+ Phase_angle_diff_upper_1_4_12: theta[1,4,12] <= 30
+ Phase_angle_diff_lower_1_4_12: theta[1,4,12] >= -30
+ Phase_angle_diff_upper_1_4_13: theta[1,4,13] <= 30
+ Phase_angle_diff_lower_1_4_13: theta[1,4,13] >= -30
+ Phase_angle_diff_upper_1_4_14: theta[1,4,14] <= 30
+ Phase_angle_diff_lower_1_4_14: theta[1,4,14] >= -30
+ Phase_angle_diff_upper_1_4_15: theta[1,4,15] <= 30
+ Phase_angle_diff_lower_1_4_15: theta[1,4,15] >= -30
+ Phase_angle_diff_upper_1_4_16: theta[1,4,16] <= 30
+ Phase_angle_diff_lower_1_4_16: theta[1,4,16] >= -30
+ Phase_angle_diff_upper_1_4_17: theta[1,4,17] <= 30
+ Phase_angle_diff_lower_1_4_17: theta[1,4,17] >= -30
+ Phase_angle_diff_upper_1_4_18: theta[1,4,18] <= 30
+ Phase_angle_diff_lower_1_4_18: theta[1,4,18] >= -30
+ Phase_angle_diff_upper_1_4_19: theta[1,4,19] <= 30
+ Phase_angle_diff_lower_1_4_19: theta[1,4,19] >= -30
+ Phase_angle_diff_upper_1_4_20: theta[1,4,20] <= 30
+ Phase_angle_diff_lower_1_4_20: theta[1,4,20] >= -30
+ Phase_angle_diff_upper_1_4_21: theta[1,4,21] <= 30
+ Phase_angle_diff_lower_1_4_21: theta[1,4,21] >= -30
+ Phase_angle_diff_upper_1_4_22: theta[1,4,22] <= 30
+ Phase_angle_diff_lower_1_4_22: theta[1,4,22] >= -30
+ Phase_angle_diff_upper_1_4_23: theta[1,4,23] <= 30
+ Phase_angle_diff_lower_1_4_23: theta[1,4,23] >= -30
+ Phase_angle_diff_upper_2_3_0: theta[2,3,0] <= 30
+ Phase_angle_diff_lower_2_3_0: theta[2,3,0] >= -30
+ Phase_angle_diff_upper_2_3_1: theta[2,3,1] <= 30
+ Phase_angle_diff_lower_2_3_1: theta[2,3,1] >= -30
+ Phase_angle_diff_upper_2_3_2: theta[2,3,2] <= 30
+ Phase_angle_diff_lower_2_3_2: theta[2,3,2] >= -30
+ Phase_angle_diff_upper_2_3_3: theta[2,3,3] <= 30
+ Phase_angle_diff_lower_2_3_3: theta[2,3,3] >= -30
+ Phase_angle_diff_upper_2_3_4: theta[2,3,4] <= 30
+ Phase_angle_diff_lower_2_3_4: theta[2,3,4] >= -30
+ Phase_angle_diff_upper_2_3_5: theta[2,3,5] <= 30
+ Phase_angle_diff_lower_2_3_5: theta[2,3,5] >= -30
+ Phase_angle_diff_upper_2_3_6: theta[2,3,6] <= 30
+ Phase_angle_diff_lower_2_3_6: theta[2,3,6] >= -30
+ Phase_angle_diff_upper_2_3_7: theta[2,3,7] <= 30
+ Phase_angle_diff_lower_2_3_7: theta[2,3,7] >= -30
+ Phase_angle_diff_upper_2_3_8: theta[2,3,8] <= 30
+ Phase_angle_diff_lower_2_3_8: theta[2,3,8] >= -30
+ Phase_angle_diff_upper_2_3_9: theta[2,3,9] <= 30
+ Phase_angle_diff_lower_2_3_9: theta[2,3,9] >= -30
+ Phase_angle_diff_upper_2_3_10: theta[2,3,10] <= 30
+ Phase_angle_diff_lower_2_3_10: theta[2,3,10] >= -30
+ Phase_angle_diff_upper_2_3_11: theta[2,3,11] <= 30
+ Phase_angle_diff_lower_2_3_11: theta[2,3,11] >= -30
+ Phase_angle_diff_upper_2_3_12: theta[2,3,12] <= 30
+ Phase_angle_diff_lower_2_3_12: theta[2,3,12] >= -30
+ Phase_angle_diff_upper_2_3_13: theta[2,3,13] <= 30
+ Phase_angle_diff_lower_2_3_13: theta[2,3,13] >= -30
+ Phase_angle_diff_upper_2_3_14: theta[2,3,14] <= 30
+ Phase_angle_diff_lower_2_3_14: theta[2,3,14] >= -30
+ Phase_angle_diff_upper_2_3_15: theta[2,3,15] <= 30
+ Phase_angle_diff_lower_2_3_15: theta[2,3,15] >= -30
+ Phase_angle_diff_upper_2_3_16: theta[2,3,16] <= 30
+ Phase_angle_diff_lower_2_3_16: theta[2,3,16] >= -30
+ Phase_angle_diff_upper_2_3_17: theta[2,3,17] <= 30
+ Phase_angle_diff_lower_2_3_17: theta[2,3,17] >= -30
+ Phase_angle_diff_upper_2_3_18: theta[2,3,18] <= 30
+ Phase_angle_diff_lower_2_3_18: theta[2,3,18] >= -30
+ Phase_angle_diff_upper_2_3_19: theta[2,3,19] <= 30
+ Phase_angle_diff_lower_2_3_19: theta[2,3,19] >= -30
+ Phase_angle_diff_upper_2_3_20: theta[2,3,20] <= 30
+ Phase_angle_diff_lower_2_3_20: theta[2,3,20] >= -30
+ Phase_angle_diff_upper_2_3_21: theta[2,3,21] <= 30
+ Phase_angle_diff_lower_2_3_21: theta[2,3,21] >= -30
+ Phase_angle_diff_upper_2_3_22: theta[2,3,22] <= 30
+ Phase_angle_diff_lower_2_3_22: theta[2,3,22] >= -30
+ Phase_angle_diff_upper_2_3_23: theta[2,3,23] <= 30
+ Phase_angle_diff_lower_2_3_23: theta[2,3,23] >= -30
+ Phase_angle_diff_upper_3_4_0: theta[3,4,0] <= 30
+ Phase_angle_diff_lower_3_4_0: theta[3,4,0] >= -30
+ Phase_angle_diff_upper_3_4_1: theta[3,4,1] <= 30
+ Phase_angle_diff_lower_3_4_1: theta[3,4,1] >= -30
+ Phase_angle_diff_upper_3_4_2: theta[3,4,2] <= 30
+ Phase_angle_diff_lower_3_4_2: theta[3,4,2] >= -30
+ Phase_angle_diff_upper_3_4_3: theta[3,4,3] <= 30
+ Phase_angle_diff_lower_3_4_3: theta[3,4,3] >= -30
+ Phase_angle_diff_upper_3_4_4: theta[3,4,4] <= 30
+ Phase_angle_diff_lower_3_4_4: theta[3,4,4] >= -30
+ Phase_angle_diff_upper_3_4_5: theta[3,4,5] <= 30
+ Phase_angle_diff_lower_3_4_5: theta[3,4,5] >= -30
+ Phase_angle_diff_upper_3_4_6: theta[3,4,6] <= 30
+ Phase_angle_diff_lower_3_4_6: theta[3,4,6] >= -30
+ Phase_angle_diff_upper_3_4_7: theta[3,4,7] <= 30
+ Phase_angle_diff_lower_3_4_7: theta[3,4,7] >= -30
+ Phase_angle_diff_upper_3_4_8: theta[3,4,8] <= 30
+ Phase_angle_diff_lower_3_4_8: theta[3,4,8] >= -30
+ Phase_angle_diff_upper_3_4_9: theta[3,4,9] <= 30
+ Phase_angle_diff_lower_3_4_9: theta[3,4,9] >= -30
+ Phase_angle_diff_upper_3_4_10: theta[3,4,10] <= 30
+ Phase_angle_diff_lower_3_4_10: theta[3,4,10] >= -30
+ Phase_angle_diff_upper_3_4_11: theta[3,4,11] <= 30
+ Phase_angle_diff_lower_3_4_11: theta[3,4,11] >= -30
+ Phase_angle_diff_upper_3_4_12: theta[3,4,12] <= 30
+ Phase_angle_diff_lower_3_4_12: theta[3,4,12] >= -30
+ Phase_angle_diff_upper_3_4_13: theta[3,4,13] <= 30
+ Phase_angle_diff_lower_3_4_13: theta[3,4,13] >= -30
+ Phase_angle_diff_upper_3_4_14: theta[3,4,14] <= 30
+ Phase_angle_diff_lower_3_4_14: theta[3,4,14] >= -30
+ Phase_angle_diff_upper_3_4_15: theta[3,4,15] <= 30
+ Phase_angle_diff_lower_3_4_15: theta[3,4,15] >= -30
+ Phase_angle_diff_upper_3_4_16: theta[3,4,16] <= 30
+ Phase_angle_diff_lower_3_4_16: theta[3,4,16] >= -30
+ Phase_angle_diff_upper_3_4_17: theta[3,4,17] <= 30
+ Phase_angle_diff_lower_3_4_17: theta[3,4,17] >= -30
+ Phase_angle_diff_upper_3_4_18: theta[3,4,18] <= 30
+ Phase_angle_diff_lower_3_4_18: theta[3,4,18] >= -30
+ Phase_angle_diff_upper_3_4_19: theta[3,4,19] <= 30
+ Phase_angle_diff_lower_3_4_19: theta[3,4,19] >= -30
+ Phase_angle_diff_upper_3_4_20: theta[3,4,20] <= 30
+ Phase_angle_diff_lower_3_4_20: theta[3,4,20] >= -30
+ Phase_angle_diff_upper_3_4_21: theta[3,4,21] <= 30
+ Phase_angle_diff_lower_3_4_21: theta[3,4,21] >= -30
+ Phase_angle_diff_upper_3_4_22: theta[3,4,22] <= 30
+ Phase_angle_diff_lower_3_4_22: theta[3,4,22] >= -30
+ Phase_angle_diff_upper_3_4_23: theta[3,4,23] <= 30
+ Phase_angle_diff_lower_3_4_23: theta[3,4,23] >= -30
+ Phase_angle_diff_upper_5_10_0: theta[5,10,0] <= 30
+ Phase_angle_diff_lower_5_10_0: theta[5,10,0] >= -30
+ Phase_angle_diff_upper_5_10_1: theta[5,10,1] <= 30
+ Phase_angle_diff_lower_5_10_1: theta[5,10,1] >= -30
+ Phase_angle_diff_upper_5_10_2: theta[5,10,2] <= 30
+ Phase_angle_diff_lower_5_10_2: theta[5,10,2] >= -30
+ Phase_angle_diff_upper_5_10_3: theta[5,10,3] <= 30
+ Phase_angle_diff_lower_5_10_3: theta[5,10,3] >= -30
+ Phase_angle_diff_upper_5_10_4: theta[5,10,4] <= 30
+ Phase_angle_diff_lower_5_10_4: theta[5,10,4] >= -30
+ Phase_angle_diff_upper_5_10_5: theta[5,10,5] <= 30
+ Phase_angle_diff_lower_5_10_5: theta[5,10,5] >= -30
+ Phase_angle_diff_upper_5_10_6: theta[5,10,6] <= 30
+ Phase_angle_diff_lower_5_10_6: theta[5,10,6] >= -30
+ Phase_angle_diff_upper_5_10_7: theta[5,10,7] <= 30
+ Phase_angle_diff_lower_5_10_7: theta[5,10,7] >= -30
+ Phase_angle_diff_upper_5_10_8: theta[5,10,8] <= 30
+ Phase_angle_diff_lower_5_10_8: theta[5,10,8] >= -30
+ Phase_angle_diff_upper_5_10_9: theta[5,10,9] <= 30
+ Phase_angle_diff_lower_5_10_9: theta[5,10,9] >= -30
+ Phase_angle_diff_upper_5_10_10: theta[5,10,10] <= 30
+ Phase_angle_diff_lower_5_10_10: theta[5,10,10] >= -30
+ Phase_angle_diff_upper_5_10_11: theta[5,10,11] <= 30
+ Phase_angle_diff_lower_5_10_11: theta[5,10,11] >= -30
+ Phase_angle_diff_upper_5_10_12: theta[5,10,12] <= 30
+ Phase_angle_diff_lower_5_10_12: theta[5,10,12] >= -30
+ Phase_angle_diff_upper_5_10_13: theta[5,10,13] <= 30
+ Phase_angle_diff_lower_5_10_13: theta[5,10,13] >= -30
+ Phase_angle_diff_upper_5_10_14: theta[5,10,14] <= 30
+ Phase_angle_diff_lower_5_10_14: theta[5,10,14] >= -30
+ Phase_angle_diff_upper_5_10_15: theta[5,10,15] <= 30
+ Phase_angle_diff_lower_5_10_15: theta[5,10,15] >= -30
+ Phase_angle_diff_upper_5_10_16: theta[5,10,16] <= 30
+ Phase_angle_diff_lower_5_10_16: theta[5,10,16] >= -30
+ Phase_angle_diff_upper_5_10_17: theta[5,10,17] <= 30
+ Phase_angle_diff_lower_5_10_17: theta[5,10,17] >= -30
+ Phase_angle_diff_upper_5_10_18: theta[5,10,18] <= 30
+ Phase_angle_diff_lower_5_10_18: theta[5,10,18] >= -30
+ Phase_angle_diff_upper_5_10_19: theta[5,10,19] <= 30
+ Phase_angle_diff_lower_5_10_19: theta[5,10,19] >= -30
+ Phase_angle_diff_upper_5_10_20: theta[5,10,20] <= 30
+ Phase_angle_diff_lower_5_10_20: theta[5,10,20] >= -30
+ Phase_angle_diff_upper_5_10_21: theta[5,10,21] <= 30
+ Phase_angle_diff_lower_5_10_21: theta[5,10,21] >= -30
+ Phase_angle_diff_upper_5_10_22: theta[5,10,22] <= 30
+ Phase_angle_diff_lower_5_10_22: theta[5,10,22] >= -30
+ Phase_angle_diff_upper_5_10_23: theta[5,10,23] <= 30
+ Phase_angle_diff_lower_5_10_23: theta[5,10,23] >= -30
+ Phase_angle_diff_upper_5_11_0: theta[5,11,0] <= 30
+ Phase_angle_diff_lower_5_11_0: theta[5,11,0] >= -30
+ Phase_angle_diff_upper_5_11_1: theta[5,11,1] <= 30
+ Phase_angle_diff_lower_5_11_1: theta[5,11,1] >= -30
+ Phase_angle_diff_upper_5_11_2: theta[5,11,2] <= 30
+ Phase_angle_diff_lower_5_11_2: theta[5,11,2] >= -30
+ Phase_angle_diff_upper_5_11_3: theta[5,11,3] <= 30
+ Phase_angle_diff_lower_5_11_3: theta[5,11,3] >= -30
+ Phase_angle_diff_upper_5_11_4: theta[5,11,4] <= 30
+ Phase_angle_diff_lower_5_11_4: theta[5,11,4] >= -30
+ Phase_angle_diff_upper_5_11_5: theta[5,11,5] <= 30
+ Phase_angle_diff_lower_5_11_5: theta[5,11,5] >= -30
+ Phase_angle_diff_upper_5_11_6: theta[5,11,6] <= 30
+ Phase_angle_diff_lower_5_11_6: theta[5,11,6] >= -30
+ Phase_angle_diff_upper_5_11_7: theta[5,11,7] <= 30
+ Phase_angle_diff_lower_5_11_7: theta[5,11,7] >= -30
+ Phase_angle_diff_upper_5_11_8: theta[5,11,8] <= 30
+ Phase_angle_diff_lower_5_11_8: theta[5,11,8] >= -30
+ Phase_angle_diff_upper_5_11_9: theta[5,11,9] <= 30
+ Phase_angle_diff_lower_5_11_9: theta[5,11,9] >= -30
+ Phase_angle_diff_upper_5_11_10: theta[5,11,10] <= 30
+ Phase_angle_diff_lower_5_11_10: theta[5,11,10] >= -30
+ Phase_angle_diff_upper_5_11_11: theta[5,11,11] <= 30
+ Phase_angle_diff_lower_5_11_11: theta[5,11,11] >= -30
+ Phase_angle_diff_upper_5_11_12: theta[5,11,12] <= 30
+ Phase_angle_diff_lower_5_11_12: theta[5,11,12] >= -30
+ Phase_angle_diff_upper_5_11_13: theta[5,11,13] <= 30
+ Phase_angle_diff_lower_5_11_13: theta[5,11,13] >= -30
+ Phase_angle_diff_upper_5_11_14: theta[5,11,14] <= 30
+ Phase_angle_diff_lower_5_11_14: theta[5,11,14] >= -30
+ Phase_angle_diff_upper_5_11_15: theta[5,11,15] <= 30
+ Phase_angle_diff_lower_5_11_15: theta[5,11,15] >= -30
+ Phase_angle_diff_upper_5_11_16: theta[5,11,16] <= 30
+ Phase_angle_diff_lower_5_11_16: theta[5,11,16] >= -30
+ Phase_angle_diff_upper_5_11_17: theta[5,11,17] <= 30
+ Phase_angle_diff_lower_5_11_17: theta[5,11,17] >= -30
+ Phase_angle_diff_upper_5_11_18: theta[5,11,18] <= 30
+ Phase_angle_diff_lower_5_11_18: theta[5,11,18] >= -30
+ Phase_angle_diff_upper_5_11_19: theta[5,11,19] <= 30
+ Phase_angle_diff_lower_5_11_19: theta[5,11,19] >= -30
+ Phase_angle_diff_upper_5_11_20: theta[5,11,20] <= 30
+ Phase_angle_diff_lower_5_11_20: theta[5,11,20] >= -30
+ Phase_angle_diff_upper_5_11_21: theta[5,11,21] <= 30
+ Phase_angle_diff_lower_5_11_21: theta[5,11,21] >= -30
+ Phase_angle_diff_upper_5_11_22: theta[5,11,22] <= 30
+ Phase_angle_diff_lower_5_11_22: theta[5,11,22] >= -30
+ Phase_angle_diff_upper_5_11_23: theta[5,11,23] <= 30
+ Phase_angle_diff_lower_5_11_23: theta[5,11,23] >= -30
+ Phase_angle_diff_upper_5_12_0: theta[5,12,0] <= 30
+ Phase_angle_diff_lower_5_12_0: theta[5,12,0] >= -30
+ Phase_angle_diff_upper_5_12_1: theta[5,12,1] <= 30
+ Phase_angle_diff_lower_5_12_1: theta[5,12,1] >= -30
+ Phase_angle_diff_upper_5_12_2: theta[5,12,2] <= 30
+ Phase_angle_diff_lower_5_12_2: theta[5,12,2] >= -30
+ Phase_angle_diff_upper_5_12_3: theta[5,12,3] <= 30
+ Phase_angle_diff_lower_5_12_3: theta[5,12,3] >= -30
+ Phase_angle_diff_upper_5_12_4: theta[5,12,4] <= 30
+ Phase_angle_diff_lower_5_12_4: theta[5,12,4] >= -30
+ Phase_angle_diff_upper_5_12_5: theta[5,12,5] <= 30
+ Phase_angle_diff_lower_5_12_5: theta[5,12,5] >= -30
+ Phase_angle_diff_upper_5_12_6: theta[5,12,6] <= 30
+ Phase_angle_diff_lower_5_12_6: theta[5,12,6] >= -30
+ Phase_angle_diff_upper_5_12_7: theta[5,12,7] <= 30
+ Phase_angle_diff_lower_5_12_7: theta[5,12,7] >= -30
+ Phase_angle_diff_upper_5_12_8: theta[5,12,8] <= 30
+ Phase_angle_diff_lower_5_12_8: theta[5,12,8] >= -30
+ Phase_angle_diff_upper_5_12_9: theta[5,12,9] <= 30
+ Phase_angle_diff_lower_5_12_9: theta[5,12,9] >= -30
+ Phase_angle_diff_upper_5_12_10: theta[5,12,10] <= 30
+ Phase_angle_diff_lower_5_12_10: theta[5,12,10] >= -30
+ Phase_angle_diff_upper_5_12_11: theta[5,12,11] <= 30
+ Phase_angle_diff_lower_5_12_11: theta[5,12,11] >= -30
+ Phase_angle_diff_upper_5_12_12: theta[5,12,12] <= 30
+ Phase_angle_diff_lower_5_12_12: theta[5,12,12] >= -30
+ Phase_angle_diff_upper_5_12_13: theta[5,12,13] <= 30
+ Phase_angle_diff_lower_5_12_13: theta[5,12,13] >= -30
+ Phase_angle_diff_upper_5_12_14: theta[5,12,14] <= 30
+ Phase_angle_diff_lower_5_12_14: theta[5,12,14] >= -30
+ Phase_angle_diff_upper_5_12_15: theta[5,12,15] <= 30
+ Phase_angle_diff_lower_5_12_15: theta[5,12,15] >= -30
+ Phase_angle_diff_upper_5_12_16: theta[5,12,16] <= 30
+ Phase_angle_diff_lower_5_12_16: theta[5,12,16] >= -30
+ Phase_angle_diff_upper_5_12_17: theta[5,12,17] <= 30
+ Phase_angle_diff_lower_5_12_17: theta[5,12,17] >= -30
+ Phase_angle_diff_upper_5_12_18: theta[5,12,18] <= 30
+ Phase_angle_diff_lower_5_12_18: theta[5,12,18] >= -30
+ Phase_angle_diff_upper_5_12_19: theta[5,12,19] <= 30
+ Phase_angle_diff_lower_5_12_19: theta[5,12,19] >= -30
+ Phase_angle_diff_upper_5_12_20: theta[5,12,20] <= 30
+ Phase_angle_diff_lower_5_12_20: theta[5,12,20] >= -30
+ Phase_angle_diff_upper_5_12_21: theta[5,12,21] <= 30
+ Phase_angle_diff_lower_5_12_21: theta[5,12,21] >= -30
+ Phase_angle_diff_upper_5_12_22: theta[5,12,22] <= 30
+ Phase_angle_diff_lower_5_12_22: theta[5,12,22] >= -30
+ Phase_angle_diff_upper_5_12_23: theta[5,12,23] <= 30
+ Phase_angle_diff_lower_5_12_23: theta[5,12,23] >= -30
+ Phase_angle_diff_upper_8_9_0: theta[8,9,0] <= 30
+ Phase_angle_diff_lower_8_9_0: theta[8,9,0] >= -30
+ Phase_angle_diff_upper_8_9_1: theta[8,9,1] <= 30
+ Phase_angle_diff_lower_8_9_1: theta[8,9,1] >= -30
+ Phase_angle_diff_upper_8_9_2: theta[8,9,2] <= 30
+ Phase_angle_diff_lower_8_9_2: theta[8,9,2] >= -30
+ Phase_angle_diff_upper_8_9_3: theta[8,9,3] <= 30
+ Phase_angle_diff_lower_8_9_3: theta[8,9,3] >= -30
+ Phase_angle_diff_upper_8_9_4: theta[8,9,4] <= 30
+ Phase_angle_diff_lower_8_9_4: theta[8,9,4] >= -30
+ Phase_angle_diff_upper_8_9_5: theta[8,9,5] <= 30
+ Phase_angle_diff_lower_8_9_5: theta[8,9,5] >= -30
+ Phase_angle_diff_upper_8_9_6: theta[8,9,6] <= 30
+ Phase_angle_diff_lower_8_9_6: theta[8,9,6] >= -30
+ Phase_angle_diff_upper_8_9_7: theta[8,9,7] <= 30
+ Phase_angle_diff_lower_8_9_7: theta[8,9,7] >= -30
+ Phase_angle_diff_upper_8_9_8: theta[8,9,8] <= 30
+ Phase_angle_diff_lower_8_9_8: theta[8,9,8] >= -30
+ Phase_angle_diff_upper_8_9_9: theta[8,9,9] <= 30
+ Phase_angle_diff_lower_8_9_9: theta[8,9,9] >= -30
+ Phase_angle_diff_upper_8_9_10: theta[8,9,10] <= 30
+ Phase_angle_diff_lower_8_9_10: theta[8,9,10] >= -30
+ Phase_angle_diff_upper_8_9_11: theta[8,9,11] <= 30
+ Phase_angle_diff_lower_8_9_11: theta[8,9,11] >= -30
+ Phase_angle_diff_upper_8_9_12: theta[8,9,12] <= 30
+ Phase_angle_diff_lower_8_9_12: theta[8,9,12] >= -30
+ Phase_angle_diff_upper_8_9_13: theta[8,9,13] <= 30
+ Phase_angle_diff_lower_8_9_13: theta[8,9,13] >= -30
+ Phase_angle_diff_upper_8_9_14: theta[8,9,14] <= 30
+ Phase_angle_diff_lower_8_9_14: theta[8,9,14] >= -30
+ Phase_angle_diff_upper_8_9_15: theta[8,9,15] <= 30
+ Phase_angle_diff_lower_8_9_15: theta[8,9,15] >= -30
+ Phase_angle_diff_upper_8_9_16: theta[8,9,16] <= 30
+ Phase_angle_diff_lower_8_9_16: theta[8,9,16] >= -30
+ Phase_angle_diff_upper_8_9_17: theta[8,9,17] <= 30
+ Phase_angle_diff_lower_8_9_17: theta[8,9,17] >= -30
+ Phase_angle_diff_upper_8_9_18: theta[8,9,18] <= 30
+ Phase_angle_diff_lower_8_9_18: theta[8,9,18] >= -30
+ Phase_angle_diff_upper_8_9_19: theta[8,9,19] <= 30
+ Phase_angle_diff_lower_8_9_19: theta[8,9,19] >= -30
+ Phase_angle_diff_upper_8_9_20: theta[8,9,20] <= 30
+ Phase_angle_diff_lower_8_9_20: theta[8,9,20] >= -30
+ Phase_angle_diff_upper_8_9_21: theta[8,9,21] <= 30
+ Phase_angle_diff_lower_8_9_21: theta[8,9,21] >= -30
+ Phase_angle_diff_upper_8_9_22: theta[8,9,22] <= 30
+ Phase_angle_diff_lower_8_9_22: theta[8,9,22] >= -30
+ Phase_angle_diff_upper_8_9_23: theta[8,9,23] <= 30
+ Phase_angle_diff_lower_8_9_23: theta[8,9,23] >= -30
+ Phase_angle_diff_upper_8_13_0: theta[8,13,0] <= 30
+ Phase_angle_diff_lower_8_13_0: theta[8,13,0] >= -30
+ Phase_angle_diff_upper_8_13_1: theta[8,13,1] <= 30
+ Phase_angle_diff_lower_8_13_1: theta[8,13,1] >= -30
+ Phase_angle_diff_upper_8_13_2: theta[8,13,2] <= 30
+ Phase_angle_diff_lower_8_13_2: theta[8,13,2] >= -30
+ Phase_angle_diff_upper_8_13_3: theta[8,13,3] <= 30
+ Phase_angle_diff_lower_8_13_3: theta[8,13,3] >= -30
+ Phase_angle_diff_upper_8_13_4: theta[8,13,4] <= 30
+ Phase_angle_diff_lower_8_13_4: theta[8,13,4] >= -30
+ Phase_angle_diff_upper_8_13_5: theta[8,13,5] <= 30
+ Phase_angle_diff_lower_8_13_5: theta[8,13,5] >= -30
+ Phase_angle_diff_upper_8_13_6: theta[8,13,6] <= 30
+ Phase_angle_diff_lower_8_13_6: theta[8,13,6] >= -30
+ Phase_angle_diff_upper_8_13_7: theta[8,13,7] <= 30
+ Phase_angle_diff_lower_8_13_7: theta[8,13,7] >= -30
+ Phase_angle_diff_upper_8_13_8: theta[8,13,8] <= 30
+ Phase_angle_diff_lower_8_13_8: theta[8,13,8] >= -30
+ Phase_angle_diff_upper_8_13_9: theta[8,13,9] <= 30
+ Phase_angle_diff_lower_8_13_9: theta[8,13,9] >= -30
+ Phase_angle_diff_upper_8_13_10: theta[8,13,10] <= 30
+ Phase_angle_diff_lower_8_13_10: theta[8,13,10] >= -30
+ Phase_angle_diff_upper_8_13_11: theta[8,13,11] <= 30
+ Phase_angle_diff_lower_8_13_11: theta[8,13,11] >= -30
+ Phase_angle_diff_upper_8_13_12: theta[8,13,12] <= 30
+ Phase_angle_diff_lower_8_13_12: theta[8,13,12] >= -30
+ Phase_angle_diff_upper_8_13_13: theta[8,13,13] <= 30
+ Phase_angle_diff_lower_8_13_13: theta[8,13,13] >= -30
+ Phase_angle_diff_upper_8_13_14: theta[8,13,14] <= 30
+ Phase_angle_diff_lower_8_13_14: theta[8,13,14] >= -30
+ Phase_angle_diff_upper_8_13_15: theta[8,13,15] <= 30
+ Phase_angle_diff_lower_8_13_15: theta[8,13,15] >= -30
+ Phase_angle_diff_upper_8_13_16: theta[8,13,16] <= 30
+ Phase_angle_diff_lower_8_13_16: theta[8,13,16] >= -30
+ Phase_angle_diff_upper_8_13_17: theta[8,13,17] <= 30
+ Phase_angle_diff_lower_8_13_17: theta[8,13,17] >= -30
+ Phase_angle_diff_upper_8_13_18: theta[8,13,18] <= 30
+ Phase_angle_diff_lower_8_13_18: theta[8,13,18] >= -30
+ Phase_angle_diff_upper_8_13_19: theta[8,13,19] <= 30
+ Phase_angle_diff_lower_8_13_19: theta[8,13,19] >= -30
+ Phase_angle_diff_upper_8_13_20: theta[8,13,20] <= 30
+ Phase_angle_diff_lower_8_13_20: theta[8,13,20] >= -30
+ Phase_angle_diff_upper_8_13_21: theta[8,13,21] <= 30
+ Phase_angle_diff_lower_8_13_21: theta[8,13,21] >= -30
+ Phase_angle_diff_upper_8_13_22: theta[8,13,22] <= 30
+ Phase_angle_diff_lower_8_13_22: theta[8,13,22] >= -30
+ Phase_angle_diff_upper_8_13_23: theta[8,13,23] <= 30
+ Phase_angle_diff_lower_8_13_23: theta[8,13,23] >= -30
+ Phase_angle_diff_upper_9_10_0: theta[9,10,0] <= 30
+ Phase_angle_diff_lower_9_10_0: theta[9,10,0] >= -30
+ Phase_angle_diff_upper_9_10_1: theta[9,10,1] <= 30
+ Phase_angle_diff_lower_9_10_1: theta[9,10,1] >= -30
+ Phase_angle_diff_upper_9_10_2: theta[9,10,2] <= 30
+ Phase_angle_diff_lower_9_10_2: theta[9,10,2] >= -30
+ Phase_angle_diff_upper_9_10_3: theta[9,10,3] <= 30
+ Phase_angle_diff_lower_9_10_3: theta[9,10,3] >= -30
+ Phase_angle_diff_upper_9_10_4: theta[9,10,4] <= 30
+ Phase_angle_diff_lower_9_10_4: theta[9,10,4] >= -30
+ Phase_angle_diff_upper_9_10_5: theta[9,10,5] <= 30
+ Phase_angle_diff_lower_9_10_5: theta[9,10,5] >= -30
+ Phase_angle_diff_upper_9_10_6: theta[9,10,6] <= 30
+ Phase_angle_diff_lower_9_10_6: theta[9,10,6] >= -30
+ Phase_angle_diff_upper_9_10_7: theta[9,10,7] <= 30
+ Phase_angle_diff_lower_9_10_7: theta[9,10,7] >= -30
+ Phase_angle_diff_upper_9_10_8: theta[9,10,8] <= 30
+ Phase_angle_diff_lower_9_10_8: theta[9,10,8] >= -30
+ Phase_angle_diff_upper_9_10_9: theta[9,10,9] <= 30
+ Phase_angle_diff_lower_9_10_9: theta[9,10,9] >= -30
+ Phase_angle_diff_upper_9_10_10: theta[9,10,10] <= 30
+ Phase_angle_diff_lower_9_10_10: theta[9,10,10] >= -30
+ Phase_angle_diff_upper_9_10_11: theta[9,10,11] <= 30
+ Phase_angle_diff_lower_9_10_11: theta[9,10,11] >= -30
+ Phase_angle_diff_upper_9_10_12: theta[9,10,12] <= 30
+ Phase_angle_diff_lower_9_10_12: theta[9,10,12] >= -30
+ Phase_angle_diff_upper_9_10_13: theta[9,10,13] <= 30
+ Phase_angle_diff_lower_9_10_13: theta[9,10,13] >= -30
+ Phase_angle_diff_upper_9_10_14: theta[9,10,14] <= 30
+ Phase_angle_diff_lower_9_10_14: theta[9,10,14] >= -30
+ Phase_angle_diff_upper_9_10_15: theta[9,10,15] <= 30
+ Phase_angle_diff_lower_9_10_15: theta[9,10,15] >= -30
+ Phase_angle_diff_upper_9_10_16: theta[9,10,16] <= 30
+ Phase_angle_diff_lower_9_10_16: theta[9,10,16] >= -30
+ Phase_angle_diff_upper_9_10_17: theta[9,10,17] <= 30
+ Phase_angle_diff_lower_9_10_17: theta[9,10,17] >= -30
+ Phase_angle_diff_upper_9_10_18: theta[9,10,18] <= 30
+ Phase_angle_diff_lower_9_10_18: theta[9,10,18] >= -30
+ Phase_angle_diff_upper_9_10_19: theta[9,10,19] <= 30
+ Phase_angle_diff_lower_9_10_19: theta[9,10,19] >= -30
+ Phase_angle_diff_upper_9_10_20: theta[9,10,20] <= 30
+ Phase_angle_diff_lower_9_10_20: theta[9,10,20] >= -30
+ Phase_angle_diff_upper_9_10_21: theta[9,10,21] <= 30
+ Phase_angle_diff_lower_9_10_21: theta[9,10,21] >= -30
+ Phase_angle_diff_upper_9_10_22: theta[9,10,22] <= 30
+ Phase_angle_diff_lower_9_10_22: theta[9,10,22] >= -30
+ Phase_angle_diff_upper_9_10_23: theta[9,10,23] <= 30
+ Phase_angle_diff_lower_9_10_23: theta[9,10,23] >= -30
+ Phase_angle_diff_upper_11_12_0: theta[11,12,0] <= 30
+ Phase_angle_diff_lower_11_12_0: theta[11,12,0] >= -30
+ Phase_angle_diff_upper_11_12_1: theta[11,12,1] <= 30
+ Phase_angle_diff_lower_11_12_1: theta[11,12,1] >= -30
+ Phase_angle_diff_upper_11_12_2: theta[11,12,2] <= 30
+ Phase_angle_diff_lower_11_12_2: theta[11,12,2] >= -30
+ Phase_angle_diff_upper_11_12_3: theta[11,12,3] <= 30
+ Phase_angle_diff_lower_11_12_3: theta[11,12,3] >= -30
+ Phase_angle_diff_upper_11_12_4: theta[11,12,4] <= 30
+ Phase_angle_diff_lower_11_12_4: theta[11,12,4] >= -30
+ Phase_angle_diff_upper_11_12_5: theta[11,12,5] <= 30
+ Phase_angle_diff_lower_11_12_5: theta[11,12,5] >= -30
+ Phase_angle_diff_upper_11_12_6: theta[11,12,6] <= 30
+ Phase_angle_diff_lower_11_12_6: theta[11,12,6] >= -30
+ Phase_angle_diff_upper_11_12_7: theta[11,12,7] <= 30
+ Phase_angle_diff_lower_11_12_7: theta[11,12,7] >= -30
+ Phase_angle_diff_upper_11_12_8: theta[11,12,8] <= 30
+ Phase_angle_diff_lower_11_12_8: theta[11,12,8] >= -30
+ Phase_angle_diff_upper_11_12_9: theta[11,12,9] <= 30
+ Phase_angle_diff_lower_11_12_9: theta[11,12,9] >= -30
+ Phase_angle_diff_upper_11_12_10: theta[11,12,10] <= 30
+ Phase_angle_diff_lower_11_12_10: theta[11,12,10] >= -30
+ Phase_angle_diff_upper_11_12_11: theta[11,12,11] <= 30
+ Phase_angle_diff_lower_11_12_11: theta[11,12,11] >= -30
+ Phase_angle_diff_upper_11_12_12: theta[11,12,12] <= 30
+ Phase_angle_diff_lower_11_12_12: theta[11,12,12] >= -30
+ Phase_angle_diff_upper_11_12_13: theta[11,12,13] <= 30
+ Phase_angle_diff_lower_11_12_13: theta[11,12,13] >= -30
+ Phase_angle_diff_upper_11_12_14: theta[11,12,14] <= 30
+ Phase_angle_diff_lower_11_12_14: theta[11,12,14] >= -30
+ Phase_angle_diff_upper_11_12_15: theta[11,12,15] <= 30
+ Phase_angle_diff_lower_11_12_15: theta[11,12,15] >= -30
+ Phase_angle_diff_upper_11_12_16: theta[11,12,16] <= 30
+ Phase_angle_diff_lower_11_12_16: theta[11,12,16] >= -30
+ Phase_angle_diff_upper_11_12_17: theta[11,12,17] <= 30
+ Phase_angle_diff_lower_11_12_17: theta[11,12,17] >= -30
+ Phase_angle_diff_upper_11_12_18: theta[11,12,18] <= 30
+ Phase_angle_diff_lower_11_12_18: theta[11,12,18] >= -30
+ Phase_angle_diff_upper_11_12_19: theta[11,12,19] <= 30
+ Phase_angle_diff_lower_11_12_19: theta[11,12,19] >= -30
+ Phase_angle_diff_upper_11_12_20: theta[11,12,20] <= 30
+ Phase_angle_diff_lower_11_12_20: theta[11,12,20] >= -30
+ Phase_angle_diff_upper_11_12_21: theta[11,12,21] <= 30
+ Phase_angle_diff_lower_11_12_21: theta[11,12,21] >= -30
+ Phase_angle_diff_upper_11_12_22: theta[11,12,22] <= 30
+ Phase_angle_diff_lower_11_12_22: theta[11,12,22] >= -30
+ Phase_angle_diff_upper_11_12_23: theta[11,12,23] <= 30
+ Phase_angle_diff_lower_11_12_23: theta[11,12,23] >= -30
+ Phase_angle_diff_upper_12_13_0: theta[12,13,0] <= 30
+ Phase_angle_diff_lower_12_13_0: theta[12,13,0] >= -30
+ Phase_angle_diff_upper_12_13_1: theta[12,13,1] <= 30
+ Phase_angle_diff_lower_12_13_1: theta[12,13,1] >= -30
+ Phase_angle_diff_upper_12_13_2: theta[12,13,2] <= 30
+ Phase_angle_diff_lower_12_13_2: theta[12,13,2] >= -30
+ Phase_angle_diff_upper_12_13_3: theta[12,13,3] <= 30
+ Phase_angle_diff_lower_12_13_3: theta[12,13,3] >= -30
+ Phase_angle_diff_upper_12_13_4: theta[12,13,4] <= 30
+ Phase_angle_diff_lower_12_13_4: theta[12,13,4] >= -30
+ Phase_angle_diff_upper_12_13_5: theta[12,13,5] <= 30
+ Phase_angle_diff_lower_12_13_5: theta[12,13,5] >= -30
+ Phase_angle_diff_upper_12_13_6: theta[12,13,6] <= 30
+ Phase_angle_diff_lower_12_13_6: theta[12,13,6] >= -30
+ Phase_angle_diff_upper_12_13_7: theta[12,13,7] <= 30
+ Phase_angle_diff_lower_12_13_7: theta[12,13,7] >= -30
+ Phase_angle_diff_upper_12_13_8: theta[12,13,8] <= 30
+ Phase_angle_diff_lower_12_13_8: theta[12,13,8] >= -30
+ Phase_angle_diff_upper_12_13_9: theta[12,13,9] <= 30
+ Phase_angle_diff_lower_12_13_9: theta[12,13,9] >= -30
+ Phase_angle_diff_upper_12_13_10: theta[12,13,10] <= 30
+ Phase_angle_diff_lower_12_13_10: theta[12,13,10] >= -30
+ Phase_angle_diff_upper_12_13_11: theta[12,13,11] <= 30
+ Phase_angle_diff_lower_12_13_11: theta[12,13,11] >= -30
+ Phase_angle_diff_upper_12_13_12: theta[12,13,12] <= 30
+ Phase_angle_diff_lower_12_13_12: theta[12,13,12] >= -30
+ Phase_angle_diff_upper_12_13_13: theta[12,13,13] <= 30
+ Phase_angle_diff_lower_12_13_13: theta[12,13,13] >= -30
+ Phase_angle_diff_upper_12_13_14: theta[12,13,14] <= 30
+ Phase_angle_diff_lower_12_13_14: theta[12,13,14] >= -30
+ Phase_angle_diff_upper_12_13_15: theta[12,13,15] <= 30
+ Phase_angle_diff_lower_12_13_15: theta[12,13,15] >= -30
+ Phase_angle_diff_upper_12_13_16: theta[12,13,16] <= 30
+ Phase_angle_diff_lower_12_13_16: theta[12,13,16] >= -30
+ Phase_angle_diff_upper_12_13_17: theta[12,13,17] <= 30
+ Phase_angle_diff_lower_12_13_17: theta[12,13,17] >= -30
+ Phase_angle_diff_upper_12_13_18: theta[12,13,18] <= 30
+ Phase_angle_diff_lower_12_13_18: theta[12,13,18] >= -30
+ Phase_angle_diff_upper_12_13_19: theta[12,13,19] <= 30
+ Phase_angle_diff_lower_12_13_19: theta[12,13,19] >= -30
+ Phase_angle_diff_upper_12_13_20: theta[12,13,20] <= 30
+ Phase_angle_diff_lower_12_13_20: theta[12,13,20] >= -30
+ Phase_angle_diff_upper_12_13_21: theta[12,13,21] <= 30
+ Phase_angle_diff_lower_12_13_21: theta[12,13,21] >= -30
+ Phase_angle_diff_upper_12_13_22: theta[12,13,22] <= 30
+ Phase_angle_diff_lower_12_13_22: theta[12,13,22] >= -30
+ Phase_angle_diff_upper_12_13_23: theta[12,13,23] <= 30
+ Phase_angle_diff_lower_12_13_23: theta[12,13,23] >= -30
+ SOC_balance_0_0: Discharging[0,0] = 0
+ SOC_balance_0_1: Discharging[0,1] = 0
+ SOC_balance_0_2: Discharging[0,2] = 0
+ SOC_balance_0_3: Discharging[0,3] = 0
+ SOC_balance_0_4: Discharging[0,4] = 0
+ SOC_balance_0_5: Discharging[0,5] = 0
+ SOC_balance_0_6: Discharging[0,6] = 0
+ SOC_balance_0_7: Discharging[0,7] = 0
+ SOC_balance_0_8: Discharging[0,8] = 0
+ SOC_balance_0_9: Discharging[0,9] = 0
+ SOC_balance_0_10: Discharging[0,10] = 0
+ SOC_balance_0_11: Discharging[0,11] = 0
+ SOC_balance_0_12: Discharging[0,12] = 0
+ SOC_balance_0_13: Discharging[0,13] = 0
+ SOC_balance_0_14: Discharging[0,14] = 0
+ SOC_balance_0_15: Discharging[0,15] = 0
+ SOC_balance_0_16: Discharging[0,16] = 0
+ SOC_balance_0_17: Discharging[0,17] = 0
+ SOC_balance_0_18: Discharging[0,18] = 0
+ SOC_balance_0_19: Discharging[0,19] = 0
+ SOC_balance_0_20: Discharging[0,20] = 0
+ SOC_balance_0_21: Discharging[0,21] = 0
+ SOC_balance_0_22: Discharging[0,22] = 0
+ SOC_balance_0_23: Discharging[0,23] = 0
+ SOC_balance_1_0: - 0.045 SOC[1,0] + 0.045 SOC[1,1] - 0.9 Charging[1,0]
+   + Discharging[1,0] = -0.008946
+ SOC_balance_1_1: - 0.045 SOC[1,1] + 0.045 SOC[1,2] - 0.9 Charging[1,1]
+   + Discharging[1,1] = -0.008946
+ SOC_balance_1_2: - 0.045 SOC[1,2] + 0.045 SOC[1,3] - 0.9 Charging[1,2]
+   + Discharging[1,2] = -0.008946
+ SOC_balance_1_3: - 0.045 SOC[1,3] + 0.045 SOC[1,4] - 0.9 Charging[1,3]
+   + Discharging[1,3] = -0.008946
+ SOC_balance_1_4: - 0.045 SOC[1,4] + 0.045 SOC[1,5] - 0.9 Charging[1,4]
+   + Discharging[1,4] = -0.008946
+ SOC_balance_1_5: - 0.045 SOC[1,5] + 0.045 SOC[1,6] - 0.9 Charging[1,5]
+   + Discharging[1,5] = -0.008946
+ SOC_balance_1_6: - 0.045 SOC[1,6] + 0.045 SOC[1,7] - 0.9 Charging[1,6]
+   + Discharging[1,6] = -0.008946
+ SOC_balance_1_7: - 0.045 SOC[1,7] + 0.045 SOC[1,8] - 0.9 Charging[1,7]
+   + Discharging[1,7] = -0.008946
+ SOC_balance_1_8: - 0.045 SOC[1,8] + 0.045 SOC[1,9] - 0.9 Charging[1,8]
+   + Discharging[1,8] = -0.008946
+ SOC_balance_1_9: - 0.045 SOC[1,9] + 0.045 SOC[1,10] - 0.9 Charging[1,9]
+   + Discharging[1,9] = -0.008946
+ SOC_balance_1_10: - 0.045 SOC[1,10] + 0.045 SOC[1,11] - 0.9 Charging[1,10]
+   + Discharging[1,10] = -0.008946
+ SOC_balance_1_11: - 0.045 SOC[1,11] + 0.045 SOC[1,12] - 0.9 Charging[1,11]
+   + Discharging[1,11] = -0.008946
+ SOC_balance_1_12: - 0.045 SOC[1,12] + 0.045 SOC[1,13] - 0.9 Charging[1,12]
+   + Discharging[1,12] = -0.008946
+ SOC_balance_1_13: - 0.045 SOC[1,13] + 0.045 SOC[1,14] - 0.9 Charging[1,13]
+   + Discharging[1,13] = -0.008946
+ SOC_balance_1_14: - 0.045 SOC[1,14] + 0.045 SOC[1,15] - 0.9 Charging[1,14]
+   + Discharging[1,14] = -0.008946
+ SOC_balance_1_15: - 0.045 SOC[1,15] + 0.045 SOC[1,16] - 0.9 Charging[1,15]
+   + Discharging[1,15] = -0.008946
+ SOC_balance_1_16: - 0.045 SOC[1,16] + 0.045 SOC[1,17] - 0.9 Charging[1,16]
+   + Discharging[1,16] = -0.008946
+ SOC_balance_1_17: - 0.045 SOC[1,17] + 0.045 SOC[1,18] - 0.9 Charging[1,17]
+   + Discharging[1,17] = -0.008946
+ SOC_balance_1_18: - 0.045 SOC[1,18] + 0.045 SOC[1,19] - 0.9 Charging[1,18]
+   + Discharging[1,18] = -0.008946
+ SOC_balance_1_19: - 0.045 SOC[1,19] + 0.045 SOC[1,20] - 0.9 Charging[1,19]
+   + Discharging[1,19] = -0.008946
+ SOC_balance_1_20: - 0.045 SOC[1,20] + 0.045 SOC[1,21] - 0.9 Charging[1,20]
+   + Discharging[1,20] = -0.008946
+ SOC_balance_1_21: - 0.045 SOC[1,21] + 0.045 SOC[1,22] - 0.9 Charging[1,21]
+   + Discharging[1,21] = -0.008946
+ SOC_balance_1_22: - 0.045 SOC[1,22] + 0.045 SOC[1,23] - 0.9 Charging[1,22]
+   + Discharging[1,22] = -0.008946
+ SOC_balance_1_23: - 0.045 SOC[1,23] + 0.045 SOC[1,24] - 0.9 Charging[1,23]
+   + Discharging[1,23] = -0.008946
+ SOC_balance_2_0: - 0.045 SOC[2,0] + 0.045 SOC[2,1] - 0.9 Charging[2,0]
+   + Discharging[2,0] = -0.174088
+ SOC_balance_2_1: - 0.045 SOC[2,1] + 0.045 SOC[2,2] - 0.9 Charging[2,1]
+   + Discharging[2,1] = -0.174088
+ SOC_balance_2_2: - 0.045 SOC[2,2] + 0.045 SOC[2,3] - 0.9 Charging[2,2]
+   + Discharging[2,2] = -0.174088
+ SOC_balance_2_3: - 0.045 SOC[2,3] + 0.045 SOC[2,4] - 0.9 Charging[2,3]
+   + Discharging[2,3] = -0.174088
+ SOC_balance_2_4: - 0.045 SOC[2,4] + 0.045 SOC[2,5] - 0.9 Charging[2,4]
+   + Discharging[2,4] = -0.174088
+ SOC_balance_2_5: - 0.045 SOC[2,5] + 0.045 SOC[2,6] - 0.9 Charging[2,5]
+   + Discharging[2,5] = -0.174088
+ SOC_balance_2_6: - 0.045 SOC[2,6] + 0.045 SOC[2,7] - 0.9 Charging[2,6]
+   + Discharging[2,6] = -0.174088
+ SOC_balance_2_7: - 0.045 SOC[2,7] + 0.045 SOC[2,8] - 0.9 Charging[2,7]
+   + Discharging[2,7] = -0.174088
+ SOC_balance_2_8: - 0.045 SOC[2,8] + 0.045 SOC[2,9] - 0.9 Charging[2,8]
+   + Discharging[2,8] = -0.174088
+ SOC_balance_2_9: - 0.045 SOC[2,9] + 0.045 SOC[2,10] - 0.9 Charging[2,9]
+   + Discharging[2,9] = -0.174088
+ SOC_balance_2_10: - 0.045 SOC[2,10] + 0.045 SOC[2,11] - 0.9 Charging[2,10]
+   + Discharging[2,10] = -0.174088
+ SOC_balance_2_11: - 0.045 SOC[2,11] + 0.045 SOC[2,12] - 0.9 Charging[2,11]
+   + Discharging[2,11] = -0.174088
+ SOC_balance_2_12: - 0.045 SOC[2,12] + 0.045 SOC[2,13] - 0.9 Charging[2,12]
+   + Discharging[2,12] = -0.174088
+ SOC_balance_2_13: - 0.045 SOC[2,13] + 0.045 SOC[2,14] - 0.9 Charging[2,13]
+   + Discharging[2,13] = -0.089253
+ SOC_balance_2_14: - 0.045 SOC[2,14] + 0.045 SOC[2,15] - 0.9 Charging[2,14]
+   + Discharging[2,14] = -0.008836
+ SOC_balance_2_15: - 0.045 SOC[2,15] + 0.045 SOC[2,16] - 0.9 Charging[2,15]
+   + Discharging[2,15] = -0.008836
+ SOC_balance_2_16: - 0.045 SOC[2,16] + 0.045 SOC[2,17] - 0.9 Charging[2,16]
+   + Discharging[2,16] = -0.008836
+ SOC_balance_2_17: - 0.045 SOC[2,17] + 0.045 SOC[2,18] - 0.9 Charging[2,17]
+   + Discharging[2,17] = -0.008836
+ SOC_balance_2_18: - 0.045 SOC[2,18] + 0.045 SOC[2,19] - 0.9 Charging[2,18]
+   + Discharging[2,18] = -0.008836
+ SOC_balance_2_19: - 0.045 SOC[2,19] + 0.045 SOC[2,20] - 0.9 Charging[2,19]
+   + Discharging[2,19] = -0.008836
+ SOC_balance_2_20: - 0.045 SOC[2,20] + 0.045 SOC[2,21] - 0.9 Charging[2,20]
+   + Discharging[2,20] = -0.008836
+ SOC_balance_2_21: - 0.045 SOC[2,21] + 0.045 SOC[2,22] - 0.9 Charging[2,21]
+   + Discharging[2,21] = -0.006627
+ SOC_balance_2_22: - 0.045 SOC[2,22] + 0.045 SOC[2,23] - 0.9 Charging[2,22]
+   + Discharging[2,22] = -0.002444
+ SOC_balance_2_23: - 0.045 SOC[2,23] + 0.045 SOC[2,24] - 0.9 Charging[2,23]
+   + Discharging[2,23] = -0.002444
+ SOC_balance_3_0: - 0.04561 SOC[3,0] + 0.04561 SOC[3,1] - 0.9 Charging[3,0]
+   + Discharging[3,0] = -0.022043
+ SOC_balance_3_1: - 0.04561 SOC[3,1] + 0.04561 SOC[3,2] - 0.9 Charging[3,1]
+   + Discharging[3,1] = -0.022043
+ SOC_balance_3_2: - 0.04561 SOC[3,2] + 0.04561 SOC[3,3] - 0.9 Charging[3,2]
+   + Discharging[3,2] = -0.022043
+ SOC_balance_3_3: - 0.04561 SOC[3,3] + 0.04561 SOC[3,4] - 0.9 Charging[3,3]
+   + Discharging[3,3] = -0.022043
+ SOC_balance_3_4: - 0.04561 SOC[3,4] + 0.04561 SOC[3,5] - 0.9 Charging[3,4]
+   + Discharging[3,4] = -0.022043
+ SOC_balance_3_5: - 0.04561 SOC[3,5] + 0.04561 SOC[3,6] - 0.9 Charging[3,5]
+   + Discharging[3,5] = -0.022043
+ SOC_balance_3_6: - 0.04561 SOC[3,6] + 0.04561 SOC[3,7] - 0.9 Charging[3,6]
+   + Discharging[3,6] = -0.022043
+ SOC_balance_3_7: - 0.04561 SOC[3,7] + 0.04561 SOC[3,8] - 0.9 Charging[3,7]
+   + Discharging[3,7] = -0.022043
+ SOC_balance_3_8: - 0.04561 SOC[3,8] + 0.04561 SOC[3,9] - 0.9 Charging[3,8]
+   + Discharging[3,8] = -0.022043
+ SOC_balance_3_9: - 0.04561 SOC[3,9] + 0.04561 SOC[3,10]
+   - 0.9 Charging[3,9] + Discharging[3,9] = -0.022043
+ SOC_balance_3_10: - 0.04561 SOC[3,10] + 0.04561 SOC[3,11]
+   - 0.9 Charging[3,10] + Discharging[3,10] = -0.022043
+ SOC_balance_3_11: - 0.04561 SOC[3,11] + 0.04561 SOC[3,12]
+   - 0.9 Charging[3,11] + Discharging[3,11] = -0.022043
+ SOC_balance_3_12: - 0.04561 SOC[3,12] + 0.04561 SOC[3,13]
+   - 0.9 Charging[3,12] + Discharging[3,12] = -0.022043
+ SOC_balance_3_13: - 0.04561 SOC[3,13] + 0.04561 SOC[3,14]
+   - 0.9 Charging[3,13] + Discharging[3,13] = -0.022043
+ SOC_balance_3_14: - 0.04561 SOC[3,14] + 0.04561 SOC[3,15]
+   - 0.9 Charging[3,14] + Discharging[3,14] = -0.022043
+ SOC_balance_3_15: - 0.04561 SOC[3,15] + 0.04561 SOC[3,16]
+   - 0.9 Charging[3,15] + Discharging[3,15] = -0.022043
+ SOC_balance_3_16: - 0.04561 SOC[3,16] + 0.04561 SOC[3,17]
+   - 0.9 Charging[3,16] + Discharging[3,16] = -0.022043
+ SOC_balance_3_17: - 0.04561 SOC[3,17] + 0.04561 SOC[3,18]
+   - 0.9 Charging[3,17] + Discharging[3,17] = -0.022043
+ SOC_balance_3_18: - 0.04561 SOC[3,18] + 0.04561 SOC[3,19]
+   - 0.9 Charging[3,18] + Discharging[3,18] = -0.022043
+ SOC_balance_3_19: - 0.04561 SOC[3,19] + 0.04561 SOC[3,20]
+   - 0.9 Charging[3,19] + Discharging[3,19] = -0.022043
+ SOC_balance_3_20: - 0.04561 SOC[3,20] + 0.04561 SOC[3,21]
+   - 0.9 Charging[3,20] + Discharging[3,20] = -0.022043
+ SOC_balance_3_21: - 0.04561 SOC[3,21] + 0.04561 SOC[3,22]
+   - 0.9 Charging[3,21] + Discharging[3,21] = -0.022043
+ SOC_balance_3_22: - 0.04561 SOC[3,22] + 0.04561 SOC[3,23]
+   - 0.9 Charging[3,22] + Discharging[3,22] = -0.022043
+ SOC_balance_3_23: - 0.04561 SOC[3,23] + 0.04561 SOC[3,24]
+   - 0.9 Charging[3,23] + Discharging[3,23] = -0.022043
+ SOC_balance_4_0: - 0.045 SOC[4,0] + 0.045 SOC[4,1] - 0.9 Charging[4,0]
+   + Discharging[4,0] = -0.014896
+ SOC_balance_4_1: - 0.045 SOC[4,1] + 0.045 SOC[4,2] - 0.9 Charging[4,1]
+   + Discharging[4,1] = -0.014896
+ SOC_balance_4_2: - 0.045 SOC[4,2] + 0.045 SOC[4,3] - 0.9 Charging[4,2]
+   + Discharging[4,2] = -0.014896
+ SOC_balance_4_3: - 0.045 SOC[4,3] + 0.045 SOC[4,4] - 0.9 Charging[4,3]
+   + Discharging[4,3] = -0.014896
+ SOC_balance_4_4: - 0.045 SOC[4,4] + 0.045 SOC[4,5] - 0.9 Charging[4,4]
+   + Discharging[4,4] = -0.014896
+ SOC_balance_4_5: - 0.045 SOC[4,5] + 0.045 SOC[4,6] - 0.9 Charging[4,5]
+   + Discharging[4,5] = -0.014896
+ SOC_balance_4_6: - 0.045 SOC[4,6] + 0.045 SOC[4,7] - 0.9 Charging[4,6]
+   + Discharging[4,6] = -0.014896
+ SOC_balance_4_7: - 0.045 SOC[4,7] + 0.045 SOC[4,8] - 0.9 Charging[4,7]
+   + Discharging[4,7] = -0.014896
+ SOC_balance_4_8: - 0.045 SOC[4,8] + 0.045 SOC[4,9] - 0.9 Charging[4,8]
+   + Discharging[4,8] = -0.014896
+ SOC_balance_4_9: - 0.045 SOC[4,9] + 0.045 SOC[4,10] - 0.9 Charging[4,9]
+   + Discharging[4,9] = -0.014896
+ SOC_balance_4_10: - 0.045 SOC[4,10] + 0.045 SOC[4,11] - 0.9 Charging[4,10]
+   + Discharging[4,10] = -0.014896
+ SOC_balance_4_11: - 0.045 SOC[4,11] + 0.045 SOC[4,12] - 0.9 Charging[4,11]
+   + Discharging[4,11] = -0.011172
+ SOC_balance_4_12: - 0.045 SOC[4,12] + 0.045 SOC[4,13] - 0.9 Charging[4,12]
+   + Discharging[4,12] = 0
+ SOC_balance_4_13: - 0.045 SOC[4,13] + 0.045 SOC[4,14] - 0.9 Charging[4,13]
+   + Discharging[4,13] = 0
+ SOC_balance_4_14: - 0.045 SOC[4,14] + 0.045 SOC[4,15] - 0.9 Charging[4,14]
+   + Discharging[4,14] = 0
+ SOC_balance_4_15: - 0.045 SOC[4,15] + 0.045 SOC[4,16] - 0.9 Charging[4,15]
+   + Discharging[4,15] = 0
+ SOC_balance_4_16: - 0.045 SOC[4,16] + 0.045 SOC[4,17] - 0.9 Charging[4,16]
+   + Discharging[4,16] = 0
+ SOC_balance_4_17: - 0.045 SOC[4,17] + 0.045 SOC[4,18] - 0.9 Charging[4,17]
+   + Discharging[4,17] = 0
+ SOC_balance_4_18: - 0.045 SOC[4,18] + 0.045 SOC[4,19] - 0.9 Charging[4,18]
+   + Discharging[4,18] = -0.002639
+ SOC_balance_4_19: - 0.045 SOC[4,19] + 0.045 SOC[4,20] - 0.9 Charging[4,19]
+   + Discharging[4,19] = -0.002639
+ SOC_balance_4_20: - 0.045 SOC[4,20] + 0.045 SOC[4,21] - 0.9 Charging[4,20]
+   + Discharging[4,20] = -0.002639
+ SOC_balance_4_21: - 0.045 SOC[4,21] + 0.045 SOC[4,22] - 0.9 Charging[4,21]
+   + Discharging[4,21] = -0.002639
+ SOC_balance_4_22: - 0.045 SOC[4,22] + 0.045 SOC[4,23] - 0.9 Charging[4,22]
+   + Discharging[4,22] = -0.002639
+ SOC_balance_4_23: - 0.045 SOC[4,23] + 0.045 SOC[4,24] - 0.9 Charging[4,23]
+   + Discharging[4,23] = -0.002639
+ SOC_balance_5_0: - 0.0795 SOC[5,0] + 0.0795 SOC[5,1] - 0.9 Charging[5,0]
+   + Discharging[5,0] = -0.0407
+ SOC_balance_5_1: - 0.0795 SOC[5,1] + 0.0795 SOC[5,2] - 0.9 Charging[5,1]
+   + Discharging[5,1] = -0.0407
+ SOC_balance_5_2: - 0.0795 SOC[5,2] + 0.0795 SOC[5,3] - 0.9 Charging[5,2]
+   + Discharging[5,2] = -0.0407
+ SOC_balance_5_3: - 0.0795 SOC[5,3] + 0.0795 SOC[5,4] - 0.9 Charging[5,3]
+   + Discharging[5,3] = -0.0407
+ SOC_balance_5_4: - 0.0795 SOC[5,4] + 0.0795 SOC[5,5] - 0.9 Charging[5,4]
+   + Discharging[5,4] = -0.0407
+ SOC_balance_5_5: - 0.0795 SOC[5,5] + 0.0795 SOC[5,6] - 0.9 Charging[5,5]
+   + Discharging[5,5] = -0.0407
+ SOC_balance_5_6: - 0.0795 SOC[5,6] + 0.0795 SOC[5,7] - 0.9 Charging[5,6]
+   + Discharging[5,6] = -0.0407
+ SOC_balance_5_7: - 0.0795 SOC[5,7] + 0.0795 SOC[5,8] - 0.9 Charging[5,7]
+   + Discharging[5,7] = 0
+ SOC_balance_5_8: - 0.0795 SOC[5,8] + 0.0795 SOC[5,9] - 0.9 Charging[5,8]
+   + Discharging[5,8] = 0
+ SOC_balance_5_9: - 0.0795 SOC[5,9] + 0.0795 SOC[5,10] - 0.9 Charging[5,9]
+   + Discharging[5,9] = 0
+ SOC_balance_5_10: - 0.0795 SOC[5,10] + 0.0795 SOC[5,11]
+   - 0.9 Charging[5,10] + Discharging[5,10] = 0
+ SOC_balance_5_11: - 0.0795 SOC[5,11] + 0.0795 SOC[5,12]
+   - 0.9 Charging[5,11] + Discharging[5,11] = -0.00383625
+ SOC_balance_5_12: - 0.0795 SOC[5,12] + 0.0795 SOC[5,13]
+   - 0.9 Charging[5,12] + Discharging[5,12] = -0.005115
+ SOC_balance_5_13: - 0.0795 SOC[5,13] + 0.0795 SOC[5,14]
+   - 0.9 Charging[5,13] + Discharging[5,13] = -0.005115
+ SOC_balance_5_14: - 0.0795 SOC[5,14] + 0.0795 SOC[5,15]
+   - 0.9 Charging[5,14] + Discharging[5,14] = -0.005115
+ SOC_balance_5_15: - 0.0795 SOC[5,15] + 0.0795 SOC[5,16]
+   - 0.9 Charging[5,15] + Discharging[5,15] = -0.005115
+ SOC_balance_5_16: - 0.0795 SOC[5,16] + 0.0795 SOC[5,17]
+   - 0.9 Charging[5,16] + Discharging[5,16] = -0.005115
+ SOC_balance_5_17: - 0.0795 SOC[5,17] + 0.0795 SOC[5,18]
+   - 0.9 Charging[5,17] + Discharging[5,17] = -0.005115
+ SOC_balance_5_18: - 0.0795 SOC[5,18] + 0.0795 SOC[5,19]
+   - 0.9 Charging[5,18] + Discharging[5,18] = -0.005115
+ SOC_balance_5_19: - 0.0795 SOC[5,19] + 0.0795 SOC[5,20]
+   - 0.9 Charging[5,19] + Discharging[5,19] = -0.005115
+ SOC_balance_5_20: - 0.0795 SOC[5,20] + 0.0795 SOC[5,21]
+   - 0.9 Charging[5,20] + Discharging[5,20] = -0.005115
+ SOC_balance_5_21: - 0.0795 SOC[5,21] + 0.0795 SOC[5,22]
+   - 0.9 Charging[5,21] + Discharging[5,21] = -0.005115
+ SOC_balance_5_22: - 0.0795 SOC[5,22] + 0.0795 SOC[5,23]
+   - 0.9 Charging[5,22] + Discharging[5,22] = -0.005115
+ SOC_balance_5_23: - 0.0795 SOC[5,23] + 0.0795 SOC[5,24]
+   - 0.9 Charging[5,23] + Discharging[5,23] = -0.005115
+ SOC_balance_6_0: Discharging[6,0] = 0
+ SOC_balance_6_1: Discharging[6,1] = 0
+ SOC_balance_6_2: Discharging[6,2] = 0
+ SOC_balance_6_3: Discharging[6,3] = 0
+ SOC_balance_6_4: Discharging[6,4] = 0
+ SOC_balance_6_5: Discharging[6,5] = 0
+ SOC_balance_6_6: Discharging[6,6] = 0
+ SOC_balance_6_7: Discharging[6,7] = 0
+ SOC_balance_6_8: Discharging[6,8] = 0
+ SOC_balance_6_9: Discharging[6,9] = 0
+ SOC_balance_6_10: Discharging[6,10] = 0
+ SOC_balance_6_11: Discharging[6,11] = 0
+ SOC_balance_6_12: Discharging[6,12] = 0
+ SOC_balance_6_13: Discharging[6,13] = 0
+ SOC_balance_6_14: Discharging[6,14] = 0
+ SOC_balance_6_15: Discharging[6,15] = 0
+ SOC_balance_6_16: Discharging[6,16] = 0
+ SOC_balance_6_17: Discharging[6,17] = 0
+ SOC_balance_6_18: Discharging[6,18] = 0
+ SOC_balance_6_19: Discharging[6,19] = 0
+ SOC_balance_6_20: Discharging[6,20] = 0
+ SOC_balance_6_21: Discharging[6,21] = 0
+ SOC_balance_6_22: Discharging[6,22] = 0
+ SOC_balance_6_23: Discharging[6,23] = 0
+ SOC_balance_7_0: Discharging[7,0] = 0
+ SOC_balance_7_1: Discharging[7,1] = 0
+ SOC_balance_7_2: Discharging[7,2] = 0
+ SOC_balance_7_3: Discharging[7,3] = 0
+ SOC_balance_7_4: Discharging[7,4] = 0
+ SOC_balance_7_5: Discharging[7,5] = 0
+ SOC_balance_7_6: Discharging[7,6] = 0
+ SOC_balance_7_7: Discharging[7,7] = 0
+ SOC_balance_7_8: Discharging[7,8] = 0
+ SOC_balance_7_9: Discharging[7,9] = 0
+ SOC_balance_7_10: Discharging[7,10] = 0
+ SOC_balance_7_11: Discharging[7,11] = 0
+ SOC_balance_7_12: Discharging[7,12] = 0
+ SOC_balance_7_13: Discharging[7,13] = 0
+ SOC_balance_7_14: Discharging[7,14] = 0
+ SOC_balance_7_15: Discharging[7,15] = 0
+ SOC_balance_7_16: Discharging[7,16] = 0
+ SOC_balance_7_17: Discharging[7,17] = 0
+ SOC_balance_7_18: Discharging[7,18] = 0
+ SOC_balance_7_19: Discharging[7,19] = 0
+ SOC_balance_7_20: Discharging[7,20] = 0
+ SOC_balance_7_21: Discharging[7,21] = 0
+ SOC_balance_7_22: Discharging[7,22] = 0
+ SOC_balance_7_23: Discharging[7,23] = 0
+ SOC_balance_8_0: - 0.045 SOC[8,0] + 0.045 SOC[8,1] - 0.9 Charging[8,0]
+   + Discharging[8,0] = -0.1073
+ SOC_balance_8_1: - 0.045 SOC[8,1] + 0.045 SOC[8,2] - 0.9 Charging[8,1]
+   + Discharging[8,1] = -0.1073
+ SOC_balance_8_2: - 0.045 SOC[8,2] + 0.045 SOC[8,3] - 0.9 Charging[8,2]
+   + Discharging[8,2] = -0.1073
+ SOC_balance_8_3: - 0.045 SOC[8,3] + 0.045 SOC[8,4] - 0.9 Charging[8,3]
+   + Discharging[8,3] = -0.1073
+ SOC_balance_8_4: - 0.045 SOC[8,4] + 0.045 SOC[8,5] - 0.9 Charging[8,4]
+   + Discharging[8,4] = -0.1073
+ SOC_balance_8_5: - 0.045 SOC[8,5] + 0.045 SOC[8,6] - 0.9 Charging[8,5]
+   + Discharging[8,5] = -0.1073
+ SOC_balance_8_6: - 0.045 SOC[8,6] + 0.045 SOC[8,7] - 0.9 Charging[8,6]
+   + Discharging[8,6] = 0
+ SOC_balance_8_7: - 0.045 SOC[8,7] + 0.045 SOC[8,8] - 0.9 Charging[8,7]
+   + Discharging[8,7] = 0
+ SOC_balance_8_8: - 0.045 SOC[8,8] + 0.045 SOC[8,9] - 0.9 Charging[8,8]
+   + Discharging[8,8] = 0
+ SOC_balance_8_9: - 0.045 SOC[8,9] + 0.045 SOC[8,10] - 0.9 Charging[8,9]
+   + Discharging[8,9] = 0
+ SOC_balance_8_10: - 0.045 SOC[8,10] + 0.045 SOC[8,11] - 0.9 Charging[8,10]
+   + Discharging[8,10] = 0
+ SOC_balance_8_11: - 0.045 SOC[8,11] + 0.045 SOC[8,12] - 0.9 Charging[8,11]
+   + Discharging[8,11] = 0
+ SOC_balance_8_12: - 0.045 SOC[8,12] + 0.045 SOC[8,13] - 0.9 Charging[8,12]
+   + Discharging[8,12] = 0
+ SOC_balance_8_13: - 0.045 SOC[8,13] + 0.045 SOC[8,14] - 0.9 Charging[8,13]
+   + Discharging[8,13] = 0
+ SOC_balance_8_14: - 0.045 SOC[8,14] + 0.045 SOC[8,15] - 0.9 Charging[8,14]
+   + Discharging[8,14] = -0.037961
+ SOC_balance_8_15: - 0.045 SOC[8,15] + 0.045 SOC[8,16] - 0.9 Charging[8,15]
+   + Discharging[8,15] = -0.113883
+ SOC_balance_8_16: - 0.045 SOC[8,16] + 0.045 SOC[8,17] - 0.9 Charging[8,16]
+   + Discharging[8,16] = -0.05426625
+ SOC_balance_8_17: - 0.045 SOC[8,17] + 0.045 SOC[8,18] - 0.9 Charging[8,17]
+   + Discharging[8,17] = -0.072355
+ SOC_balance_8_18: - 0.045 SOC[8,18] + 0.045 SOC[8,19] - 0.9 Charging[8,18]
+   + Discharging[8,18] = -0.002581
+ SOC_balance_8_19: - 0.045 SOC[8,19] + 0.045 SOC[8,20] - 0.9 Charging[8,19]
+   + Discharging[8,19] = -0.005162
+ SOC_balance_8_20: - 0.045 SOC[8,20] + 0.045 SOC[8,21] - 0.9 Charging[8,20]
+   + Discharging[8,20] = -0.005162
+ SOC_balance_8_21: - 0.045 SOC[8,21] + 0.045 SOC[8,22] - 0.9 Charging[8,21]
+   + Discharging[8,21] = -0.005162
+ SOC_balance_8_22: - 0.045 SOC[8,22] + 0.045 SOC[8,23] - 0.9 Charging[8,22]
+   + Discharging[8,22] = -0.002581
+ SOC_balance_8_23: - 0.045 SOC[8,23] + 0.045 SOC[8,24] - 0.9 Charging[8,23]
+   + Discharging[8,23] = -0.01681275
+ SOC_balance_9_0: - 0.0795 SOC[9,0] + 0.0795 SOC[9,1] - 0.9 Charging[9,0]
+   + Discharging[9,0] = -0.027891
+ SOC_balance_9_1: - 0.0795 SOC[9,1] + 0.0795 SOC[9,2] - 0.9 Charging[9,1]
+   + Discharging[9,1] = -0.027891
+ SOC_balance_9_2: - 0.0795 SOC[9,2] + 0.0795 SOC[9,3] - 0.9 Charging[9,2]
+   + Discharging[9,2] = -0.027891
+ SOC_balance_9_3: - 0.0795 SOC[9,3] + 0.0795 SOC[9,4] - 0.9 Charging[9,3]
+   + Discharging[9,3] = -0.027891
+ SOC_balance_9_4: - 0.0795 SOC[9,4] + 0.0795 SOC[9,5] - 0.9 Charging[9,4]
+   + Discharging[9,4] = -0.027891
+ SOC_balance_9_5: - 0.0795 SOC[9,5] + 0.0795 SOC[9,6] - 0.9 Charging[9,5]
+   + Discharging[9,5] = -0.027891
+ SOC_balance_9_6: - 0.0795 SOC[9,6] + 0.0795 SOC[9,7] - 0.9 Charging[9,6]
+   + Discharging[9,6] = -0.027891
+ SOC_balance_9_7: - 0.0795 SOC[9,7] + 0.0795 SOC[9,8] - 0.9 Charging[9,7]
+   + Discharging[9,7] = -0.027891
+ SOC_balance_9_8: - 0.0795 SOC[9,8] + 0.0795 SOC[9,9] - 0.9 Charging[9,8]
+   + Discharging[9,8] = -0.027891
+ SOC_balance_9_9: - 0.0795 SOC[9,9] + 0.0795 SOC[9,10] - 0.9 Charging[9,9]
+   + Discharging[9,9] = -0.027891
+ SOC_balance_9_10: - 0.0795 SOC[9,10] + 0.0795 SOC[9,11]
+   - 0.9 Charging[9,10] + Discharging[9,10] = -0.027891
+ SOC_balance_9_11: - 0.0795 SOC[9,11] + 0.0795 SOC[9,12]
+   - 0.9 Charging[9,11] + Discharging[9,11] = -0.027891
+ SOC_balance_9_12: - 0.0795 SOC[9,12] + 0.0795 SOC[9,13]
+   - 0.9 Charging[9,12] + Discharging[9,12] = -0.027891
+ SOC_balance_9_13: - 0.0795 SOC[9,13] + 0.0795 SOC[9,14]
+   - 0.9 Charging[9,13] + Discharging[9,13] = -0.027891
+ SOC_balance_9_14: - 0.0795 SOC[9,14] + 0.0795 SOC[9,15]
+   - 0.9 Charging[9,14] + Discharging[9,14] = -0.00697275
+ SOC_balance_9_15: - 0.0795 SOC[9,15] + 0.0795 SOC[9,16]
+   - 0.9 Charging[9,15] + Discharging[9,15] = 0
+ SOC_balance_9_16: - 0.0795 SOC[9,16] + 0.0795 SOC[9,17]
+   - 0.9 Charging[9,16] + Discharging[9,16] = 0
+ SOC_balance_9_17: - 0.0795 SOC[9,17] + 0.0795 SOC[9,18]
+   - 0.9 Charging[9,17] + Discharging[9,17] = 0
+ SOC_balance_9_18: - 0.0795 SOC[9,18] + 0.0795 SOC[9,19]
+   - 0.9 Charging[9,18] + Discharging[9,18] = 0
+ SOC_balance_9_19: - 0.0795 SOC[9,19] + 0.0795 SOC[9,20]
+   - 0.9 Charging[9,19] + Discharging[9,19] = -0.000891
+ SOC_balance_9_20: - 0.0795 SOC[9,20] + 0.0795 SOC[9,21]
+   - 0.9 Charging[9,20] + Discharging[9,20] = -0.003564
+ SOC_balance_9_21: - 0.0795 SOC[9,21] + 0.0795 SOC[9,22]
+   - 0.9 Charging[9,21] + Discharging[9,21] = -0.003564
+ SOC_balance_9_22: - 0.0795 SOC[9,22] + 0.0795 SOC[9,23]
+   - 0.9 Charging[9,22] + Discharging[9,22] = -0.003564
+ SOC_balance_9_23: - 0.0795 SOC[9,23] + 0.0795 SOC[9,24]
+   - 0.9 Charging[9,23] + Discharging[9,23] = -0.003564
+ SOC_balance_10_0: - 0.04561 SOC[10,0] + 0.04561 SOC[10,1]
+   - 0.9 Charging[10,0] + Discharging[10,0] = -0.002235
+ SOC_balance_10_1: - 0.04561 SOC[10,1] + 0.04561 SOC[10,2]
+   - 0.9 Charging[10,1] + Discharging[10,1] = -0.002235
+ SOC_balance_10_2: - 0.04561 SOC[10,2] + 0.04561 SOC[10,3]
+   - 0.9 Charging[10,2] + Discharging[10,2] = -0.002235
+ SOC_balance_10_3: - 0.04561 SOC[10,3] + 0.04561 SOC[10,4]
+   - 0.9 Charging[10,3] + Discharging[10,3] = -0.002235
+ SOC_balance_10_4: - 0.04561 SOC[10,4] + 0.04561 SOC[10,5]
+   - 0.9 Charging[10,4] + Discharging[10,4] = -0.002235
+ SOC_balance_10_5: - 0.04561 SOC[10,5] + 0.04561 SOC[10,6]
+   - 0.9 Charging[10,5] + Discharging[10,5] = -0.002235
+ SOC_balance_10_6: - 0.04561 SOC[10,6] + 0.04561 SOC[10,7]
+   - 0.9 Charging[10,6] + Discharging[10,6] = -0.002235
+ SOC_balance_10_7: - 0.04561 SOC[10,7] + 0.04561 SOC[10,8]
+   - 0.9 Charging[10,7] + Discharging[10,7] = -0.002235
+ SOC_balance_10_8: - 0.04561 SOC[10,8] + 0.04561 SOC[10,9]
+   - 0.9 Charging[10,8] + Discharging[10,8] = -0.002235
+ SOC_balance_10_9: - 0.04561 SOC[10,9] + 0.04561 SOC[10,10]
+   - 0.9 Charging[10,9] + Discharging[10,9] = -0.002235
+ SOC_balance_10_10: - 0.04561 SOC[10,10] + 0.04561 SOC[10,11]
+   - 0.9 Charging[10,10] + Discharging[10,10] = -0.002235
+ SOC_balance_10_11: - 0.04561 SOC[10,11] + 0.04561 SOC[10,12]
+   - 0.9 Charging[10,11] + Discharging[10,11] = -0.002235
+ SOC_balance_10_12: - 0.04561 SOC[10,12] + 0.04561 SOC[10,13]
+   - 0.9 Charging[10,12] + Discharging[10,12] = -0.002235
+ SOC_balance_10_13: - 0.04561 SOC[10,13] + 0.04561 SOC[10,14]
+   - 0.9 Charging[10,13] + Discharging[10,13] = -0.002235
+ SOC_balance_10_14: - 0.04561 SOC[10,14] + 0.04561 SOC[10,15]
+   - 0.9 Charging[10,14] + Discharging[10,14] = -0.002235
+ SOC_balance_10_15: - 0.04561 SOC[10,15] + 0.04561 SOC[10,16]
+   - 0.9 Charging[10,15] + Discharging[10,15] = -0.002235
+ SOC_balance_10_16: - 0.04561 SOC[10,16] + 0.04561 SOC[10,17]
+   - 0.9 Charging[10,16] + Discharging[10,16] = -0.002235
+ SOC_balance_10_17: - 0.04561 SOC[10,17] + 0.04561 SOC[10,18]
+   - 0.9 Charging[10,17] + Discharging[10,17] = -0.002235
+ SOC_balance_10_18: - 0.04561 SOC[10,18] + 0.04561 SOC[10,19]
+   - 0.9 Charging[10,18] + Discharging[10,18] = -0.002235
+ SOC_balance_10_19: - 0.04561 SOC[10,19] + 0.04561 SOC[10,20]
+   - 0.9 Charging[10,19] + Discharging[10,19] = -0.002235
+ SOC_balance_10_20: - 0.04561 SOC[10,20] + 0.04561 SOC[10,21]
+   - 0.9 Charging[10,20] + Discharging[10,20] = -0.002235
+ SOC_balance_10_21: - 0.04561 SOC[10,21] + 0.04561 SOC[10,22]
+   - 0.9 Charging[10,21] + Discharging[10,21] = -0.002235
+ SOC_balance_10_22: - 0.04561 SOC[10,22] + 0.04561 SOC[10,23]
+   - 0.9 Charging[10,22] + Discharging[10,22] = -0.002235
+ SOC_balance_10_23: - 0.04561 SOC[10,23] + 0.04561 SOC[10,24]
+   - 0.9 Charging[10,23] + Discharging[10,23] = -0.002235
+ SOC_balance_11_0: - 0.0795 SOC[11,0] + 0.0795 SOC[11,1]
+   - 0.9 Charging[11,0] + Discharging[11,0] = -0.0222
+ SOC_balance_11_1: - 0.0795 SOC[11,1] + 0.0795 SOC[11,2]
+   - 0.9 Charging[11,1] + Discharging[11,1] = -0.0222
+ SOC_balance_11_2: - 0.0795 SOC[11,2] + 0.0795 SOC[11,3]
+   - 0.9 Charging[11,2] + Discharging[11,2] = -0.0222
+ SOC_balance_11_3: - 0.0795 SOC[11,3] + 0.0795 SOC[11,4]
+   - 0.9 Charging[11,3] + Discharging[11,3] = -0.0222
+ SOC_balance_11_4: - 0.0795 SOC[11,4] + 0.0795 SOC[11,5]
+   - 0.9 Charging[11,4] + Discharging[11,4] = -0.0222
+ SOC_balance_11_5: - 0.0795 SOC[11,5] + 0.0795 SOC[11,6]
+   - 0.9 Charging[11,5] + Discharging[11,5] = -0.0222
+ SOC_balance_11_6: - 0.0795 SOC[11,6] + 0.0795 SOC[11,7]
+   - 0.9 Charging[11,6] + Discharging[11,6] = -0.0222
+ SOC_balance_11_7: - 0.0795 SOC[11,7] + 0.0795 SOC[11,8]
+   - 0.9 Charging[11,7] + Discharging[11,7] = -0.0146925
+ SOC_balance_11_8: - 0.0795 SOC[11,8] + 0.0795 SOC[11,9]
+   - 0.9 Charging[11,8] + Discharging[11,8] = -0.01437
+ SOC_balance_11_9: - 0.0795 SOC[11,9] + 0.0795 SOC[11,10]
+   - 0.9 Charging[11,9] + Discharging[11,9] = -0.01437
+ SOC_balance_11_10: - 0.0795 SOC[11,10] + 0.0795 SOC[11,11]
+   - 0.9 Charging[11,10] + Discharging[11,10] = -0.01437
+ SOC_balance_11_11: - 0.0795 SOC[11,11] + 0.0795 SOC[11,12]
+   - 0.9 Charging[11,11] + Discharging[11,11] = -0.01437
+ SOC_balance_11_12: - 0.0795 SOC[11,12] + 0.0795 SOC[11,13]
+   - 0.9 Charging[11,12] + Discharging[11,12] = -0.01437
+ SOC_balance_11_13: - 0.0795 SOC[11,13] + 0.0795 SOC[11,14]
+   - 0.9 Charging[11,13] + Discharging[11,13] = -0.01437
+ SOC_balance_11_14: - 0.0795 SOC[11,14] + 0.0795 SOC[11,15]
+   - 0.9 Charging[11,14] + Discharging[11,14] = -0.01437
+ SOC_balance_11_15: - 0.0795 SOC[11,15] + 0.0795 SOC[11,16]
+   - 0.9 Charging[11,15] + Discharging[11,15] = -0.0035925
+ SOC_balance_11_16: - 0.0795 SOC[11,16] + 0.0795 SOC[11,17]
+   - 0.9 Charging[11,16] + Discharging[11,16] = -0.000936
+ SOC_balance_11_17: - 0.0795 SOC[11,17] + 0.0795 SOC[11,18]
+   - 0.9 Charging[11,17] + Discharging[11,17] = -0.000936
+ SOC_balance_11_18: - 0.0795 SOC[11,18] + 0.0795 SOC[11,19]
+   - 0.9 Charging[11,18] + Discharging[11,18] = -0.000936
+ SOC_balance_11_19: - 0.0795 SOC[11,19] + 0.0795 SOC[11,20]
+   - 0.9 Charging[11,19] + Discharging[11,19] = -0.000936
+ SOC_balance_11_20: - 0.0795 SOC[11,20] + 0.0795 SOC[11,21]
+   - 0.9 Charging[11,20] + Discharging[11,20] = -0.000936
+ SOC_balance_11_21: - 0.0795 SOC[11,21] + 0.0795 SOC[11,22]
+   - 0.9 Charging[11,21] + Discharging[11,21] = -0.000936
+ SOC_balance_11_22: - 0.0795 SOC[11,22] + 0.0795 SOC[11,23]
+   - 0.9 Charging[11,22] + Discharging[11,22] = -0.000936
+ SOC_balance_11_23: - 0.0795 SOC[11,23] + 0.0795 SOC[11,24]
+   - 0.9 Charging[11,23] + Discharging[11,23] = -0.000936
+ SOC_balance_12_0: - 0.04561 SOC[12,0] + 0.04561 SOC[12,1]
+   - 0.9 Charging[12,0] + Discharging[12,0] = -0.035607
+ SOC_balance_12_1: - 0.04561 SOC[12,1] + 0.04561 SOC[12,2]
+   - 0.9 Charging[12,1] + Discharging[12,1] = -0.035607
+ SOC_balance_12_2: - 0.04561 SOC[12,2] + 0.04561 SOC[12,3]
+   - 0.9 Charging[12,2] + Discharging[12,2] = -0.035607
+ SOC_balance_12_3: - 0.04561 SOC[12,3] + 0.04561 SOC[12,4]
+   - 0.9 Charging[12,3] + Discharging[12,3] = -0.035607
+ SOC_balance_12_4: - 0.04561 SOC[12,4] + 0.04561 SOC[12,5]
+   - 0.9 Charging[12,4] + Discharging[12,4] = -0.035607
+ SOC_balance_12_5: - 0.04561 SOC[12,5] + 0.04561 SOC[12,6]
+   - 0.9 Charging[12,5] + Discharging[12,5] = -0.035607
+ SOC_balance_12_6: - 0.04561 SOC[12,6] + 0.04561 SOC[12,7]
+   - 0.9 Charging[12,6] + Discharging[12,6] = -0.035607
+ SOC_balance_12_7: - 0.04561 SOC[12,7] + 0.04561 SOC[12,8]
+   - 0.9 Charging[12,7] + Discharging[12,7] = -0.035607
+ SOC_balance_12_8: - 0.04561 SOC[12,8] + 0.04561 SOC[12,9]
+   - 0.9 Charging[12,8] + Discharging[12,8] = -0.035607
+ SOC_balance_12_9: - 0.04561 SOC[12,9] + 0.04561 SOC[12,10]
+   - 0.9 Charging[12,9] + Discharging[12,9] = -0.00890175
+ SOC_balance_12_10: - 0.04561 SOC[12,10] + 0.04561 SOC[12,11]
+   - 0.9 Charging[12,10] + Discharging[12,10] = 0
+ SOC_balance_12_11: - 0.04561 SOC[12,11] + 0.04561 SOC[12,12]
+   - 0.9 Charging[12,11] + Discharging[12,11] = 0
+ SOC_balance_12_12: - 0.04561 SOC[12,12] + 0.04561 SOC[12,13]
+   - 0.9 Charging[12,12] + Discharging[12,12] = 0
+ SOC_balance_12_13: - 0.04561 SOC[12,13] + 0.04561 SOC[12,14]
+   - 0.9 Charging[12,13] + Discharging[12,13] = 0
+ SOC_balance_12_14: - 0.04561 SOC[12,14] + 0.04561 SOC[12,15]
+   - 0.9 Charging[12,14] + Discharging[12,14] = 0
+ SOC_balance_12_15: - 0.04561 SOC[12,15] + 0.04561 SOC[12,16]
+   - 0.9 Charging[12,15] + Discharging[12,15] = 0
+ SOC_balance_12_16: - 0.04561 SOC[12,16] + 0.04561 SOC[12,17]
+   - 0.9 Charging[12,16] + Discharging[12,16] = 0
+ SOC_balance_12_17: - 0.04561 SOC[12,17] + 0.04561 SOC[12,18]
+   - 0.9 Charging[12,17] + Discharging[12,17] = 0
+ SOC_balance_12_18: - 0.04561 SOC[12,18] + 0.04561 SOC[12,19]
+   - 0.9 Charging[12,18] + Discharging[12,18] = -0.005967
+ SOC_balance_12_19: - 0.04561 SOC[12,19] + 0.04561 SOC[12,20]
+   - 0.9 Charging[12,19] + Discharging[12,19] = -0.007956
+ SOC_balance_12_20: - 0.04561 SOC[12,20] + 0.04561 SOC[12,21]
+   - 0.9 Charging[12,20] + Discharging[12,20] = -0.007956
+ SOC_balance_12_21: - 0.04561 SOC[12,21] + 0.04561 SOC[12,22]
+   - 0.9 Charging[12,21] + Discharging[12,21] = -0.007956
+ SOC_balance_12_22: - 0.04561 SOC[12,22] + 0.04561 SOC[12,23]
+   - 0.9 Charging[12,22] + Discharging[12,22] = -0.007956
+ SOC_balance_12_23: - 0.04561 SOC[12,23] + 0.04561 SOC[12,24]
+   - 0.9 Charging[12,23] + Discharging[12,23] = -0.007956
+ SOC_balance_13_0: - 0.04561 SOC[13,0] + 0.04561 SOC[13,1]
+   - 0.9 Charging[13,0] + Discharging[13,0] = -0.0518
+ SOC_balance_13_1: - 0.04561 SOC[13,1] + 0.04561 SOC[13,2]
+   - 0.9 Charging[13,1] + Discharging[13,1] = -0.0518
+ SOC_balance_13_2: - 0.04561 SOC[13,2] + 0.04561 SOC[13,3]
+   - 0.9 Charging[13,2] + Discharging[13,2] = -0.0518
+ SOC_balance_13_3: - 0.04561 SOC[13,3] + 0.04561 SOC[13,4]
+   - 0.9 Charging[13,3] + Discharging[13,3] = -0.0518
+ SOC_balance_13_4: - 0.04561 SOC[13,4] + 0.04561 SOC[13,5]
+   - 0.9 Charging[13,4] + Discharging[13,4] = -0.0518
+ SOC_balance_13_5: - 0.04561 SOC[13,5] + 0.04561 SOC[13,6]
+   - 0.9 Charging[13,5] + Discharging[13,5] = -0.0518
+ SOC_balance_13_6: - 0.04561 SOC[13,6] + 0.04561 SOC[13,7]
+   - 0.9 Charging[13,6] + Discharging[13,6] = -0.03885
+ SOC_balance_13_7: - 0.04561 SOC[13,7] + 0.04561 SOC[13,8]
+   - 0.9 Charging[13,7] + Discharging[13,7] = 0
+ SOC_balance_13_8: - 0.04561 SOC[13,8] + 0.04561 SOC[13,9]
+   - 0.9 Charging[13,8] + Discharging[13,8] = 0
+ SOC_balance_13_9: - 0.04561 SOC[13,9] + 0.04561 SOC[13,10]
+   - 0.9 Charging[13,9] + Discharging[13,9] = 0
+ SOC_balance_13_10: - 0.04561 SOC[13,10] + 0.04561 SOC[13,11]
+   - 0.9 Charging[13,10] + Discharging[13,10] = 0
+ SOC_balance_13_11: - 0.04561 SOC[13,11] + 0.04561 SOC[13,12]
+   - 0.9 Charging[13,11] + Discharging[13,11] = 0
+ SOC_balance_13_12: - 0.04561 SOC[13,12] + 0.04561 SOC[13,13]
+   - 0.9 Charging[13,12] + Discharging[13,12] = 0
+ SOC_balance_13_13: - 0.04561 SOC[13,13] + 0.04561 SOC[13,14]
+   - 0.9 Charging[13,13] + Discharging[13,13] = 0
+ SOC_balance_13_14: - 0.04561 SOC[13,14] + 0.04561 SOC[13,15]
+   - 0.9 Charging[13,14] + Discharging[13,14] = 0
+ SOC_balance_13_15: - 0.04561 SOC[13,15] + 0.04561 SOC[13,16]
+   - 0.9 Charging[13,15] + Discharging[13,15] = 0
+ SOC_balance_13_16: - 0.04561 SOC[13,16] + 0.04561 SOC[13,17]
+   - 0.9 Charging[13,16] + Discharging[13,16] = -0.051429
+ SOC_balance_13_17: - 0.04561 SOC[13,17] + 0.04561 SOC[13,18]
+   - 0.9 Charging[13,17] + Discharging[13,17] = -0.0771435
+ SOC_balance_13_18: - 0.04561 SOC[13,18] + 0.04561 SOC[13,19]
+   - 0.9 Charging[13,18] + Discharging[13,18] = -0.0002205
+ SOC_balance_13_19: - 0.04561 SOC[13,19] + 0.04561 SOC[13,20]
+   - 0.9 Charging[13,19] + Discharging[13,19] = -0.000294
+ SOC_balance_13_20: - 0.04561 SOC[13,20] + 0.04561 SOC[13,21]
+   - 0.9 Charging[13,20] + Discharging[13,20] = -0.000294
+ SOC_balance_13_21: - 0.04561 SOC[13,21] + 0.04561 SOC[13,22]
+   - 0.9 Charging[13,21] + Discharging[13,21] = -0.000294
+ SOC_balance_13_22: - 0.04561 SOC[13,22] + 0.04561 SOC[13,23]
+   - 0.9 Charging[13,22] + Discharging[13,22] = -0.000294
+ SOC_balance_13_23: - 0.04561 SOC[13,23] + 0.04561 SOC[13,24]
+   - 0.9 Charging[13,23] + Discharging[13,23] = -0.000294
  SOC_upperbound_0_0: SOC[0,0] <= 1
  SOC_lowerbound_0_0: SOC[0,0] >= 0
  SOC_upperbound_0_1: SOC[0,1] <= 1
@@ -32209,6 +33428,394 @@ Subject To
    + s_ijt[12,13,22] ^2 ] <= 0
  SOCP_12_13_23: [ - c_ijt[12,12,23] * c_ijt[12,13,23] + c_ijt[12,13,23] ^2
    + s_ijt[12,13,23] ^2 ] <= 0
+ Line_loading_0_1_0: [ P_ijt[0,1,0] ^2 + Q_ijt[0,1,0] ^2 ] <= 9900
+ Line_loading_0_1_1: [ P_ijt[0,1,1] ^2 + Q_ijt[0,1,1] ^2 ] <= 9900
+ Line_loading_0_1_2: [ P_ijt[0,1,2] ^2 + Q_ijt[0,1,2] ^2 ] <= 9900
+ Line_loading_0_1_3: [ P_ijt[0,1,3] ^2 + Q_ijt[0,1,3] ^2 ] <= 9900
+ Line_loading_0_1_4: [ P_ijt[0,1,4] ^2 + Q_ijt[0,1,4] ^2 ] <= 9900
+ Line_loading_0_1_5: [ P_ijt[0,1,5] ^2 + Q_ijt[0,1,5] ^2 ] <= 9900
+ Line_loading_0_1_6: [ P_ijt[0,1,6] ^2 + Q_ijt[0,1,6] ^2 ] <= 9900
+ Line_loading_0_1_7: [ P_ijt[0,1,7] ^2 + Q_ijt[0,1,7] ^2 ] <= 9900
+ Line_loading_0_1_8: [ P_ijt[0,1,8] ^2 + Q_ijt[0,1,8] ^2 ] <= 9900
+ Line_loading_0_1_9: [ P_ijt[0,1,9] ^2 + Q_ijt[0,1,9] ^2 ] <= 9900
+ Line_loading_0_1_10: [ P_ijt[0,1,10] ^2 + Q_ijt[0,1,10] ^2 ] <= 9900
+ Line_loading_0_1_11: [ P_ijt[0,1,11] ^2 + Q_ijt[0,1,11] ^2 ] <= 9900
+ Line_loading_0_1_12: [ P_ijt[0,1,12] ^2 + Q_ijt[0,1,12] ^2 ] <= 9900
+ Line_loading_0_1_13: [ P_ijt[0,1,13] ^2 + Q_ijt[0,1,13] ^2 ] <= 9900
+ Line_loading_0_1_14: [ P_ijt[0,1,14] ^2 + Q_ijt[0,1,14] ^2 ] <= 9900
+ Line_loading_0_1_15: [ P_ijt[0,1,15] ^2 + Q_ijt[0,1,15] ^2 ] <= 9900
+ Line_loading_0_1_16: [ P_ijt[0,1,16] ^2 + Q_ijt[0,1,16] ^2 ] <= 9900
+ Line_loading_0_1_17: [ P_ijt[0,1,17] ^2 + Q_ijt[0,1,17] ^2 ] <= 9900
+ Line_loading_0_1_18: [ P_ijt[0,1,18] ^2 + Q_ijt[0,1,18] ^2 ] <= 9900
+ Line_loading_0_1_19: [ P_ijt[0,1,19] ^2 + Q_ijt[0,1,19] ^2 ] <= 9900
+ Line_loading_0_1_20: [ P_ijt[0,1,20] ^2 + Q_ijt[0,1,20] ^2 ] <= 9900
+ Line_loading_0_1_21: [ P_ijt[0,1,21] ^2 + Q_ijt[0,1,21] ^2 ] <= 9900
+ Line_loading_0_1_22: [ P_ijt[0,1,22] ^2 + Q_ijt[0,1,22] ^2 ] <= 9900
+ Line_loading_0_1_23: [ P_ijt[0,1,23] ^2 + Q_ijt[0,1,23] ^2 ] <= 9900
+ Line_loading_0_4_0: [ P_ijt[0,4,0] ^2 + Q_ijt[0,4,0] ^2 ] <= 9900
+ Line_loading_0_4_1: [ P_ijt[0,4,1] ^2 + Q_ijt[0,4,1] ^2 ] <= 9900
+ Line_loading_0_4_2: [ P_ijt[0,4,2] ^2 + Q_ijt[0,4,2] ^2 ] <= 9900
+ Line_loading_0_4_3: [ P_ijt[0,4,3] ^2 + Q_ijt[0,4,3] ^2 ] <= 9900
+ Line_loading_0_4_4: [ P_ijt[0,4,4] ^2 + Q_ijt[0,4,4] ^2 ] <= 9900
+ Line_loading_0_4_5: [ P_ijt[0,4,5] ^2 + Q_ijt[0,4,5] ^2 ] <= 9900
+ Line_loading_0_4_6: [ P_ijt[0,4,6] ^2 + Q_ijt[0,4,6] ^2 ] <= 9900
+ Line_loading_0_4_7: [ P_ijt[0,4,7] ^2 + Q_ijt[0,4,7] ^2 ] <= 9900
+ Line_loading_0_4_8: [ P_ijt[0,4,8] ^2 + Q_ijt[0,4,8] ^2 ] <= 9900
+ Line_loading_0_4_9: [ P_ijt[0,4,9] ^2 + Q_ijt[0,4,9] ^2 ] <= 9900
+ Line_loading_0_4_10: [ P_ijt[0,4,10] ^2 + Q_ijt[0,4,10] ^2 ] <= 9900
+ Line_loading_0_4_11: [ P_ijt[0,4,11] ^2 + Q_ijt[0,4,11] ^2 ] <= 9900
+ Line_loading_0_4_12: [ P_ijt[0,4,12] ^2 + Q_ijt[0,4,12] ^2 ] <= 9900
+ Line_loading_0_4_13: [ P_ijt[0,4,13] ^2 + Q_ijt[0,4,13] ^2 ] <= 9900
+ Line_loading_0_4_14: [ P_ijt[0,4,14] ^2 + Q_ijt[0,4,14] ^2 ] <= 9900
+ Line_loading_0_4_15: [ P_ijt[0,4,15] ^2 + Q_ijt[0,4,15] ^2 ] <= 9900
+ Line_loading_0_4_16: [ P_ijt[0,4,16] ^2 + Q_ijt[0,4,16] ^2 ] <= 9900
+ Line_loading_0_4_17: [ P_ijt[0,4,17] ^2 + Q_ijt[0,4,17] ^2 ] <= 9900
+ Line_loading_0_4_18: [ P_ijt[0,4,18] ^2 + Q_ijt[0,4,18] ^2 ] <= 9900
+ Line_loading_0_4_19: [ P_ijt[0,4,19] ^2 + Q_ijt[0,4,19] ^2 ] <= 9900
+ Line_loading_0_4_20: [ P_ijt[0,4,20] ^2 + Q_ijt[0,4,20] ^2 ] <= 9900
+ Line_loading_0_4_21: [ P_ijt[0,4,21] ^2 + Q_ijt[0,4,21] ^2 ] <= 9900
+ Line_loading_0_4_22: [ P_ijt[0,4,22] ^2 + Q_ijt[0,4,22] ^2 ] <= 9900
+ Line_loading_0_4_23: [ P_ijt[0,4,23] ^2 + Q_ijt[0,4,23] ^2 ] <= 9900
+ Line_loading_1_2_0: [ P_ijt[1,2,0] ^2 + Q_ijt[1,2,0] ^2 ] <= 9900
+ Line_loading_1_2_1: [ P_ijt[1,2,1] ^2 + Q_ijt[1,2,1] ^2 ] <= 9900
+ Line_loading_1_2_2: [ P_ijt[1,2,2] ^2 + Q_ijt[1,2,2] ^2 ] <= 9900
+ Line_loading_1_2_3: [ P_ijt[1,2,3] ^2 + Q_ijt[1,2,3] ^2 ] <= 9900
+ Line_loading_1_2_4: [ P_ijt[1,2,4] ^2 + Q_ijt[1,2,4] ^2 ] <= 9900
+ Line_loading_1_2_5: [ P_ijt[1,2,5] ^2 + Q_ijt[1,2,5] ^2 ] <= 9900
+ Line_loading_1_2_6: [ P_ijt[1,2,6] ^2 + Q_ijt[1,2,6] ^2 ] <= 9900
+ Line_loading_1_2_7: [ P_ijt[1,2,7] ^2 + Q_ijt[1,2,7] ^2 ] <= 9900
+ Line_loading_1_2_8: [ P_ijt[1,2,8] ^2 + Q_ijt[1,2,8] ^2 ] <= 9900
+ Line_loading_1_2_9: [ P_ijt[1,2,9] ^2 + Q_ijt[1,2,9] ^2 ] <= 9900
+ Line_loading_1_2_10: [ P_ijt[1,2,10] ^2 + Q_ijt[1,2,10] ^2 ] <= 9900
+ Line_loading_1_2_11: [ P_ijt[1,2,11] ^2 + Q_ijt[1,2,11] ^2 ] <= 9900
+ Line_loading_1_2_12: [ P_ijt[1,2,12] ^2 + Q_ijt[1,2,12] ^2 ] <= 9900
+ Line_loading_1_2_13: [ P_ijt[1,2,13] ^2 + Q_ijt[1,2,13] ^2 ] <= 9900
+ Line_loading_1_2_14: [ P_ijt[1,2,14] ^2 + Q_ijt[1,2,14] ^2 ] <= 9900
+ Line_loading_1_2_15: [ P_ijt[1,2,15] ^2 + Q_ijt[1,2,15] ^2 ] <= 9900
+ Line_loading_1_2_16: [ P_ijt[1,2,16] ^2 + Q_ijt[1,2,16] ^2 ] <= 9900
+ Line_loading_1_2_17: [ P_ijt[1,2,17] ^2 + Q_ijt[1,2,17] ^2 ] <= 9900
+ Line_loading_1_2_18: [ P_ijt[1,2,18] ^2 + Q_ijt[1,2,18] ^2 ] <= 9900
+ Line_loading_1_2_19: [ P_ijt[1,2,19] ^2 + Q_ijt[1,2,19] ^2 ] <= 9900
+ Line_loading_1_2_20: [ P_ijt[1,2,20] ^2 + Q_ijt[1,2,20] ^2 ] <= 9900
+ Line_loading_1_2_21: [ P_ijt[1,2,21] ^2 + Q_ijt[1,2,21] ^2 ] <= 9900
+ Line_loading_1_2_22: [ P_ijt[1,2,22] ^2 + Q_ijt[1,2,22] ^2 ] <= 9900
+ Line_loading_1_2_23: [ P_ijt[1,2,23] ^2 + Q_ijt[1,2,23] ^2 ] <= 9900
+ Line_loading_1_3_0: [ P_ijt[1,3,0] ^2 + Q_ijt[1,3,0] ^2 ] <= 9900
+ Line_loading_1_3_1: [ P_ijt[1,3,1] ^2 + Q_ijt[1,3,1] ^2 ] <= 9900
+ Line_loading_1_3_2: [ P_ijt[1,3,2] ^2 + Q_ijt[1,3,2] ^2 ] <= 9900
+ Line_loading_1_3_3: [ P_ijt[1,3,3] ^2 + Q_ijt[1,3,3] ^2 ] <= 9900
+ Line_loading_1_3_4: [ P_ijt[1,3,4] ^2 + Q_ijt[1,3,4] ^2 ] <= 9900
+ Line_loading_1_3_5: [ P_ijt[1,3,5] ^2 + Q_ijt[1,3,5] ^2 ] <= 9900
+ Line_loading_1_3_6: [ P_ijt[1,3,6] ^2 + Q_ijt[1,3,6] ^2 ] <= 9900
+ Line_loading_1_3_7: [ P_ijt[1,3,7] ^2 + Q_ijt[1,3,7] ^2 ] <= 9900
+ Line_loading_1_3_8: [ P_ijt[1,3,8] ^2 + Q_ijt[1,3,8] ^2 ] <= 9900
+ Line_loading_1_3_9: [ P_ijt[1,3,9] ^2 + Q_ijt[1,3,9] ^2 ] <= 9900
+ Line_loading_1_3_10: [ P_ijt[1,3,10] ^2 + Q_ijt[1,3,10] ^2 ] <= 9900
+ Line_loading_1_3_11: [ P_ijt[1,3,11] ^2 + Q_ijt[1,3,11] ^2 ] <= 9900
+ Line_loading_1_3_12: [ P_ijt[1,3,12] ^2 + Q_ijt[1,3,12] ^2 ] <= 9900
+ Line_loading_1_3_13: [ P_ijt[1,3,13] ^2 + Q_ijt[1,3,13] ^2 ] <= 9900
+ Line_loading_1_3_14: [ P_ijt[1,3,14] ^2 + Q_ijt[1,3,14] ^2 ] <= 9900
+ Line_loading_1_3_15: [ P_ijt[1,3,15] ^2 + Q_ijt[1,3,15] ^2 ] <= 9900
+ Line_loading_1_3_16: [ P_ijt[1,3,16] ^2 + Q_ijt[1,3,16] ^2 ] <= 9900
+ Line_loading_1_3_17: [ P_ijt[1,3,17] ^2 + Q_ijt[1,3,17] ^2 ] <= 9900
+ Line_loading_1_3_18: [ P_ijt[1,3,18] ^2 + Q_ijt[1,3,18] ^2 ] <= 9900
+ Line_loading_1_3_19: [ P_ijt[1,3,19] ^2 + Q_ijt[1,3,19] ^2 ] <= 9900
+ Line_loading_1_3_20: [ P_ijt[1,3,20] ^2 + Q_ijt[1,3,20] ^2 ] <= 9900
+ Line_loading_1_3_21: [ P_ijt[1,3,21] ^2 + Q_ijt[1,3,21] ^2 ] <= 9900
+ Line_loading_1_3_22: [ P_ijt[1,3,22] ^2 + Q_ijt[1,3,22] ^2 ] <= 9900
+ Line_loading_1_3_23: [ P_ijt[1,3,23] ^2 + Q_ijt[1,3,23] ^2 ] <= 9900
+ Line_loading_1_4_0: [ P_ijt[1,4,0] ^2 + Q_ijt[1,4,0] ^2 ] <= 9900
+ Line_loading_1_4_1: [ P_ijt[1,4,1] ^2 + Q_ijt[1,4,1] ^2 ] <= 9900
+ Line_loading_1_4_2: [ P_ijt[1,4,2] ^2 + Q_ijt[1,4,2] ^2 ] <= 9900
+ Line_loading_1_4_3: [ P_ijt[1,4,3] ^2 + Q_ijt[1,4,3] ^2 ] <= 9900
+ Line_loading_1_4_4: [ P_ijt[1,4,4] ^2 + Q_ijt[1,4,4] ^2 ] <= 9900
+ Line_loading_1_4_5: [ P_ijt[1,4,5] ^2 + Q_ijt[1,4,5] ^2 ] <= 9900
+ Line_loading_1_4_6: [ P_ijt[1,4,6] ^2 + Q_ijt[1,4,6] ^2 ] <= 9900
+ Line_loading_1_4_7: [ P_ijt[1,4,7] ^2 + Q_ijt[1,4,7] ^2 ] <= 9900
+ Line_loading_1_4_8: [ P_ijt[1,4,8] ^2 + Q_ijt[1,4,8] ^2 ] <= 9900
+ Line_loading_1_4_9: [ P_ijt[1,4,9] ^2 + Q_ijt[1,4,9] ^2 ] <= 9900
+ Line_loading_1_4_10: [ P_ijt[1,4,10] ^2 + Q_ijt[1,4,10] ^2 ] <= 9900
+ Line_loading_1_4_11: [ P_ijt[1,4,11] ^2 + Q_ijt[1,4,11] ^2 ] <= 9900
+ Line_loading_1_4_12: [ P_ijt[1,4,12] ^2 + Q_ijt[1,4,12] ^2 ] <= 9900
+ Line_loading_1_4_13: [ P_ijt[1,4,13] ^2 + Q_ijt[1,4,13] ^2 ] <= 9900
+ Line_loading_1_4_14: [ P_ijt[1,4,14] ^2 + Q_ijt[1,4,14] ^2 ] <= 9900
+ Line_loading_1_4_15: [ P_ijt[1,4,15] ^2 + Q_ijt[1,4,15] ^2 ] <= 9900
+ Line_loading_1_4_16: [ P_ijt[1,4,16] ^2 + Q_ijt[1,4,16] ^2 ] <= 9900
+ Line_loading_1_4_17: [ P_ijt[1,4,17] ^2 + Q_ijt[1,4,17] ^2 ] <= 9900
+ Line_loading_1_4_18: [ P_ijt[1,4,18] ^2 + Q_ijt[1,4,18] ^2 ] <= 9900
+ Line_loading_1_4_19: [ P_ijt[1,4,19] ^2 + Q_ijt[1,4,19] ^2 ] <= 9900
+ Line_loading_1_4_20: [ P_ijt[1,4,20] ^2 + Q_ijt[1,4,20] ^2 ] <= 9900
+ Line_loading_1_4_21: [ P_ijt[1,4,21] ^2 + Q_ijt[1,4,21] ^2 ] <= 9900
+ Line_loading_1_4_22: [ P_ijt[1,4,22] ^2 + Q_ijt[1,4,22] ^2 ] <= 9900
+ Line_loading_1_4_23: [ P_ijt[1,4,23] ^2 + Q_ijt[1,4,23] ^2 ] <= 9900
+ Line_loading_2_3_0: [ P_ijt[2,3,0] ^2 + Q_ijt[2,3,0] ^2 ] <= 9900
+ Line_loading_2_3_1: [ P_ijt[2,3,1] ^2 + Q_ijt[2,3,1] ^2 ] <= 9900
+ Line_loading_2_3_2: [ P_ijt[2,3,2] ^2 + Q_ijt[2,3,2] ^2 ] <= 9900
+ Line_loading_2_3_3: [ P_ijt[2,3,3] ^2 + Q_ijt[2,3,3] ^2 ] <= 9900
+ Line_loading_2_3_4: [ P_ijt[2,3,4] ^2 + Q_ijt[2,3,4] ^2 ] <= 9900
+ Line_loading_2_3_5: [ P_ijt[2,3,5] ^2 + Q_ijt[2,3,5] ^2 ] <= 9900
+ Line_loading_2_3_6: [ P_ijt[2,3,6] ^2 + Q_ijt[2,3,6] ^2 ] <= 9900
+ Line_loading_2_3_7: [ P_ijt[2,3,7] ^2 + Q_ijt[2,3,7] ^2 ] <= 9900
+ Line_loading_2_3_8: [ P_ijt[2,3,8] ^2 + Q_ijt[2,3,8] ^2 ] <= 9900
+ Line_loading_2_3_9: [ P_ijt[2,3,9] ^2 + Q_ijt[2,3,9] ^2 ] <= 9900
+ Line_loading_2_3_10: [ P_ijt[2,3,10] ^2 + Q_ijt[2,3,10] ^2 ] <= 9900
+ Line_loading_2_3_11: [ P_ijt[2,3,11] ^2 + Q_ijt[2,3,11] ^2 ] <= 9900
+ Line_loading_2_3_12: [ P_ijt[2,3,12] ^2 + Q_ijt[2,3,12] ^2 ] <= 9900
+ Line_loading_2_3_13: [ P_ijt[2,3,13] ^2 + Q_ijt[2,3,13] ^2 ] <= 9900
+ Line_loading_2_3_14: [ P_ijt[2,3,14] ^2 + Q_ijt[2,3,14] ^2 ] <= 9900
+ Line_loading_2_3_15: [ P_ijt[2,3,15] ^2 + Q_ijt[2,3,15] ^2 ] <= 9900
+ Line_loading_2_3_16: [ P_ijt[2,3,16] ^2 + Q_ijt[2,3,16] ^2 ] <= 9900
+ Line_loading_2_3_17: [ P_ijt[2,3,17] ^2 + Q_ijt[2,3,17] ^2 ] <= 9900
+ Line_loading_2_3_18: [ P_ijt[2,3,18] ^2 + Q_ijt[2,3,18] ^2 ] <= 9900
+ Line_loading_2_3_19: [ P_ijt[2,3,19] ^2 + Q_ijt[2,3,19] ^2 ] <= 9900
+ Line_loading_2_3_20: [ P_ijt[2,3,20] ^2 + Q_ijt[2,3,20] ^2 ] <= 9900
+ Line_loading_2_3_21: [ P_ijt[2,3,21] ^2 + Q_ijt[2,3,21] ^2 ] <= 9900
+ Line_loading_2_3_22: [ P_ijt[2,3,22] ^2 + Q_ijt[2,3,22] ^2 ] <= 9900
+ Line_loading_2_3_23: [ P_ijt[2,3,23] ^2 + Q_ijt[2,3,23] ^2 ] <= 9900
+ Line_loading_3_4_0: [ P_ijt[3,4,0] ^2 + Q_ijt[3,4,0] ^2 ] <= 9900
+ Line_loading_3_4_1: [ P_ijt[3,4,1] ^2 + Q_ijt[3,4,1] ^2 ] <= 9900
+ Line_loading_3_4_2: [ P_ijt[3,4,2] ^2 + Q_ijt[3,4,2] ^2 ] <= 9900
+ Line_loading_3_4_3: [ P_ijt[3,4,3] ^2 + Q_ijt[3,4,3] ^2 ] <= 9900
+ Line_loading_3_4_4: [ P_ijt[3,4,4] ^2 + Q_ijt[3,4,4] ^2 ] <= 9900
+ Line_loading_3_4_5: [ P_ijt[3,4,5] ^2 + Q_ijt[3,4,5] ^2 ] <= 9900
+ Line_loading_3_4_6: [ P_ijt[3,4,6] ^2 + Q_ijt[3,4,6] ^2 ] <= 9900
+ Line_loading_3_4_7: [ P_ijt[3,4,7] ^2 + Q_ijt[3,4,7] ^2 ] <= 9900
+ Line_loading_3_4_8: [ P_ijt[3,4,8] ^2 + Q_ijt[3,4,8] ^2 ] <= 9900
+ Line_loading_3_4_9: [ P_ijt[3,4,9] ^2 + Q_ijt[3,4,9] ^2 ] <= 9900
+ Line_loading_3_4_10: [ P_ijt[3,4,10] ^2 + Q_ijt[3,4,10] ^2 ] <= 9900
+ Line_loading_3_4_11: [ P_ijt[3,4,11] ^2 + Q_ijt[3,4,11] ^2 ] <= 9900
+ Line_loading_3_4_12: [ P_ijt[3,4,12] ^2 + Q_ijt[3,4,12] ^2 ] <= 9900
+ Line_loading_3_4_13: [ P_ijt[3,4,13] ^2 + Q_ijt[3,4,13] ^2 ] <= 9900
+ Line_loading_3_4_14: [ P_ijt[3,4,14] ^2 + Q_ijt[3,4,14] ^2 ] <= 9900
+ Line_loading_3_4_15: [ P_ijt[3,4,15] ^2 + Q_ijt[3,4,15] ^2 ] <= 9900
+ Line_loading_3_4_16: [ P_ijt[3,4,16] ^2 + Q_ijt[3,4,16] ^2 ] <= 9900
+ Line_loading_3_4_17: [ P_ijt[3,4,17] ^2 + Q_ijt[3,4,17] ^2 ] <= 9900
+ Line_loading_3_4_18: [ P_ijt[3,4,18] ^2 + Q_ijt[3,4,18] ^2 ] <= 9900
+ Line_loading_3_4_19: [ P_ijt[3,4,19] ^2 + Q_ijt[3,4,19] ^2 ] <= 9900
+ Line_loading_3_4_20: [ P_ijt[3,4,20] ^2 + Q_ijt[3,4,20] ^2 ] <= 9900
+ Line_loading_3_4_21: [ P_ijt[3,4,21] ^2 + Q_ijt[3,4,21] ^2 ] <= 9900
+ Line_loading_3_4_22: [ P_ijt[3,4,22] ^2 + Q_ijt[3,4,22] ^2 ] <= 9900
+ Line_loading_3_4_23: [ P_ijt[3,4,23] ^2 + Q_ijt[3,4,23] ^2 ] <= 9900
+ Line_loading_5_10_0: [ P_ijt[5,10,0] ^2 + Q_ijt[5,10,0] ^2 ] <= 9900
+ Line_loading_5_10_1: [ P_ijt[5,10,1] ^2 + Q_ijt[5,10,1] ^2 ] <= 9900
+ Line_loading_5_10_2: [ P_ijt[5,10,2] ^2 + Q_ijt[5,10,2] ^2 ] <= 9900
+ Line_loading_5_10_3: [ P_ijt[5,10,3] ^2 + Q_ijt[5,10,3] ^2 ] <= 9900
+ Line_loading_5_10_4: [ P_ijt[5,10,4] ^2 + Q_ijt[5,10,4] ^2 ] <= 9900
+ Line_loading_5_10_5: [ P_ijt[5,10,5] ^2 + Q_ijt[5,10,5] ^2 ] <= 9900
+ Line_loading_5_10_6: [ P_ijt[5,10,6] ^2 + Q_ijt[5,10,6] ^2 ] <= 9900
+ Line_loading_5_10_7: [ P_ijt[5,10,7] ^2 + Q_ijt[5,10,7] ^2 ] <= 9900
+ Line_loading_5_10_8: [ P_ijt[5,10,8] ^2 + Q_ijt[5,10,8] ^2 ] <= 9900
+ Line_loading_5_10_9: [ P_ijt[5,10,9] ^2 + Q_ijt[5,10,9] ^2 ] <= 9900
+ Line_loading_5_10_10: [ P_ijt[5,10,10] ^2 + Q_ijt[5,10,10] ^2 ] <= 9900
+ Line_loading_5_10_11: [ P_ijt[5,10,11] ^2 + Q_ijt[5,10,11] ^2 ] <= 9900
+ Line_loading_5_10_12: [ P_ijt[5,10,12] ^2 + Q_ijt[5,10,12] ^2 ] <= 9900
+ Line_loading_5_10_13: [ P_ijt[5,10,13] ^2 + Q_ijt[5,10,13] ^2 ] <= 9900
+ Line_loading_5_10_14: [ P_ijt[5,10,14] ^2 + Q_ijt[5,10,14] ^2 ] <= 9900
+ Line_loading_5_10_15: [ P_ijt[5,10,15] ^2 + Q_ijt[5,10,15] ^2 ] <= 9900
+ Line_loading_5_10_16: [ P_ijt[5,10,16] ^2 + Q_ijt[5,10,16] ^2 ] <= 9900
+ Line_loading_5_10_17: [ P_ijt[5,10,17] ^2 + Q_ijt[5,10,17] ^2 ] <= 9900
+ Line_loading_5_10_18: [ P_ijt[5,10,18] ^2 + Q_ijt[5,10,18] ^2 ] <= 9900
+ Line_loading_5_10_19: [ P_ijt[5,10,19] ^2 + Q_ijt[5,10,19] ^2 ] <= 9900
+ Line_loading_5_10_20: [ P_ijt[5,10,20] ^2 + Q_ijt[5,10,20] ^2 ] <= 9900
+ Line_loading_5_10_21: [ P_ijt[5,10,21] ^2 + Q_ijt[5,10,21] ^2 ] <= 9900
+ Line_loading_5_10_22: [ P_ijt[5,10,22] ^2 + Q_ijt[5,10,22] ^2 ] <= 9900
+ Line_loading_5_10_23: [ P_ijt[5,10,23] ^2 + Q_ijt[5,10,23] ^2 ] <= 9900
+ Line_loading_5_11_0: [ P_ijt[5,11,0] ^2 + Q_ijt[5,11,0] ^2 ] <= 9900
+ Line_loading_5_11_1: [ P_ijt[5,11,1] ^2 + Q_ijt[5,11,1] ^2 ] <= 9900
+ Line_loading_5_11_2: [ P_ijt[5,11,2] ^2 + Q_ijt[5,11,2] ^2 ] <= 9900
+ Line_loading_5_11_3: [ P_ijt[5,11,3] ^2 + Q_ijt[5,11,3] ^2 ] <= 9900
+ Line_loading_5_11_4: [ P_ijt[5,11,4] ^2 + Q_ijt[5,11,4] ^2 ] <= 9900
+ Line_loading_5_11_5: [ P_ijt[5,11,5] ^2 + Q_ijt[5,11,5] ^2 ] <= 9900
+ Line_loading_5_11_6: [ P_ijt[5,11,6] ^2 + Q_ijt[5,11,6] ^2 ] <= 9900
+ Line_loading_5_11_7: [ P_ijt[5,11,7] ^2 + Q_ijt[5,11,7] ^2 ] <= 9900
+ Line_loading_5_11_8: [ P_ijt[5,11,8] ^2 + Q_ijt[5,11,8] ^2 ] <= 9900
+ Line_loading_5_11_9: [ P_ijt[5,11,9] ^2 + Q_ijt[5,11,9] ^2 ] <= 9900
+ Line_loading_5_11_10: [ P_ijt[5,11,10] ^2 + Q_ijt[5,11,10] ^2 ] <= 9900
+ Line_loading_5_11_11: [ P_ijt[5,11,11] ^2 + Q_ijt[5,11,11] ^2 ] <= 9900
+ Line_loading_5_11_12: [ P_ijt[5,11,12] ^2 + Q_ijt[5,11,12] ^2 ] <= 9900
+ Line_loading_5_11_13: [ P_ijt[5,11,13] ^2 + Q_ijt[5,11,13] ^2 ] <= 9900
+ Line_loading_5_11_14: [ P_ijt[5,11,14] ^2 + Q_ijt[5,11,14] ^2 ] <= 9900
+ Line_loading_5_11_15: [ P_ijt[5,11,15] ^2 + Q_ijt[5,11,15] ^2 ] <= 9900
+ Line_loading_5_11_16: [ P_ijt[5,11,16] ^2 + Q_ijt[5,11,16] ^2 ] <= 9900
+ Line_loading_5_11_17: [ P_ijt[5,11,17] ^2 + Q_ijt[5,11,17] ^2 ] <= 9900
+ Line_loading_5_11_18: [ P_ijt[5,11,18] ^2 + Q_ijt[5,11,18] ^2 ] <= 9900
+ Line_loading_5_11_19: [ P_ijt[5,11,19] ^2 + Q_ijt[5,11,19] ^2 ] <= 9900
+ Line_loading_5_11_20: [ P_ijt[5,11,20] ^2 + Q_ijt[5,11,20] ^2 ] <= 9900
+ Line_loading_5_11_21: [ P_ijt[5,11,21] ^2 + Q_ijt[5,11,21] ^2 ] <= 9900
+ Line_loading_5_11_22: [ P_ijt[5,11,22] ^2 + Q_ijt[5,11,22] ^2 ] <= 9900
+ Line_loading_5_11_23: [ P_ijt[5,11,23] ^2 + Q_ijt[5,11,23] ^2 ] <= 9900
+ Line_loading_5_12_0: [ P_ijt[5,12,0] ^2 + Q_ijt[5,12,0] ^2 ] <= 9900
+ Line_loading_5_12_1: [ P_ijt[5,12,1] ^2 + Q_ijt[5,12,1] ^2 ] <= 9900
+ Line_loading_5_12_2: [ P_ijt[5,12,2] ^2 + Q_ijt[5,12,2] ^2 ] <= 9900
+ Line_loading_5_12_3: [ P_ijt[5,12,3] ^2 + Q_ijt[5,12,3] ^2 ] <= 9900
+ Line_loading_5_12_4: [ P_ijt[5,12,4] ^2 + Q_ijt[5,12,4] ^2 ] <= 9900
+ Line_loading_5_12_5: [ P_ijt[5,12,5] ^2 + Q_ijt[5,12,5] ^2 ] <= 9900
+ Line_loading_5_12_6: [ P_ijt[5,12,6] ^2 + Q_ijt[5,12,6] ^2 ] <= 9900
+ Line_loading_5_12_7: [ P_ijt[5,12,7] ^2 + Q_ijt[5,12,7] ^2 ] <= 9900
+ Line_loading_5_12_8: [ P_ijt[5,12,8] ^2 + Q_ijt[5,12,8] ^2 ] <= 9900
+ Line_loading_5_12_9: [ P_ijt[5,12,9] ^2 + Q_ijt[5,12,9] ^2 ] <= 9900
+ Line_loading_5_12_10: [ P_ijt[5,12,10] ^2 + Q_ijt[5,12,10] ^2 ] <= 9900
+ Line_loading_5_12_11: [ P_ijt[5,12,11] ^2 + Q_ijt[5,12,11] ^2 ] <= 9900
+ Line_loading_5_12_12: [ P_ijt[5,12,12] ^2 + Q_ijt[5,12,12] ^2 ] <= 9900
+ Line_loading_5_12_13: [ P_ijt[5,12,13] ^2 + Q_ijt[5,12,13] ^2 ] <= 9900
+ Line_loading_5_12_14: [ P_ijt[5,12,14] ^2 + Q_ijt[5,12,14] ^2 ] <= 9900
+ Line_loading_5_12_15: [ P_ijt[5,12,15] ^2 + Q_ijt[5,12,15] ^2 ] <= 9900
+ Line_loading_5_12_16: [ P_ijt[5,12,16] ^2 + Q_ijt[5,12,16] ^2 ] <= 9900
+ Line_loading_5_12_17: [ P_ijt[5,12,17] ^2 + Q_ijt[5,12,17] ^2 ] <= 9900
+ Line_loading_5_12_18: [ P_ijt[5,12,18] ^2 + Q_ijt[5,12,18] ^2 ] <= 9900
+ Line_loading_5_12_19: [ P_ijt[5,12,19] ^2 + Q_ijt[5,12,19] ^2 ] <= 9900
+ Line_loading_5_12_20: [ P_ijt[5,12,20] ^2 + Q_ijt[5,12,20] ^2 ] <= 9900
+ Line_loading_5_12_21: [ P_ijt[5,12,21] ^2 + Q_ijt[5,12,21] ^2 ] <= 9900
+ Line_loading_5_12_22: [ P_ijt[5,12,22] ^2 + Q_ijt[5,12,22] ^2 ] <= 9900
+ Line_loading_5_12_23: [ P_ijt[5,12,23] ^2 + Q_ijt[5,12,23] ^2 ] <= 9900
+ Line_loading_8_9_0: [ P_ijt[8,9,0] ^2 + Q_ijt[8,9,0] ^2 ] <= 9900
+ Line_loading_8_9_1: [ P_ijt[8,9,1] ^2 + Q_ijt[8,9,1] ^2 ] <= 9900
+ Line_loading_8_9_2: [ P_ijt[8,9,2] ^2 + Q_ijt[8,9,2] ^2 ] <= 9900
+ Line_loading_8_9_3: [ P_ijt[8,9,3] ^2 + Q_ijt[8,9,3] ^2 ] <= 9900
+ Line_loading_8_9_4: [ P_ijt[8,9,4] ^2 + Q_ijt[8,9,4] ^2 ] <= 9900
+ Line_loading_8_9_5: [ P_ijt[8,9,5] ^2 + Q_ijt[8,9,5] ^2 ] <= 9900
+ Line_loading_8_9_6: [ P_ijt[8,9,6] ^2 + Q_ijt[8,9,6] ^2 ] <= 9900
+ Line_loading_8_9_7: [ P_ijt[8,9,7] ^2 + Q_ijt[8,9,7] ^2 ] <= 9900
+ Line_loading_8_9_8: [ P_ijt[8,9,8] ^2 + Q_ijt[8,9,8] ^2 ] <= 9900
+ Line_loading_8_9_9: [ P_ijt[8,9,9] ^2 + Q_ijt[8,9,9] ^2 ] <= 9900
+ Line_loading_8_9_10: [ P_ijt[8,9,10] ^2 + Q_ijt[8,9,10] ^2 ] <= 9900
+ Line_loading_8_9_11: [ P_ijt[8,9,11] ^2 + Q_ijt[8,9,11] ^2 ] <= 9900
+ Line_loading_8_9_12: [ P_ijt[8,9,12] ^2 + Q_ijt[8,9,12] ^2 ] <= 9900
+ Line_loading_8_9_13: [ P_ijt[8,9,13] ^2 + Q_ijt[8,9,13] ^2 ] <= 9900
+ Line_loading_8_9_14: [ P_ijt[8,9,14] ^2 + Q_ijt[8,9,14] ^2 ] <= 9900
+ Line_loading_8_9_15: [ P_ijt[8,9,15] ^2 + Q_ijt[8,9,15] ^2 ] <= 9900
+ Line_loading_8_9_16: [ P_ijt[8,9,16] ^2 + Q_ijt[8,9,16] ^2 ] <= 9900
+ Line_loading_8_9_17: [ P_ijt[8,9,17] ^2 + Q_ijt[8,9,17] ^2 ] <= 9900
+ Line_loading_8_9_18: [ P_ijt[8,9,18] ^2 + Q_ijt[8,9,18] ^2 ] <= 9900
+ Line_loading_8_9_19: [ P_ijt[8,9,19] ^2 + Q_ijt[8,9,19] ^2 ] <= 9900
+ Line_loading_8_9_20: [ P_ijt[8,9,20] ^2 + Q_ijt[8,9,20] ^2 ] <= 9900
+ Line_loading_8_9_21: [ P_ijt[8,9,21] ^2 + Q_ijt[8,9,21] ^2 ] <= 9900
+ Line_loading_8_9_22: [ P_ijt[8,9,22] ^2 + Q_ijt[8,9,22] ^2 ] <= 9900
+ Line_loading_8_9_23: [ P_ijt[8,9,23] ^2 + Q_ijt[8,9,23] ^2 ] <= 9900
+ Line_loading_8_13_0: [ P_ijt[8,13,0] ^2 + Q_ijt[8,13,0] ^2 ] <= 9900
+ Line_loading_8_13_1: [ P_ijt[8,13,1] ^2 + Q_ijt[8,13,1] ^2 ] <= 9900
+ Line_loading_8_13_2: [ P_ijt[8,13,2] ^2 + Q_ijt[8,13,2] ^2 ] <= 9900
+ Line_loading_8_13_3: [ P_ijt[8,13,3] ^2 + Q_ijt[8,13,3] ^2 ] <= 9900
+ Line_loading_8_13_4: [ P_ijt[8,13,4] ^2 + Q_ijt[8,13,4] ^2 ] <= 9900
+ Line_loading_8_13_5: [ P_ijt[8,13,5] ^2 + Q_ijt[8,13,5] ^2 ] <= 9900
+ Line_loading_8_13_6: [ P_ijt[8,13,6] ^2 + Q_ijt[8,13,6] ^2 ] <= 9900
+ Line_loading_8_13_7: [ P_ijt[8,13,7] ^2 + Q_ijt[8,13,7] ^2 ] <= 9900
+ Line_loading_8_13_8: [ P_ijt[8,13,8] ^2 + Q_ijt[8,13,8] ^2 ] <= 9900
+ Line_loading_8_13_9: [ P_ijt[8,13,9] ^2 + Q_ijt[8,13,9] ^2 ] <= 9900
+ Line_loading_8_13_10: [ P_ijt[8,13,10] ^2 + Q_ijt[8,13,10] ^2 ] <= 9900
+ Line_loading_8_13_11: [ P_ijt[8,13,11] ^2 + Q_ijt[8,13,11] ^2 ] <= 9900
+ Line_loading_8_13_12: [ P_ijt[8,13,12] ^2 + Q_ijt[8,13,12] ^2 ] <= 9900
+ Line_loading_8_13_13: [ P_ijt[8,13,13] ^2 + Q_ijt[8,13,13] ^2 ] <= 9900
+ Line_loading_8_13_14: [ P_ijt[8,13,14] ^2 + Q_ijt[8,13,14] ^2 ] <= 9900
+ Line_loading_8_13_15: [ P_ijt[8,13,15] ^2 + Q_ijt[8,13,15] ^2 ] <= 9900
+ Line_loading_8_13_16: [ P_ijt[8,13,16] ^2 + Q_ijt[8,13,16] ^2 ] <= 9900
+ Line_loading_8_13_17: [ P_ijt[8,13,17] ^2 + Q_ijt[8,13,17] ^2 ] <= 9900
+ Line_loading_8_13_18: [ P_ijt[8,13,18] ^2 + Q_ijt[8,13,18] ^2 ] <= 9900
+ Line_loading_8_13_19: [ P_ijt[8,13,19] ^2 + Q_ijt[8,13,19] ^2 ] <= 9900
+ Line_loading_8_13_20: [ P_ijt[8,13,20] ^2 + Q_ijt[8,13,20] ^2 ] <= 9900
+ Line_loading_8_13_21: [ P_ijt[8,13,21] ^2 + Q_ijt[8,13,21] ^2 ] <= 9900
+ Line_loading_8_13_22: [ P_ijt[8,13,22] ^2 + Q_ijt[8,13,22] ^2 ] <= 9900
+ Line_loading_8_13_23: [ P_ijt[8,13,23] ^2 + Q_ijt[8,13,23] ^2 ] <= 9900
+ Line_loading_9_10_0: [ P_ijt[9,10,0] ^2 + Q_ijt[9,10,0] ^2 ] <= 9900
+ Line_loading_9_10_1: [ P_ijt[9,10,1] ^2 + Q_ijt[9,10,1] ^2 ] <= 9900
+ Line_loading_9_10_2: [ P_ijt[9,10,2] ^2 + Q_ijt[9,10,2] ^2 ] <= 9900
+ Line_loading_9_10_3: [ P_ijt[9,10,3] ^2 + Q_ijt[9,10,3] ^2 ] <= 9900
+ Line_loading_9_10_4: [ P_ijt[9,10,4] ^2 + Q_ijt[9,10,4] ^2 ] <= 9900
+ Line_loading_9_10_5: [ P_ijt[9,10,5] ^2 + Q_ijt[9,10,5] ^2 ] <= 9900
+ Line_loading_9_10_6: [ P_ijt[9,10,6] ^2 + Q_ijt[9,10,6] ^2 ] <= 9900
+ Line_loading_9_10_7: [ P_ijt[9,10,7] ^2 + Q_ijt[9,10,7] ^2 ] <= 9900
+ Line_loading_9_10_8: [ P_ijt[9,10,8] ^2 + Q_ijt[9,10,8] ^2 ] <= 9900
+ Line_loading_9_10_9: [ P_ijt[9,10,9] ^2 + Q_ijt[9,10,9] ^2 ] <= 9900
+ Line_loading_9_10_10: [ P_ijt[9,10,10] ^2 + Q_ijt[9,10,10] ^2 ] <= 9900
+ Line_loading_9_10_11: [ P_ijt[9,10,11] ^2 + Q_ijt[9,10,11] ^2 ] <= 9900
+ Line_loading_9_10_12: [ P_ijt[9,10,12] ^2 + Q_ijt[9,10,12] ^2 ] <= 9900
+ Line_loading_9_10_13: [ P_ijt[9,10,13] ^2 + Q_ijt[9,10,13] ^2 ] <= 9900
+ Line_loading_9_10_14: [ P_ijt[9,10,14] ^2 + Q_ijt[9,10,14] ^2 ] <= 9900
+ Line_loading_9_10_15: [ P_ijt[9,10,15] ^2 + Q_ijt[9,10,15] ^2 ] <= 9900
+ Line_loading_9_10_16: [ P_ijt[9,10,16] ^2 + Q_ijt[9,10,16] ^2 ] <= 9900
+ Line_loading_9_10_17: [ P_ijt[9,10,17] ^2 + Q_ijt[9,10,17] ^2 ] <= 9900
+ Line_loading_9_10_18: [ P_ijt[9,10,18] ^2 + Q_ijt[9,10,18] ^2 ] <= 9900
+ Line_loading_9_10_19: [ P_ijt[9,10,19] ^2 + Q_ijt[9,10,19] ^2 ] <= 9900
+ Line_loading_9_10_20: [ P_ijt[9,10,20] ^2 + Q_ijt[9,10,20] ^2 ] <= 9900
+ Line_loading_9_10_21: [ P_ijt[9,10,21] ^2 + Q_ijt[9,10,21] ^2 ] <= 9900
+ Line_loading_9_10_22: [ P_ijt[9,10,22] ^2 + Q_ijt[9,10,22] ^2 ] <= 9900
+ Line_loading_9_10_23: [ P_ijt[9,10,23] ^2 + Q_ijt[9,10,23] ^2 ] <= 9900
+ Line_loading_11_12_0: [ P_ijt[11,12,0] ^2 + Q_ijt[11,12,0] ^2 ] <= 9900
+ Line_loading_11_12_1: [ P_ijt[11,12,1] ^2 + Q_ijt[11,12,1] ^2 ] <= 9900
+ Line_loading_11_12_2: [ P_ijt[11,12,2] ^2 + Q_ijt[11,12,2] ^2 ] <= 9900
+ Line_loading_11_12_3: [ P_ijt[11,12,3] ^2 + Q_ijt[11,12,3] ^2 ] <= 9900
+ Line_loading_11_12_4: [ P_ijt[11,12,4] ^2 + Q_ijt[11,12,4] ^2 ] <= 9900
+ Line_loading_11_12_5: [ P_ijt[11,12,5] ^2 + Q_ijt[11,12,5] ^2 ] <= 9900
+ Line_loading_11_12_6: [ P_ijt[11,12,6] ^2 + Q_ijt[11,12,6] ^2 ] <= 9900
+ Line_loading_11_12_7: [ P_ijt[11,12,7] ^2 + Q_ijt[11,12,7] ^2 ] <= 9900
+ Line_loading_11_12_8: [ P_ijt[11,12,8] ^2 + Q_ijt[11,12,8] ^2 ] <= 9900
+ Line_loading_11_12_9: [ P_ijt[11,12,9] ^2 + Q_ijt[11,12,9] ^2 ] <= 9900
+ Line_loading_11_12_10: [ P_ijt[11,12,10] ^2 + Q_ijt[11,12,10] ^2 ]
+   <= 9900
+ Line_loading_11_12_11: [ P_ijt[11,12,11] ^2 + Q_ijt[11,12,11] ^2 ]
+   <= 9900
+ Line_loading_11_12_12: [ P_ijt[11,12,12] ^2 + Q_ijt[11,12,12] ^2 ]
+   <= 9900
+ Line_loading_11_12_13: [ P_ijt[11,12,13] ^2 + Q_ijt[11,12,13] ^2 ]
+   <= 9900
+ Line_loading_11_12_14: [ P_ijt[11,12,14] ^2 + Q_ijt[11,12,14] ^2 ]
+   <= 9900
+ Line_loading_11_12_15: [ P_ijt[11,12,15] ^2 + Q_ijt[11,12,15] ^2 ]
+   <= 9900
+ Line_loading_11_12_16: [ P_ijt[11,12,16] ^2 + Q_ijt[11,12,16] ^2 ]
+   <= 9900
+ Line_loading_11_12_17: [ P_ijt[11,12,17] ^2 + Q_ijt[11,12,17] ^2 ]
+   <= 9900
+ Line_loading_11_12_18: [ P_ijt[11,12,18] ^2 + Q_ijt[11,12,18] ^2 ]
+   <= 9900
+ Line_loading_11_12_19: [ P_ijt[11,12,19] ^2 + Q_ijt[11,12,19] ^2 ]
+   <= 9900
+ Line_loading_11_12_20: [ P_ijt[11,12,20] ^2 + Q_ijt[11,12,20] ^2 ]
+   <= 9900
+ Line_loading_11_12_21: [ P_ijt[11,12,21] ^2 + Q_ijt[11,12,21] ^2 ]
+   <= 9900
+ Line_loading_11_12_22: [ P_ijt[11,12,22] ^2 + Q_ijt[11,12,22] ^2 ]
+   <= 9900
+ Line_loading_11_12_23: [ P_ijt[11,12,23] ^2 + Q_ijt[11,12,23] ^2 ]
+   <= 9900
+ Line_loading_12_13_0: [ P_ijt[12,13,0] ^2 + Q_ijt[12,13,0] ^2 ] <= 9900
+ Line_loading_12_13_1: [ P_ijt[12,13,1] ^2 + Q_ijt[12,13,1] ^2 ] <= 9900
+ Line_loading_12_13_2: [ P_ijt[12,13,2] ^2 + Q_ijt[12,13,2] ^2 ] <= 9900
+ Line_loading_12_13_3: [ P_ijt[12,13,3] ^2 + Q_ijt[12,13,3] ^2 ] <= 9900
+ Line_loading_12_13_4: [ P_ijt[12,13,4] ^2 + Q_ijt[12,13,4] ^2 ] <= 9900
+ Line_loading_12_13_5: [ P_ijt[12,13,5] ^2 + Q_ijt[12,13,5] ^2 ] <= 9900
+ Line_loading_12_13_6: [ P_ijt[12,13,6] ^2 + Q_ijt[12,13,6] ^2 ] <= 9900
+ Line_loading_12_13_7: [ P_ijt[12,13,7] ^2 + Q_ijt[12,13,7] ^2 ] <= 9900
+ Line_loading_12_13_8: [ P_ijt[12,13,8] ^2 + Q_ijt[12,13,8] ^2 ] <= 9900
+ Line_loading_12_13_9: [ P_ijt[12,13,9] ^2 + Q_ijt[12,13,9] ^2 ] <= 9900
+ Line_loading_12_13_10: [ P_ijt[12,13,10] ^2 + Q_ijt[12,13,10] ^2 ]
+   <= 9900
+ Line_loading_12_13_11: [ P_ijt[12,13,11] ^2 + Q_ijt[12,13,11] ^2 ]
+   <= 9900
+ Line_loading_12_13_12: [ P_ijt[12,13,12] ^2 + Q_ijt[12,13,12] ^2 ]
+   <= 9900
+ Line_loading_12_13_13: [ P_ijt[12,13,13] ^2 + Q_ijt[12,13,13] ^2 ]
+   <= 9900
+ Line_loading_12_13_14: [ P_ijt[12,13,14] ^2 + Q_ijt[12,13,14] ^2 ]
+   <= 9900
+ Line_loading_12_13_15: [ P_ijt[12,13,15] ^2 + Q_ijt[12,13,15] ^2 ]
+   <= 9900
+ Line_loading_12_13_16: [ P_ijt[12,13,16] ^2 + Q_ijt[12,13,16] ^2 ]
+   <= 9900
+ Line_loading_12_13_17: [ P_ijt[12,13,17] ^2 + Q_ijt[12,13,17] ^2 ]
+   <= 9900
+ Line_loading_12_13_18: [ P_ijt[12,13,18] ^2 + Q_ijt[12,13,18] ^2 ]
+   <= 9900
+ Line_loading_12_13_19: [ P_ijt[12,13,19] ^2 + Q_ijt[12,13,19] ^2 ]
+   <= 9900
+ Line_loading_12_13_20: [ P_ijt[12,13,20] ^2 + Q_ijt[12,13,20] ^2 ]
+   <= 9900
+ Line_loading_12_13_21: [ P_ijt[12,13,21] ^2 + Q_ijt[12,13,21] ^2 ]
+   <= 9900
+ Line_loading_12_13_22: [ P_ijt[12,13,22] ^2 + Q_ijt[12,13,22] ^2 ]
+   <= 9900
+ Line_loading_12_13_23: [ P_ijt[12,13,23] ^2 + Q_ijt[12,13,23] ^2 ]
+   <= 9900
 Bounds
  theta[0,0,0] <= 30
  theta[0,0,1] <= 30
