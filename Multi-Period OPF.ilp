@@ -1,0 +1,35 @@
+\ Model Multi-Period OPF_copy
+\ LP format - for model browsing. Use MPS format to capture full model detail.
+Minimize
+ 
+Subject To
+ Power_balance_P_3_8: P_G[3,8] + P_ex[3,8] - P_ijt[3,1,8] - P_ijt[3,2,8]
+   - P_ijt[3,4,8] - Charging[3,8] + 0.95 Discharging[3,8]
+   = 21.131217312336
+ Power_balance_Q_3_8: Q_G[3,8] + Q_ex[3,8] - Q_ijt[3,1,8] - Q_ijt[3,2,8]
+   - Q_ijt[3,4,8] = -0.4374021332446864
+ Power_flow_P_3_4_8: - 0.0375362450562177 c_ijt[3,3,8]
+   - 0.0375362450562177 c_ijt[3,4,8] - 0.1184008448926836 s_ijt[3,4,8]
+   + P_ijt[3,4,8] = 0
+ Power_flow_Q_3_4_8: - 0.1184008448926836 c_ijt[3,3,8]
+   - 0.1184008448926836 c_ijt[3,4,8] + 0.0375362450562177 s_ijt[3,4,8]
+   + Q_ijt[3,4,8] = 0
+ cosine_lowerbound_3_8: c_ijt[3,3,8] >= 16103.61
+ PG_upperbound_3_8: P_G[3,8] <= 0
+ QG_upperbound_3_8: Q_G[3,8] <= 0
+ Pex_upperbound_3_8: P_ex[3,8] <= 0
+ Qex_upperbound_3_8: Q_ex[3,8] <= 0
+ SOC_balance_3_8: - 0.04561 SOC[3,8] + 0.04561 SOC[3,9] - 0.9 Charging[3,8]
+   + Discharging[3,8] = -0.022043
+Bounds
+ P_G[3,8] free
+ Q_G[3,8] free
+ P_ex[3,8] free
+ Q_ex[3,8] free
+ c_ijt[3,3,8] free
+ s_ijt[3,4,8] free
+ P_ijt[3,4,8] free
+ Q_ijt[3,4,8] free
+ -infinity <= SOC[3,8] <= 1
+ Discharging[3,8] free
+End

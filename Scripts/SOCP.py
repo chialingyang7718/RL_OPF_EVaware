@@ -25,10 +25,18 @@ for i in net.line.index:
 
 neighbors = {} # δ(i)
 for line in lines:
-    if line[0] not in neighbors:
+    if line[0] not in neighbors and line[1] not in neighbors:
+        neighbors[line[0]] = [line[1]]
+        neighbors[line[1]] = [line[0]]
+    elif line[1] not in neighbors and line[0] in neighbors:
+        neighbors[line[0]].append(line[1])
+        neighbors[line[1]] = [line[0]]
+    elif line[1] in neighbors and line[0] not in neighbors:
+        neighbors[line[1]].append(line[0])
         neighbors[line[0]] = [line[1]]
     else:
         neighbors[line[0]].append(line[1])
+        neighbors[line[1]].append(line[0])
 
 # Define time periods
 time_periods = range(0, 24) # T
@@ -411,14 +419,25 @@ for i in buses:
 
 # Optimize the model
 model.optimize()
-# Write the model to a file
-model.write("Multi-Period OPF.lp")
+
+
 
 # Check if the model solved successfully
 if model.status == GRB.OPTIMAL:
     print("Optimal solution found")
 else:
-    print("Model did not solve to optimality")
+    print("Model did not solve to optimality. Status: ", model.status)
+    model.computeIIS()
+    # Write the model to a file
+    model.write("Multi-Period OPF.ilp")
+
+    print('\nThe following constraints and variables are in the IIS:')
+    for c in model.getConstrs():
+        if c.IISConstr: print(f'\t{c.constrname}: {model.getRow(c)} {c.Sense} {c.RHS}')
+
+    for v in model.getVars():
+        if v.IISLB: print(f'\t{v.varname} ≥ {v.LB}')
+        if v.IISUB: print(f'\t{v.varname} ≤ {v.UB}')
 
 # TODO: Model infeasible during presolve already. If commented constranint 3a and 3b, model is feasible.
 # See https://support.gurobi.com/hc/en-us/articles/4402704428177-How-do-I-resolve-the-error-Model-is-infeasible-or-unbounded
