@@ -1,0 +1,152 @@
+\chapter{Methodology}\label{chapter:Methodology}
+\section{OPF Formulation}\label{sec:OPF_form}
+The formulation of a multi-period \gls{EV}-aware \gls{OPF} problem is illustrated in the Tables \ref{tab:sets and indices}-\ref{tab:parameters} and Equations \ref{eq:obj}-\ref{eq:discharging_limit}. In this study, the main objective is to minimize the generation cost for the \gls{DSO} as shown in the Equation \ref{eq:obj}. As for constraints, Equations \ref{eq:Line_balance_P} and \ref{eq:Line_balance_Q} define the active and reactive power flow in the lines respectively. Equations \ref{eq:Bus_balance_P} and \ref{eq:Bus_balance_Q} represent the power balance constraints as each node. Equation \ref{eq:Voltage_limit} points out the voltage limitation at each bus. Equations \ref{eq:Generator_limit_p} and \ref{eq:Generator_limit_q} illustrate the operational limitation of the generators. Additionally, Equation \ref{eq:Line_limit} corresponds to the transmission line loading limitation, which is related to maximum current flow and thermal limitation of the lines. Equation \ref{eq:Phase_limit} stands for the constraint of phase angle difference over each line. With respect to the \gls{EV}-related part, Equation \ref{eq:charging_balance} depicts the balance between power supply and \gls{EV} demands. Equation \ref{eq:SOC_limit} enforces the \gls{SOC} limitation of the \gls{EV} batteries. Equations \ref{eq:charging_limit} and \ref{eq:discharging_limit} limit the charging and discharging power allowance.
+\begin{table}[h]
+\centering
+\begin{tabular}{p{4cm} p{3cm} p{4cm}}
+\toprule
+Set & Index & Description \\
+\midrule
+\gls{symb:B} & $i$ or $j$ & Buses\\[0.5em]
+\gls{symb:G} &  & Generator buses \\[0.5em]
+\gls{symb:D} &  & Load buses \\[0.5em]
+\gls{symb:L} & $(i,j)$ & Transmission lines \\[0.5em]
+\gls{symb:N} &  & Power network\\[0.5em]
+\gls{symb:T} & $t$ & Time periods \\[0.5em]
+\bottomrule
+\end{tabular}
+\caption{Sets and indices}\label{tab:sets and indices}
+\end{table}
+
+\begin{longtable}{llp{8cm}}
+\toprule
+Variable & Range & Description \\
+\midrule
+$P_{it}^G$ & $\mathbb R^+$ & Active power output at generator bus $i \in G$ at time period $t \in T$\\[1em]
+$Q_{it}^G$ & $\mathbb R^+$ & Reactive power output at generator bus $i \in G$ at time period $t \in T$\\[1em]
+$|V_{it}^G|$ & $\mathbb R^+$ & Voltage magnitude at generator bus $i \in G$ at time period $t \in T$\\[1em]
+$\theta_{ijt}$ & $(0,1)$ & Phase angle difference  of line $(i,j) \in L$ at time period $t \in T$\\[1em]
+$P_{it}^{c}$ & $\mathbb R^+$ & Charging power to bus $i \in B$ at time period $t \in T$\\[1em]
+$P_{it}^{d}$ & $\mathbb R^+$ & Discharging power to bus $i \in B$ at time period $t \in T$\\[1em]
+$Z_{it}$ & $(0,1)$ & \gls{SOC} at bus $i \in B$ at $t \in T$\\
+\bottomrule
+\caption{Decision Variables}\label{tab:decision variables}
+\end{longtable}
+
+\begin{longtable}{lp{10cm}}
+\toprule
+Parameter & Description\\
+\midrule
+$P_{it}^{D}$ & Active power load at load bus $i \in D$ at time period $t \in T$\\[0.5em]
+$Q_{it}^{D}$ & Reactive power load at load bus $i \in D$ at time period $t \in T$\\[0.5em]
+$P_{it}^{max}$ & Upper bound on the active power generation at generator bus $i \in G$ at time period $t$\\[0.5em]
+$P_{i}^{min}$ & Lower bound on the active power generation at generator bus $i \in G$ at time period $t$\\[0.5em]
+$Q_{i}^{max}$ & Upper bound on the reactive power generation at generator bus $i \in G$\\[0.5em]
+$Q_{i}^{min}$ & Lower bound on the reactive power generation at generator bus $i \in G$\\[0.5em]
+$V_{max}$ & Upper bound on the voltage magnitude\\[0.5em]
+$V_{min}$ & Lower bound on the voltage magnitude\\[0.5em]
+$S_{ij}^{max}$ & Upper bound on apparent power flow through the line $(i,j) \in L$\\[0.5em]
+$\theta_{ij}^{max}$ & Upper bound on phase angle through the line $(i,j) \in L$\\[0.5em]
+$P_{it}^{c,max}$ & Maximum charging power at the bus $i \in B$\\[0.5em]
+$P_{it}^{d,max}$ & Maximum discharging power at the bus $i \in B$\\[0.5em]
+$Z_{it}^{max}$ & Maximum \gls{SOC} of \gls{EV}s at bus $i \in B$ at $t \in T$\\[0.5em]
+$Z_{it}^{min}$ & Minimum \gls{SOC} of \gls{EV}s at bus $i \in B$ at $t \in T$\\[0.5em]
+$\eta_{c}$ & Charging rate for \gls{EV}s\\[0.5em]
+$\eta_{d}$ & Discharging rate for \gls{EV}s\\[0.5em]
+$Z_{i0}$ & Initial \gls{SOC} of \gls{EV}s for bus $i \in B$\\[0.5em]
+$C_{i}$ & Energy capacity of \gls{EV}s at bus $i \in B$\\[0.5em]
+$ed_{it}$ & Energy demand of \gls{EV}s at bus $i \in B$ at $t \in T$ \\[0.5em]
+$G_{ij}$ & Conductance of the line $(i,j) \in L$\\[0.5em]
+$B_{ij}$ & Susceptance of the line $(i,j) \in L$\\[0.5em]
+$Y_{ij} = G_{ij}+jB_{ij}$ & Complex admittance of the line $(i,j) \in L$\\[0.5em]
+$\delta(i)$ & Neighbor buses of $i \in N$\\[0.5em]
+\bottomrule
+\caption{Parameters}\label{tab:parameters}
+\end{longtable}
+
+\subsection*{Objective Function}
+\begin{equation}
+    \begin{split}
+        Min \sum_{i \in G}\sum_{t \in T} f(P_{it}^G)
+    \end{split}
+    \label{eq:obj}
+\end{equation}
+where $f$ is the cost function for power generation.
+
+\subsection*{Constraints}
+\begin{align}
+&P_{ijt} = V_{it} \sum_{j \in \delta(i)} V_{jt}(G_{ij}cos\theta_{ijt}+B_{ij}sin\theta_{ijt})&\forall (i, j) \in L, t \in T\label{eq:Line_balance_P}\\[0.5em]
+&Q_{ijt} = V_{it} \sum_{j \in \delta(i)} V_{jt}(G_{ij}sin\theta_{ijt}+B_{ij}cos\theta_{ijt})&\forall (i, j) \in L, t \in T\label{eq:Line_balance_Q}\\[0.5em]
+&P_{it}^{G} - P_{it}^D - P_{it}^{c} + \eta_{d}P_{it}^{d} = \sum_{j\in \delta(i)}P_{ijt}&\forall i \in B, t \in T\label{eq:Bus_balance_P}\\[0.5em]
+&Q_{it}^{G} - Q_{it}^D = \sum_{j\in \delta(i)}Q_{ijt}&\forall i \in B, t \in T\label{eq:Bus_balance_Q}\\[0.5em]
+&V_{min} \leq V_{it} \leq V_{max}& \forall i \in B, t \in T \label{eq:Voltage_limit}\\[0.5em]
+&P_{it}^{min} \leq P_{it}^G \leq P_{it}^{max} &\forall i \in G, t \in T \label{eq:Generator_limit_p}\\[0.5em]
+&Q_{i}^{min} \leq Q_{it}^G \leq Q_{i}^{max} &\forall i \in G, t \in T \label{eq:Generator_limit_q}\\[0.5em]
+& P_{ijt}^2 + Q_{ijt}^2 \leq (S_{ij}^{max})^2 &\forall (i,j) \in L, t \in T\label{eq:Line_limit}\\[0.5em]
+&|\theta_{ij}| \leq \theta_{ij}^{max} &\forall (i,j) \in L, t \in T \label{eq:Phase_limit}\\[0.5em]
+&Z_{it}C_{i}+\eta_{c}P_{it}^{c}-P_{it}^{d}-ed_{it} = Z_{i(t+1)}C_{i}&\forall i \in B, t \in T\label{eq:charging_balance}\\[0.5em]
+&Z_{it}^{min} \leq Z_{it} \leq Z_{it}^{max}&\forall i \in B, t \in T\label{eq:SOC_limit}\\[0.5em]
+&0 \leq P_{it}^{c} \leq P_{it}^{c,max} &\forall i \in B, t \in T\label{eq:charging_limit}\\[0.5em]
+&0 \leq P_{it}^{d} \leq P_{it}^{d,max} &\forall i \in B, t \in T\label{eq:discharging_limit}
+\end{align}
+
+
+\section{\acrlong{DRL} Framework}\label{sec:RL Framework}
+In order to solve the \gls{OPF} problem with \gls{DRL} methods, it is essential to transform the \gls{OPF} problem into the \gls{DRL} framework. In this use case, the \gls{DSO} is symbolized by the \gls{DRL} agent. The \gls{DRL} environment can be regarded as the distribution power system and other related external factors. The further details for such as time period definition, actions and states will be explained in the following subsections.
+
+\subsection{Time Period}
+The EV-aware \gls{OPF} is formulated as multi-period in the Section \ref{sec:OPF_form}. However, when transformed into \gls{RL} framework, all the variables are turned into single-period form to avoid high-dimensional state or action space. Every time step of the \gls{DRL} agent interacting with the environment represents every time period $t$ of the time period set $T$. The episode length is regarded as the total length of the time periods.
+
+\subsection{Actions}
+In \gls{DRL} models, the action space typically represents the set of decision variables that an agent can directly control or adjust in the environment. However, in the context of applying \gls{DRL} to \gls{OPF}, not all decision variables from the traditional \gls{OPF} problem need to be included in the action space. This is because \gls{DRL} models often focus on a subset of variables that have the most direct or significant impact on the control problem, while others might be treated as implicit or handled by the environment. In the EV-aware \gls{OPF} using RL, the action space only includes active power generation $P_{it}^G$, voltage magnitude $|V_{it}^G|$ for $i \in G$ along with charging and discharging power $P_{it}^c$,  $P_{i}^d$ for $i \in B$ at a certain point of time step $t$. These are the decision variables the \gls{DSO} would actually control in a real-world setting. While other decision variables are treated as part of the state that evolves based on the agent's actions but are not directly controlled.
+
+\subsection{States}
+The state space represents the observable conditions of the power system at any given time. The state space is essentially a snapshot of the system that the \gls{DRL} agent uses to make decisions, and it typically consists of variables that describe the current operating conditions of the grid. Similar to the action space, the state space is often simplified for \gls{DRL} models to reduce complexity. Including too many state variables can lead to a high-dimensional state space, making it harder for the agent to learn efficiently (\cite{wolgast2024learning}). Instead, the most relevant and observable variables that provide enough information to make informed decisions are typically included. Variables at the time step $t$ such as active power load $P_{it}^D$, reactive power load $Q_{it}^D$ for $i \in D$ and power generation availability $P_{it}^{max}$ for $i \in G$ are included in the state space since both power consumption and renewable power generation  fluctuate throughout the time. Additionally, including \gls{SOC} of \gls{EV}s $Z_{it}$ for $i \in B$ at each time step $t$ in the state space is essential because it provides the \gls{DRL} agent with the information needed to manage \gls{EV} charging and discharging, optimize energy storage availability, respect user mobility needs, and ensure grid stability by utilizing \gls{EV}s as flexible resources in the power system. 
+
+\subsection{Power Flow Solver}
+
+\subsection{Rewards}
+The reward function should reflect the objectives and constraints of the \gls{OPF} problem, encouraging the agent to find optimal control actions while maintaining grid constraints. Since the system stability and constraint satisfaction are crucial in \gls{OPF}, a rule-based reward function is proposed in .
+% \begin{equation}
+    
+%     \label{eq:reward function}
+% \end{equation}
+
+\section{\acrlong{PPO}}\label{
+sec:PPO}
+There are numerous state-of-the-art \gls{DRL} algorithms with significant potential for addressing \gls{OPF} problems, as discussed in Section \ref{subsec:DRLApplication}. In this study, \gls{PPO} was selected due to its simplicity in implementation and low computational demands.\\
+\gls{PPO} was developed by \cite{schulman2017proximal} and had become the default reinforcement learning algorithm at OpenAI. It gains popularity because it seems to strike a balance between performance and comprehension. \gls{PPO} aims to maximize the expected return by optimizing a surrogate objective function that approximates the policy improvement. This surrogate objective, constraining the policy update to be within a certain range, is constructed to prevent large policy updates, ensuring stable and efficient learning.
+
+\begin{algorithm}
+\caption{\gls{PPO} Training for solving \gls{EV}-aware \gls{OPF} problem}
+\begin{algorithmic}[1]
+\State Initialize policy parameters $\theta_0$, value function parameters $w_0$, number of environments $n_{env}$, episode length $len_{ep}$, number of updating steps $n_{update}$, and all related hyper-parameters mentioned in \cite{schulman2017proximal}.
+% TODO: Add creation of multiple vectorized environments
+\For{iteration = 1, 2, ..., K} \Comment{Each iteration represents one policy update cycle}
+    \For{each episode e}
+        \State Generate dataset $D_{train}$ containing load, generator, and EV settings
+        \For{actor = 1, 2, ..., N} \Comment{Parallel environments}
+            \State Collect a set of trajectories $\tau_i = \{(s_t, a_t, R_t, s_{t+1})\}$ by running policy $\pi_{\theta_k}$ in the environment for every time step
+        \EndFor
+    \EndFor
+    \State Compute advantage estimates $\hat{A}_t$ using the value function $V_{w_k}(s_t)$
+    \State Compute the probability ratio: 
+    \[
+    r_t(\theta) = \frac{\pi_{\theta}(a_t|s_t)}{\pi_{\theta_{\text{old}}}(a_t|s_t)}
+    \]
+    \State Compute the clipped surrogate objective:
+    \[
+    L(\theta) = \mathbb{E}_t \left[ \min \left( r_t(\theta) \hat{A}_t, \text{clip}(r_t(\theta), 1 - \epsilon, 1 + \epsilon) \hat{A}_t \right) \right]
+    \]
+    \State Update policy by maximizing the objective: 
+    \[
+    \theta_{k+1} = \arg \max_{\theta} L(\theta)
+    \]
+    \State Update value function by minimizing the loss: 
+    \[
+    L_V(w) = \mathbb{E}_t \left[ \left( V_w(s_t) - R_t \right)^2 \right]
+    \]
+\EndFor
+\State \Return Final policy $\pi_{\theta_k}$
+\end{algorithmic}
+\end{algorithm}

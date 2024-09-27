@@ -1,0 +1,31 @@
+\documentclass[listof=flat,a4paper,12pt,headsepline,bibliography=totoc,listof=totoc,index=totoc,cleardoublepage=empty,numbers=noenddot,headings=normal]{scrreprt}
+
+\input{settings} % include all settings here
+\input{commands} % include all individual commands here
+\input{info} % include all cover information here
+\begin{document}
+\input{cover} 
+\renewcommand{\thepage}{\roman{page}}
+
+\onehalfspacing
+\input{chapters/Abstract}
+\pdfbookmark[1]{Table of contents}{toc}
+\renewcommand\contentsname{Table of Contents}
+\tableofcontents
+\listoffigures
+\listoftables
+\printnoidxglossary[type=\acronymtype, style=long ,title=Abbreviations, toctitle=Abbreviations]
+\printnoidxglossary[type=symbolslist,style=long ,title=Symbols]
+%\setcounter{page}{1}
+\input{chapters/Introduction}
+\input{chapters/Literature}
+\input{chapters/Methodology}
+% \input{chapters/Implementation}
+% \input{chapters/Evaluation}
+% \input{chapters/Discussion}
+% \input{chapters/Conclusion}
+% ...include other chapters here
+\bibliography{bibliography/literature}
+% \input{chapters/Appendix}
+\input{chapters/EhrenwoertlicheErklaerung}
+\end{document}

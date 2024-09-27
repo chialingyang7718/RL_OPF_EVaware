@@ -1,0 +1,234 @@
+\part*{Appendix}
+\addcontentsline{toc}{chapter}{Appendix}
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\theequation}{\arabic{equation}}
+\section{Appendix I - MIP Optimization Model}\label{section:Appendix One - Full Model Formulation}
+\renewcommand{\thetable}{A\arabic{table}} % Redefine table numbering for appendix
+\renewcommand{\theequation}{A. \arabic{equation}} % Redefine equation numbering for appendix
+In this section, the full mathematical formulation of the MIP model introduced in the Section \ref{section:Model} is presented (\cite{mainreference_thies}). It comprises the model's sets and indices in Table \ref{subsec: sets and indices}, the decision variables in Table \ref{subsec: decision variables}, the parameters in Table \ref{subsec: parameters}, the objective function \ref{subsec: objective function} and the constraints \ref{subsec: constraints}.
+\subsection{Sets and Indices}\label{subsec: sets and indices}
+\begin{table}[h]
+\centering
+\begin{tabular}{llp{10cm}}
+\toprule
+Set & Index & Description \\
+\midrule
+\textit{V} & \textit{v} & Vehicle projects\\[0.5em]
+$W \subseteq V$ & & Vehicle projects with \gls{SOP} before planning horizon \\[0.5em]
+\textit{T} & $t, \tau$ & Periods\\[0.5em]
+$U \subseteq T$ & & Periods within the planning horizon \\[0.5em]
+\textit{M} & \textit{m} & Market segments\\[0.5em]
+\textit{C} & \textit{c} & Production resources\\[0.5em]
+\bottomrule
+\end{tabular}
+\caption{Sets and indices}\label{tab:sets and indices}
+\end{table}
+
+\subsection{Decision Variables}\label{subsec: decision variables}
+\begin{table}[h]
+\centering
+\begin{tabular}{llp{10cm}}
+\toprule
+Variable & Range & Description \\
+\midrule
+$y_v$ & \{0, 1\} & Vehicle project realization: 1 if vehicle project $v$ is realized, and 0 if not\\[1em]
+$q_{vt}$ & $\mathbb Z^+$ & Production quantity of vehicle project $v$ in period $t$\\[1em]
+$k_{ct}$ & $\mathbb Z^+$ & Capacity of resource $c$ in period $t$\\[1em]
+$k_{ct}^{Bin}$ & \{0, 1\} & Binary ramp-up: 1 if capacity for resource $c$ is ramped up in period $t$, and 0 if not\\[1em]
+$k_{ct}^{Rampup}$ &  $\mathbb Z^+$  & Ramp-up of resource $c$ at the beginning of period $t$\\[1em]
+$k_{ct}^{Rampdown}$ &  $\mathbb Z^+$  & Ramp-down of resource $c$ at the beginning of period $t$\\[1em]
+$z_{t}^{Penalty}$ & $\mathbb R^+$ & Penalty payment for the exceedance of the $\text{CO}_2$ fleet emission threshold in period $t$\\[1em]
+$z_{c}^{Back}$ & $\mathbb R^+$ & Cash inflow for resource $c$ with residual value at the end of the planning horizon\\[1em]
+\bottomrule
+\end{tabular}
+\caption{Decision Variables}\label{tab:decision variables}
+\end{table}
+
+\subsection{Parameters}\label{subsec: parameters}
+\begin{longtable}{lp{11cm}}
+\toprule[0.15em]
+\multicolumn{2}{c}{\textbf{Vehicle projects}}\\
+\midrule
+Parameter & Description\\
+\midrule
+$SOP_v$ & \gls{SOP} of vehicle project $v$\\[0.5em]
+$c_v^{ProdVar}$ & Variable production cost for vehicle project $v$\\[0.5em]
+$p_v^{ProdVar}$ & Sales revenues for each produced unit of vehicle project $v$\\[0.5em]
+$E_v$ & $\text{CO}_2$ fleet emission of vehicle from vehicle project $v$\\[0.5em]
+$n_v$ & Market segment corresponding to vehicle project $v$\\[0.5em]
+$r_v$ & Resource type corresponding to vehicle project $v$\\[0.5em]
+$\tau^{LC}$ & Maximum duration of the market life cycle\\[0.5em]
+$c^{RD}$ & Development cost of a new vehicle project/model\\[0.5em]
+$Vect_{vt}^{RD}$ & Percentage of total development cost ($c^{RD}$) in period $t$ for vehicle project $v$\\[0.5em]
+$y_{v}^{Preset}$ & Preset for the realization of vehicle project $v$\\[0.5em]
+\toprule[0.15em]
+\multicolumn{2}{c}{\textbf{Production resources}} \\
+\midrule
+Parameter & Description\\
+\midrule
+$c^{RampupFixed}$ & Fixed ramp-up cost for each resource\\[0.5em]
+$c^{RampupVar}$ & Variable ramp-up cost for each unit of resource\\[0.5em]
+$\tau_c^{Rampup}$ & First ramp-up year for resource $c$\\[0.5em]
+$Vect_{t\tau}^{PC}$ & Percentage of total ramp-up cost in period $t$ for capacities installed in period $\tau$\\[0.5em]
+$\delta t^{Rampup}$ & Installation duration for ramp-up resource\\[0.5em]
+$c^{ProdFixed}$ & Fixed annual costs for existing resources\\[0.5em]
+$k_{c}^{Preset}$ & Capacity of resource $c$ at the beginning of the planning horizon\\[0.5em]
+$V_c^{res}$ & Residual value of resource $c$ at the end of the planning horizon $T$\\[0.5em]
+\toprule[0.15em]
+\multicolumn{2}{c}{\textbf{Demand}} \\
+\midrule
+Parameter & Description\\
+\midrule
+$d_{mt}$ & Demand of market segment $m$ in period $t$\\[0.5em]
+\toprule[0.15em]
+\multicolumn{2}{c}{\textbf{Emissions legislation}} \\
+\midrule
+Parameter & Description\\
+\midrule
+$E_t^{Law}$ & $\text{CO}_2$ fleet emission threshold in period $t$\\[0.5em]
+$c^{CO_2}$ & Penalty payment per g$\text{CO}_2$/km threshold exceedance and per vehicle sold\\[0.5em]
+\toprule[0.15em]
+\multicolumn{2}{c}{\textbf{Manufacturer's setting}} \\
+\midrule
+Parameter & Description\\
+\midrule
+$i$ & Target interest rate\\[0.5em]
+$dr_t$ & Discount rate in period $t$ with $dr_t = (1+i)^{-(t-min(T))}$\\[0.5em]
+$\epsilon$ & Maximum $\text{CO}_2$ emission threshold exceedance\\[0.5em]
+$q_t^{min}$ & Minimum production quantity in period $t$\\[0.5em]
+$\varphi ^{max}$ & Maxmimum utilization of production capacity in ramp-up year\\[0.5em]
+$SOP^{max}$ & Maximum project realization/number of \gls{SOP}s per period\\[0.5em]
+\toprule[0.15em]
+\multicolumn{2}{c}{\textbf{Other parameters}} \\
+\midrule
+Parameter & Description\\
+\midrule
+$N$ & Large number ($\geq 1,000,000$)\\[0.5em]
+$T^{max}$ & Last period of the planning horizon $U$ \\[0.5em]
+\bottomrule
+\caption{Parameters}\label{tab:parameters}
+\end{longtable}
+\subsection{Objective Function} \label{subsec: objective function}
+\begin{equation}
+    \begin{split}
+        Max \quad NPV & = \sum_{t \in U}{((CF_t^{SalesProd} - CF_t^{ProdFixed}-CF_t^{Penalty})*dr_t)} \\
+        & - \sum_{t\in T}{((CF_t^{RD}+CF_t^{Capacity})*dr_t)}\\
+        & + CF^{CapaBack}*dr_{T^{max}}
+    \end{split}
+    \label{eq:A.1}
+\end{equation}
+where
+\begin{align}
+    & CF_t^{SalesProd} = \sum_{v \in V}{((p_v^{ProdVar}-c_v^{ProdVar})*q_{vt})}\\[0.5em]
+    & CF_t^{ProdFixed}  = \sum_{c \in C}{(c^{ProdFixed}*k_{ct})}\\[0.5em]
+    & CF_t^{Penalty} = z_t^{Penalty}\\[0.5em]
+    & CF_t^{RD} = \sum_{v \in V}{(c^{RD}*Vect_{t\tau}^{RD}*y_v)}\\[0.5em]
+    \begin{split}
+    & CF_t^{Capacity} = \sum_{c \in C}\sum_{\tau \in U}((c^{RampupFixed}*Vect_{t\tau}^{PC}*k_{c\tau}^{RampupBin})\\
+    &\qquad \qquad +(c^{RampupVar}*Vect_{t\tau}^{PC}*k_{c\tau}^{Rampup}))
+    \end{split}\\[0.5em]
+    &CF^{CapaBack} = \sum_{c \in C}{z_c^{Back}}.
+\end{align}
+
+
+\subsection{Constraints} \label{subsec: constraints}
+\subsubsection*{Vehicle projects}
+\begin{align}
+&y_v = y_v^{Preset}&  \qquad \qquad \qquad \qquad \qquad \qquad \qquad \forall v \in W \label{eq:A.8}\\[0.5em]
+&q_{vt} \leq N*y_v &  \forall v \in V, \forall t \in U \label{eq:A.9}\\[0.5em]
+&\sum_{v \in V:SOP_v=t}{y_v} \leq SOP^{max} & \forall t \in U \label{eq:A.10}
+\end{align}
+\begin{equation}
+    q_{vt} = 0  \qquad \qquad\qquad \forall v \in V, \forall t \in T: t < SOP_v \vee t \geq SOP_v+\tau^{LC} \label{eq:A.11}
+\end{equation}
+
+\subsubsection*{Production resources}
+\begin{align}
+&\sum_{v \in V: r_v = c}{q_{vt}\leq k_{ct}} & \forall c \in C, \forall t \in U\label{eq:A.12}\\[0.5em]
+&\sum_{v \in V: r_v = c}{q_{vt}\leq \varphi^{max}*k_{ct}}  \qquad \qquad\qquad \forall c \in C,& \forall t \in T: t = \tau_c^{Rampup}\label{eq:A.13}\\[0.5em]
+&k_{ct} = k_c^{Preset}+\sum_{\tau \in U: \tau \leq t}{(k_{c\tau}^{Rampup}-k_{c\tau}^{Rampdown})} & \forall c \in C, \forall t \in T\label{eq:A.14}\\[0.5em]
+&k_{ct}^{Rampup} \leq N*k_{ct}^{Bin} & \forall c \in C, \forall t \in T \label{eq:A.15}
+\end{align}
+\begin{multline}
+ z_c^{Back} \leq V_c^{res} * \sum_{t \in T}\sum_{\substack{\tau \in U:\\ \tau > T^{Rampup}}} \bigl((c^{RampupFixed}*Vect_{t\tau}^{PC}*k_{c\tau}^{Bin})\\
+ \qquad \qquad \qquad +(c^{RampupVar}*Vect_{t\tau}^{PC}*k_{c\tau}^{Rampup})\bigr) \qquad \qquad \forall c\in C\label{eq:A.16}
+\end{multline}
+where
+$T^{Rampup} = T^{max}-\delta t^{Rampup}$ 
+
+\subsubsection*{Vehicle demand}
+\begin{equation}
+    \sum_{v \in V: n_v = m}{q_{vt} \leq d_{mt}}  \qquad\qquad\qquad\qquad\qquad\qquad \qquad \forall m \in M, \forall t\in U
+    \label{eq:A.17}
+\end{equation}
+\subsubsection*{Emission legislation}
+\begin{align}
+&\sum_{v \in V}{(E_v*q_{vt})}\leq E_t^{Law}*(1+\epsilon)*\sum_{v \in V}{q_{vt}} &\qquad\qquad  \forall t \in U \label{eq:A.18}\\[0.5em]
+&z_t^{Penalty} \geq c^{CO_2} * \bigl(\sum_{v \in V}{(E_v * q_{vt})-E_t^{Law}*\sum_{v \in V}{q_{vt}}\bigr)} &\forall t \in U\label{eq:A.19}\\[0.5em]
+&z_t^{Penalty} \geq 0 &\forall t \in U\label{eq:A.20}\\[0.5em]
+&E_t = \frac{\sum_{v\in V}{E_v*q_{vt}}}{\sum_{v \in V}q_{vt}} & \forall t \in U\label{eq:A.21}
+\end{align}
+\subsubsection*{Production volume}
+\begin{equation}
+    \sum_{v \in V}q_{vt} \geq q_t^{min} \qquad\qquad\qquad\qquad \qquad\qquad\qquad\qquad\qquad\qquad \forall t\in U\label{eq:A.22}
+\end{equation}
+\newpage
+\section{Appendix II - Parameters Values}\label{section:Appendix Two - Parameters}
+In this section, there are the values that were imputed in the model to obtain the results described in the article. Tables \ref{tab:projectsbefore2026} and \ref{tab:resourcesbefore2026} contain the decisions already made before the planning horizon starts, and Table \ref{tab:setsofthresholds} presents the 2 sets of the fleet emission thresholds defined in 2019 and 2023 by the EU Commission.
+
+
+\begin{table}[h]
+\centering
+\begin{tabular}{cccc}
+\toprule
+Vehicle Size&Powertrain Technology&Power Class&\gls{SOP} \\
+\midrule
+small&ICEV&low&2020 \\
+small&ICEV&high&2020\\
+medium&ICEV&low&2020\\
+medium&ICEV&high&2020\\
+large&ICEV&low&2020\\
+large&ICEV&high&2020\\
+large&ICEV&low&2021\\
+large&ICEV&high&2021\\
+small&ICEV&low&2024\\
+small&ICEV&high&2024\\
+\bottomrule
+\end{tabular}
+\caption{Vehicle projects decided before the start of the planning horizon}\label{tab:projectsbefore2026}
+\end{table}
+\begin{table}[h]
+\centering
+\begin{tabular}{ccc|c}
+\toprule
+Vehicle Size&Powertrain Technology&Year&Capacity in 2025\\
+\midrule
+small&ICEV&2020&260,000\\
+medium&ICEV&2020&200,000\\
+large&ICEV&2020&300,000\\
+large&ICEV&2021&360,000\\
+small&ICEV&2024&260,000\\
+\bottomrule
+\end{tabular}
+\caption{Production resources already installed before the start of the planning horizon and their capacity in vehicles/year in 2025}\label{tab:resourcesbefore2026}
+\end{table}
+\begin{table}[h]
+\centering
+\begin{tabular}{c|cc}
+\toprule
+Period &Thresholds (2019)&Thresholds (2023)\\
+\midrule
+2026&80.00& 93.90 \\
+2027&80.00&93.90\\
+2028&80.00&93.90\\
+2029&80.00&93.90\\
+2030&60.00&49.50\\
+2031&60.00&46.50\\
+2032&60.00&49.50\\
+2033&60.00&49.50\\
+2034&60.00&49.50\\
+2035&45.00&0.00\\
+\bottomrule
+\end{tabular}
+\caption{$\text{CO}_{2}$ fleet emission thresholds defined in 2019 and in 2023 in Regulation (EU) 2019/631 (\cite{european2019regulation}) and in Decision 2023/1623 (\cite{european2023newregulation})}\label{tab:setsofthresholds}
+\end{table}
