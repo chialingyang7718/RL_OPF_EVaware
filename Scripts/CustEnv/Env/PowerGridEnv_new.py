@@ -106,8 +106,6 @@ class PowerGrid(Env):
         # initialize the state with existing single data saved in the grid
         self.state = self.read_state_from_grid()
 
-        # # add some noice to load and renewable generation
-        # self.add_noice_load_sgen_state()
 
     def step(self, action):
         # intialize the terminated and truncated
