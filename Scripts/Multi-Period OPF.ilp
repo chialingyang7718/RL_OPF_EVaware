@@ -3,19 +3,18 @@
 Minimize
  
 Subject To
- SOC_balance_2_8: - 0.045 SOC[2,8] + 0.045 SOC[2,9] - 0.9 P_c[2,8]
-   + P_d[2,8] = -0.174088
- SOC_balance_2_9: - 0.045 SOC[2,9] + 0.045 SOC[2,10] - 0.9 P_c[2,9]
-   + P_d[2,9] = -0.174088
- SOC_balance_2_10: - 0.045 SOC[2,10] + 0.045 SOC[2,11] - 0.9 P_c[2,10]
-   + P_d[2,10] = -0.174088
- Charging_power_ub_2_8: 0.045 SOC[2,8] + P_c[2,8] <= 0.045
- Charging_power_ub_2_9: 0.045 SOC[2,9] + P_c[2,9] <= 0.045
- Charging_power_ub_2_10: 0.045 SOC[2,10] + P_c[2,10] <= 0.045
+ Power_flow_Q_12_13_14: - 5350.784659544544 c_ijt[12,12,14]
+   - 5350.784659544544 c_ijt[12,13,14] + 2628.037531911813 s_ijt[12,13,14]
+   + Q_ijt[12,13,14] = 0
+ cosine_lowerbound_12_14: c_ijt[12,12,14] >= 0.0382280704
+ SOCP_12_13_14: [ - c_ijt[12,12,14] * c_ijt[12,13,14] + c_ijt[12,13,14] ^2
+   + s_ijt[12,13,14] ^2 ] <= 0
+ Line_loading_12_13_14: [ P_ijt[12,13,14] ^2 + Q_ijt[12,13,14] ^2 ]
+   <= 9900
 Bounds
- SOC[2,8] free
- SOC[2,9] free
- SOC[2,10] free
- P_c[2,9] free
- P_c[2,10] free
+ c_ijt[12,12,14] free
+ c_ijt[12,13,14] free
+ s_ijt[12,13,14] free
+ P_ijt[12,13,14] free
+ Q_ijt[12,13,14] free
 End

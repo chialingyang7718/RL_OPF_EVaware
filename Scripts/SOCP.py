@@ -1,5 +1,5 @@
 # Assumptions:
-# 1. The admittance of the buses is not considered
+# 1. The shunt conductance is not considered
 # 2. The power system frequency is assumed to be 50 Hz
 # 3. All test cases comes from https://labs.ece.uw.edu/pstca/
 
@@ -94,7 +94,7 @@ df_EV_demand = pd.read_csv("Evaluation/Case14_EV/ev_demand.csv").transpose()
 df_EV_spec["bus"] = loads
 df_EV_SOC["bus"] = loads
 df_EV_demand["bus"] = loads
-df_EV_spec["battery_capacity"] = df_EV_spec["max_e_mwh"] / df_EV_spec["n_car"]
+# df_EV_spec["battery_capacity"] = df_EV_spec["max_e_mwh"] / df_EV_spec["n_car"]
 C = {}  # Battery capacity
 eta_d = {}  # Discharge efficiency
 eta_c = {}  # Charge efficiency
@@ -102,7 +102,8 @@ Z_init = {}  # Initial SOC
 EV_demand = {}  # EV demand
 for i in buses:
     if i in loads:
-        C[i] = df_EV_spec.loc[df_EV_spec["bus"] == i, "battery_capacity"].values[0]
+        # C[i] = df_EV_spec.loc[df_EV_spec["bus"] == i, "battery_capacity"].values[0]
+        C[i] = df_EV_spec.loc[df_EV_spec["bus"] == i, "max_e_mwh"].values[0]
         eta_d[i] = df_EV_spec[df_EV_spec.loc[:, "bus"] == i]["eta_d"].values[0]
         eta_c[i] = df_EV_spec[df_EV_spec.loc[:, "bus"] == i]["eta_c"].values[0]
         Z_init[i] = df_EV_SOC[df_EV_SOC.loc[:, "bus"] == i][0].values[0]
