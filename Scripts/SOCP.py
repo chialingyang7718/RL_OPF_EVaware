@@ -54,6 +54,16 @@ net.line["susceptance"] = np.imag(net.line["admittance"])
 buses_data, lines_data, generators_data, costs_data = Input("Scripts/Matpower/case14.m")
 S_max = get_rateA(lines_data)
 
+# Get shunt conductance and susceptance
+g_i = {}
+b_i = {}
+for i in buses:
+    g_i[i] = sum(net.line.loc[net.line["from_bus"] == i, "g_us_per_km"].values 
+                 * net.line.loc[net.line["from_bus"] == i, "length_km"].values
+                 * net.line.loc[net.line["from_bus"] == i, "parallel"].values) * 1e-6 / 2
+    b_i[i] = sum(net.line.loc[net.line["from_bus"] == i, "c_nf_per_km"].values 
+                 * net.line.loc[net.line["from_bus"] == i, "length_km"].values
+                 * net.line.loc[net.line["from_bus"] == i, "parallel"].values) * 2 * math.pi * 50 * 1e-9 / 2
 
 # Get load data
 df_load_p = pd.read_csv("Evaluation/Case14_EV/load_p.csv").transpose()
@@ -251,22 +261,23 @@ for i in buses:
         if i in neighbors:
             model.addConstr(
                 P_G[i, t] + P_ex[i, t] - P_D[i][t] - P_c[i, t] + eta_d[i] * P_d[i, t]
-                == gp.quicksum(P_ijt[i, j, t] for j in neighbors[i]),
+                == gp.quicksum(P_ijt[i, j, t] for j in neighbors[i]) + c_ijt[i, i, t] * g_i[i],
                 name=f"Power_balance_P_{i}_{t}",
             )
             model.addConstr(
                 Q_G[i, t] + Q_ex[i, t] - Q_D[i][t]
-                == gp.quicksum(Q_ijt[i, j, t] for j in neighbors[i]),
+                == gp.quicksum(Q_ijt[i, j, t] for j in neighbors[i]) - c_ijt[i, i, t] * b_i[i],
                 name=f"Power_balance_Q_{i}_{t}",
             )
         else:
             model.addConstr(
                 P_G[i, t] + P_ex[i, t] - P_D[i][t] - P_c[i, t] + eta_d[i] * P_d[i, t]
-                == 0,
+                == c_ijt[i, i, t] * g_i[i],
                 name=f"Power_balance_P_{i}_{t}",
             )
             model.addConstr(
-                Q_G[i, t] + Q_ex[i, t] - Q_D[i][t] == 0, name=f"Power_balance_Q_{i}_{t}"
+                Q_G[i, t] + Q_ex[i, t] - Q_D[i][t] == - c_ijt[i, i, t] * b_i[i], 
+                name=f"Power_balance_Q_{i}_{t}"
             )
 
 # Power flow constraints (3c and 3d)
