@@ -70,7 +70,7 @@ if __name__ == "__main__":
     )
 
     # create the log path
-    log_path = os.path.join("Training", "Logs", "EnvV1")
+    log_path = os.path.join("Training", "Logs", "Case%s" % n_case)
 
     # custom MLP policy: network depends on the observation space, indirectly, the number of buses
     # first, we need to find the nearest power of 2 to the number of buses
@@ -136,10 +136,10 @@ if __name__ == "__main__":
     # train the agent
     if EV_aware:
         # model.learn(total_timesteps=500000, callback=[soc_callback], progress_bar=True)
-        model.learn(total_timesteps=6, progress_bar=True)
+        model.learn(total_timesteps=800000, progress_bar=True)
 
     # save the model
-    model.save("Training/Model/Case" % n_case)
+    model.save("Training/Model/Case%s" %n_case)
 
 
 # DONE: why the model does not end -- Ans: the n_steps was much larger than total_timesteps

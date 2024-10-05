@@ -9,10 +9,8 @@ import CustEnv
 from grid_loader import load_test_case_grid
 
 # load the grid for the environment
-grid = load_test_case_grid(14)
-# grid = load_simple_grid()
-# grid_code = "1-HV-urban--0-sw"
-# grid = load_simbench_grid(grid_code)
+grid = load_test_case_grid(57)
+
 
 if __name__ == "__main__":
     # initiate the environment for vectorizing

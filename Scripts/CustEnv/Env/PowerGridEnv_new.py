@@ -79,6 +79,7 @@ class PowerGrid(Env):
             self.N_EV = 0
 
         # initialization
+        self.theta_max = 30  # phase angle difference limit
         self.pre_reward = 0
         self.training = Training
         self.episode_length = self.dispatching_intervals
@@ -770,11 +771,11 @@ class PowerGrid(Env):
                     p0, p1, c01 = points
                     if p0 <= self.net.res_gen.p_mw[i] < p1:
                         gen_cost += c01 * self.net.res_gen.p_mw[i]
-            # for i in self.net.ext_grid.index:
-            #     for points in points_list:
-            #         p0, p1, c01 = points
-            #         if p0 <= self.net.res_ext_grid.p_mw[i] < p1:
-            #             gen_cost += c01 * self.net.res_ext_grid.p_mw[i]
+            for i in self.net.ext_grid.index:
+                for points in points_list:
+                    p0, p1, c01 = points
+                    if p0 <= self.net.res_ext_grid.p_mw[i] < p1:
+                        gen_cost += c01 * self.net.res_ext_grid.p_mw[i]
         # if the cost function is missing
         else:
             total_gen = (
