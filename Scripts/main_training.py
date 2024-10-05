@@ -44,7 +44,7 @@ def make_env(env_id, net, dispatching_interval, EVaware, Training, rank):
 if __name__ == "__main__":
 
     # Load the grid
-    n_case = 14
+    n_case = 57
     grid = load_test_case_grid(n_case)
 
     # Parameters
@@ -88,8 +88,8 @@ if __name__ == "__main__":
     # the policy network architecture
     policy_kwargs = dict(
         activation_fn=th.nn.Tanh,
-        net_arch=dict(pi=[NN_size, NN_size, NN_size], vf=[NN_size, NN_size, NN_size]),
-        # activation_fn=th.nn.Tanh, net_arch=dict(pi=[NN_size, NN_size], vf=[NN_size, NN_size])
+        net_arch=dict(pi=[NN_size, NN_size, NN_size], vf=[NN_size, NN_size, NN_size]), # 3 layers
+        # activation_fn=th.nn.Tanh, net_arch=dict(pi=[NN_size, NN_size], vf=[NN_size, NN_size])# 2 layers
     )
 
     def create_unique_soc_log_path(base_log_dir):
@@ -119,8 +119,8 @@ if __name__ == "__main__":
         return new_soc_dir_path
 
     # initialize callback
-    soc_log_path = create_unique_soc_log_path(os.path.join(log_path, "SOC"))
-    soc_callback = SOCCallback(log_dir=soc_log_path)
+    # soc_log_path = create_unique_soc_log_path(os.path.join(log_path, "SOC"))
+    # soc_callback = SOCCallback(log_dir=soc_log_path)
 
     # create the agent
     model = PPO(
@@ -135,11 +135,11 @@ if __name__ == "__main__":
 
     # train the agent
     if EV_aware:
-        model.learn(total_timesteps=500000, callback=[soc_callback], progress_bar=True)
-    # model.learn(total_timesteps= 96, callback=[soc_callback], progress_bar=True)
+        # model.learn(total_timesteps=500000, callback=[soc_callback], progress_bar=True)
+        model.learn(total_timesteps=6, progress_bar=True)
 
     # save the model
-    model.save("Training/Model/Env_v1/Case%s_3innerLayer_angle" % n_case)
+    model.save("Training/Model/Case" % n_case)
 
 
 # DONE: why the model does not end -- Ans: the n_steps was much larger than total_timesteps

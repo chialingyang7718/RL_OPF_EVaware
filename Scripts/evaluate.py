@@ -211,33 +211,33 @@ def evaluate_PPO_model(n_steps=24, n_case=14, model=None):
             df_generation_cost = pd.DataFrame(generation_cost)
 
             # Create the directory if it does not exist
-            if not os.path.exists("Evaluation/Case14_EV"):
-                os.makedirs("Evaluation/Case14_EV")
+            if not os.path.exists("Evaluation/Case%s" % n_case):
+                os.makedirs("Evaluation/Case%s" % n_case)
 
             # Save the dataframes to a csv file
-            df_EV_spec.to_csv("Evaluation/Case14_EV/EV_spec.csv", index=False)
-            df_load_p.to_csv("Evaluation/Case14_EV/load_p.csv", index=False)
-            df_load_q.to_csv("Evaluation/Case14_EV/load_q.csv", index=False)
-            df_renewable.to_csv("Evaluation/Case14_EV/renewable.csv", index=False)
-            df_ev_demand.to_csv("Evaluation/Case14_EV/ev_demand.csv", index=False)
-            df_ev_soc.to_csv("Evaluation/Case14_EV/ev_soc.csv", index=False)
-            df_gen_p.to_csv("Evaluation/Case14_EV/gen_p.csv", index=False)
-            # df_gen_q.to_csv("Evaluation/Case14_EV/gen_q.csv", index=False)
-            df_gen_v.to_csv("Evaluation/Case14_EV/gen_v.csv", index=False)
-            df_ev_action.to_csv("Evaluation/Case14_EV/ev_action.csv", index=False)
-            df_voltage.to_csv("Evaluation/Case14_EV/voltage.csv", index=False)
-            df_line_loading.to_csv("Evaluation/Case14_EV/line_loading.csv", index=False)
+            df_EV_spec.to_csv("Evaluation/Case%s/EV_spec.csv" % n_case, index=False)
+            df_load_p.to_csv("Evaluation/Case%s/load_p.csv" % n_case, index=False)
+            df_load_q.to_csv("Evaluation/Case%s/load_q.csv" % n_case, index=False)
+            df_renewable.to_csv("Evaluation/Case%s/renewable.csv" % n_case, index=False)
+            df_ev_demand.to_csv("Evaluation/Case%s/ev_demand.csv" % n_case, index=False)
+            df_ev_soc.to_csv("Evaluation/Case%s/ev_soc.csv" % n_case, index=False)
+            df_gen_p.to_csv("Evaluation/Case%s/gen_p.csv" % n_case, index=False)
+            # df_gen_q.to_csv("Evaluation/Case%s/gen_q.csv" % n_case, index=False)
+            df_gen_v.to_csv("Evaluation/Case%s/gen_v.csv" % n_case, index=False)
+            df_ev_action.to_csv("Evaluation/Case%s/ev_action.csv" % n_case, index=False)
+            df_voltage.to_csv("Evaluation/Case%s/voltage.csv" % n_case, index=False)
+            df_line_loading.to_csv("Evaluation/Case%s/line_loading.csv" % n_case, index=False)
             df_bus_violation.to_csv(
-                "Evaluation/Case14_EV/bus_violation.csv", index=False
+                "Evaluation/Case%s/bus_violation.csv", index=False
             )
             df_line_violation.to_csv(
-                "Evaluation/Case14_EV/line_violation.csv", index=False
+                "Evaluation/Case%s/line_violation.csv" % n_case, index=False
             )
             df_phase_angle_violation.to_csv(
-                "Evaluation/Case14_EV/phase_angle_violation.csv", index=False
+                "Evaluation/Case%s/phase_angle_violation.csv" % n_case, index=False
             )
             df_generation_cost.to_csv(
-                "Evaluation/Case14_EV/generation_cost.csv", index=False
+                "Evaluation/Case%s/generation_cost.csv" % n_case, index=False
             )
 
             # Reset the environment for a new episode
@@ -255,8 +255,9 @@ def visualization(df):
 
 
 if __name__ == "__main__":
+    n_case = 14
     # Load the trained model
-    model = PPO.load("Training/Model/Case14_3innerLayer_angle")
+    model = PPO.load("Training/Model/Case%s" % n_case)
 
     # Evaluate the model
     n_steps = 24
@@ -265,7 +266,7 @@ if __name__ == "__main__":
     # df_ev_soc, df_gen_p, df_gen_v, df_ev_action, df_voltage,\
     # df_line_loading, df_bus_vioation, df_line_violation, df_generation_cost, RLtime =\
     rewards, df_generation_cost, RLtime = evaluate_PPO_model(
-        n_steps=n_steps, n_case=14, model=model
+        n_steps=n_steps, n_case=n_case, model=model
     )
 
     print(f"Mean Reward: {sum(rewards)/n_steps}")
