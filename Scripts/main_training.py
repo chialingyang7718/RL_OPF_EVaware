@@ -126,7 +126,7 @@ if __name__ == "__main__":
     model = PPO(
         policy="MlpPolicy",
         env=env,
-        n_steps=120,  # update every 5 days
+        # n_steps=120,  # update every 5 days
         gamma=0.99,
         verbose=0,
         policy_kwargs=policy_kwargs,
