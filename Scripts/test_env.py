@@ -6,7 +6,7 @@ import CustEnv
 
 
 # import the grid loader
-from grid_loader import load_test_case_grid, load_simple_grid, load_simbench_grid
+from grid_loader import load_test_case_grid
 
 # load the grid for the environment
 grid = load_test_case_grid(14)
