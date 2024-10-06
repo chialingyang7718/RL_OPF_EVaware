@@ -16,6 +16,7 @@ from callback_soc import SOCCallback
 from stable_baselines3 import PPO
 from stable_baselines3.common.vec_env import SubprocVecEnv
 from stable_baselines3.common.monitor import Monitor
+from stable_baselines3.common.callbacks import CheckpointCallback
 
 # Import other stuff
 import torch as th
@@ -44,7 +45,7 @@ def make_env(env_id, net, dispatching_interval, EVaware, Training, rank):
 if __name__ == "__main__":
 
     # Load the grid
-    n_case = 57
+    n_case = 14
     grid = load_test_case_grid(n_case)
 
     # Parameters
@@ -80,15 +81,18 @@ if __name__ == "__main__":
             return N
         return 2 ** (a + 1)  # return the ceiling of the power of 2
 
-    # choose a network size that is slightly larger than the observation space
-    NN_size = nearestPowerOf2(
+    # choose a network size that is slightly larger 
+    AN_size = nearestPowerOf2(
         n_case * 4
-    )  # 4 times of the number of buses is slightly larger the observation space which contains sgen_pmw, load_pmw, and load_qmvar & SOC
+    )  
+    CN_size = nearestPowerOf2(
+        n_case * 7
+    ) 
 
     # the policy network architecture
     policy_kwargs = dict(
         activation_fn=th.nn.Tanh,
-        net_arch=dict(pi=[NN_size, NN_size, NN_size], vf=[NN_size, NN_size, NN_size]), # 3 layers
+        net_arch=dict(pi=[AN_size, AN_size, AN_size], vf=[CN_size, CN_size, CN_size]), # 3 layers
         # activation_fn=th.nn.Tanh, net_arch=dict(pi=[NN_size, NN_size], vf=[NN_size, NN_size])# 2 layers
     )
 
@@ -122,6 +126,13 @@ if __name__ == "__main__":
     # soc_log_path = create_unique_soc_log_path(os.path.join(log_path, "SOC"))
     # soc_callback = SOCCallback(log_dir=soc_log_path)
 
+    # create checkpoint callback
+    checkpoint_callback = CheckpointCallback(
+        save_freq=1000,
+        save_path=os.path.join(log_path, "Checkpoints"),
+        name_prefix="Case%s_model"%n_case,
+    )
+
     # create the agent
     model = PPO(
         policy="MlpPolicy",
@@ -136,7 +147,7 @@ if __name__ == "__main__":
     # train the agent
     if EV_aware:
         # model.learn(total_timesteps=500000, callback=[soc_callback], progress_bar=True)
-        model.learn(total_timesteps=800000, progress_bar=True)
+        model.learn(total_timesteps=500000, callback=checkpoint_callback, progress_bar=True)
 
     # save the model
     model.save("Training/Model/Case%s" %n_case)
