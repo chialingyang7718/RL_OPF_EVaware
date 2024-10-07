@@ -699,8 +699,7 @@ class PowerGrid(Env):
             self.violation = True
             for overload_line in overload_lines:
                 penalty_line += (
-                    self.linemax
-                    - self.net.res_line.loc[overload_line, "loading_percent"]
+                    self.linemax - self.net.res_line.loc[overload_line, "loading_percent"]
                 ) * 10
 
         # phase angle violation

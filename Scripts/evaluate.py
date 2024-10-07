@@ -228,7 +228,7 @@ def evaluate_PPO_model(n_steps=24, n_case=14, model=None):
             df_voltage.to_csv("Evaluation/Case%s/voltage.csv" % n_case, index=False)
             df_line_loading.to_csv("Evaluation/Case%s/line_loading.csv" % n_case, index=False)
             df_bus_violation.to_csv(
-                "Evaluation/Case%s/bus_violation.csv", index=False
+                "Evaluation/Case%s/bus_violation.csv" % n_case, index=False
             )
             df_line_violation.to_csv(
                 "Evaluation/Case%s/line_violation.csv" % n_case, index=False
@@ -257,7 +257,7 @@ def visualization(df):
 if __name__ == "__main__":
     n_case = 14
     # Load the trained model
-    model = PPO.load("Training/Model/Case%s" % n_case)
+    model = PPO.load("Training/Model/Case%s" %n_case)
 
     # Evaluate the model
     n_steps = 24

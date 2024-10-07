@@ -54,6 +54,7 @@ if __name__ == "__main__":
     num_envs = 6
     EV_aware = True
     Training = True
+    total_timesteps = 500000
 
     # Create the vectorized environment
     env = SubprocVecEnv(
@@ -81,18 +82,15 @@ if __name__ == "__main__":
             return N
         return 2 ** (a + 1)  # return the ceiling of the power of 2
 
-    # choose a network size that is slightly larger 
-    AN_size = nearestPowerOf2(
-        n_case * 4
-    )  
-    CN_size = nearestPowerOf2(
-        n_case * 7
-    ) 
+    # choose a network size that is slightly larger than observation space
+    NN_size = nearestPowerOf2(n_case * 4)  
+    
 
     # the policy network architecture
     policy_kwargs = dict(
         activation_fn=th.nn.Tanh,
-        net_arch=dict(pi=[AN_size, AN_size, AN_size], vf=[CN_size, CN_size, CN_size]), # 3 layers
+        net_arch=dict(pi=[NN_size, NN_size], vf=[NN_size, NN_size]), # 2 layers
+        # net_arch=dict(pi=[NN_size, NN_size, NN_size], vf=[NN_size, NN_size, NN_size]), # 3 layers
         # activation_fn=th.nn.Tanh, net_arch=dict(pi=[NN_size, NN_size], vf=[NN_size, NN_size])# 2 layers
     )
 
@@ -128,7 +126,7 @@ if __name__ == "__main__":
 
     # create checkpoint callback
     checkpoint_callback = CheckpointCallback(
-        save_freq=1000,
+        save_freq=math.floor(total_timesteps/100000),
         save_path=os.path.join(log_path, "Checkpoints"),
         name_prefix="Case%s_model"%n_case,
     )
