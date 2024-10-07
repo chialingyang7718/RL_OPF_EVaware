@@ -1,7 +1,6 @@
 # Assumptions:
-# 1. The shunt conductance is not considered
-# 2. The power system frequency is assumed to be 50 Hz
-# 3. All test cases comes from https://labs.ece.uw.edu/pstca/
+# 1. The power system frequency is assumed to be 50 Hz
+# 2. All test cases comes from https://labs.ece.uw.edu/pstca/
 
 import gurobipy as gp
 from gurobipy import GRB
@@ -204,6 +203,7 @@ sin = model.addVars(buses, buses, time_periods, vtype=GRB.CONTINUOUS, lb=-1, ub=
 v_sqrt = model.addVars(buses, buses, time_periods, vtype=GRB.CONTINUOUS, name="v_sqrt")
 c_ijt = model.addVars(buses, buses, time_periods, vtype=GRB.CONTINUOUS, lb=-1e20, name="c_ijt")
 s_ijt = model.addVars(buses, buses, time_periods, vtype=GRB.CONTINUOUS, lb=-1e20, name="s_ijt")
+c_iit = model.addVars(buses, time_periods, vtype=GRB.CONTINUOUS, lb=-1e20, name="c_iit")
 # Power flow variables
 P_ijt = model.addVars(buses, buses, time_periods, vtype=GRB.CONTINUOUS, lb=-1e20, name="P_ijt")
 Q_ijt = model.addVars(buses, buses, time_periods, vtype=GRB.CONTINUOUS, lb=-1e20, name="Q_ijt")
@@ -246,6 +246,8 @@ for i in buses:
             if i in neighbors and j not in neighbors[i] and j != i:
                 model.addConstr(P_ijt[i, j, t] == 0, name=f"Zero_P_{i}_{j}_{t}")
                 model.addConstr(Q_ijt[i, j, t] == 0, name=f"Zero_Q_{i}_{j}_{t}")
+                # model.addConstr(c_ijt[i, j, t] == 0, name=f"Zero_cosine_{i}_{j}_{t}")
+                # model.addConstr(s_ijt[i, j, t] == 0, name=f"Zero_sine_{i}_{j}_{t}")
 
 # Set SOC, charging and discharging power to zero for non-load buses
 for i in buses:
@@ -255,28 +257,31 @@ for i in buses:
             model.addConstr(P_c[i, t] == 0, name=f"Zero_Charging_{i}_{t}")
             model.addConstr(P_d[i, t] == 0, name=f"Zero_Discharging_{i}_{t}")
 
+
+
 # Active power balance 3(a) & Reactive power balance 3(b)
 for i in buses:
     for t in time_periods:
         if i in neighbors:
             model.addConstr(
                 P_G[i, t] + P_ex[i, t] - P_D[i][t] - P_c[i, t] + eta_d[i] * P_d[i, t]
-                == gp.quicksum(P_ijt[i, j, t] for j in neighbors[i]) + c_ijt[i, i, t] * g_i[i],
+                == c_iit[i, t] * g_i[i] + gp.quicksum(P_ijt[i, j, t] for j in neighbors[i]),
                 name=f"Power_balance_P_{i}_{t}",
             )
             model.addConstr(
                 Q_G[i, t] + Q_ex[i, t] - Q_D[i][t]
-                == gp.quicksum(Q_ijt[i, j, t] for j in neighbors[i]) - c_ijt[i, i, t] * b_i[i],
+                ==  - c_iit[i, t] * b_i[i] + gp.quicksum(Q_ijt[i, j, t] for j in neighbors[i]),
                 name=f"Power_balance_Q_{i}_{t}",
             )
         else:
             model.addConstr(
                 P_G[i, t] + P_ex[i, t] - P_D[i][t] - P_c[i, t] + eta_d[i] * P_d[i, t]
-                == c_ijt[i, i, t] * g_i[i],
+                == c_iit[i, t] * g_i[i],
                 name=f"Power_balance_P_{i}_{t}",
             )
             model.addConstr(
-                Q_G[i, t] + Q_ex[i, t] - Q_D[i][t] == - c_ijt[i, i, t] * b_i[i], 
+                Q_G[i, t] + Q_ex[i, t] - Q_D[i][t] 
+                == - c_iit[i, t] * b_i[i], 
                 name=f"Power_balance_Q_{i}_{t}"
             )
 
@@ -288,7 +293,7 @@ for i, j in lines:
             == net.line.loc[
                 (net.line["from_bus"] == i) & (net.line["to_bus"] == j), "conductance"
             ].values[0]
-            * c_ijt[i, i, t]
+            * c_iit[i, t]
             + net.line.loc[
                 (net.line["from_bus"] == i) & (net.line["to_bus"] == j), "conductance"
             ].values[0]
@@ -305,7 +310,7 @@ for i, j in lines:
             == -net.line.loc[
                 (net.line["from_bus"] == i) & (net.line["to_bus"] == j), "susceptance"
             ].values[0]
-            * c_ijt[i, i, t]
+            * c_iit[i, t]
             - net.line.loc[
                 (net.line["from_bus"] == i) & (net.line["to_bus"] == j), "susceptance"
             ].values[0]
@@ -319,45 +324,42 @@ for i, j in lines:
 
 # Constraints to build up the cosine and sine variables
 for i in buses:
-    for j in buses:
-        for t in time_periods:
-            model.addGenConstrCos(theta[i, j, t], cos[i, j, t])
-            model.addGenConstrSin(theta[i, j, t], sin[i, j, t])
-            model.addConstr(
-                v_sqrt[i, j, t] == V[i, t] * V[j, t], name=f"v_sqrt_{i}_{j}_{t}"
-            )
-            model.addConstr(
-                c_ijt[i, j, t] == v_sqrt[i, j, t] * cos[i, j, t],
-                name=f"c_ijt_{i}_{j}_{t}",
-            )
-            model.addConstr(
-                s_ijt[i, j, t] == -1 * v_sqrt[i, j, t] * sin[i, j, t],
-                name=f"s_ijt_{i}_{j}_{t}",
-            )
+    model.addConstr(
+        c_iit[i, t] == V[i, t] ** 2, name=f"c_iit_{i}_{t}"
+    )
 
+for i, j in lines:
+    for t in time_periods:
+        model.addGenConstrCos(theta[i, j, t], cos[i, j, t])
+        model.addGenConstrSin(theta[i, j, t], sin[i, j, t])
+        model.addConstr(
+            v_sqrt[i, j, t] == V[i, t] * V[j, t], name=f"v_sqrt_{i}_{j}_{t}"
+        )
+        model.addConstr(
+            c_ijt[i, j, t] == v_sqrt[i, j, t] * cos[i, j, t], name=f"c_ijt_{i}_{j}_{t}",
+        )
+        model.addConstr(
+            s_ijt[i, j, t] == -1 * v_sqrt[i, j, t] * sin[i, j, t], name=f"s_ijt_{i}_{j}_{t}",
+        )
 
 # Cosine variable constraints (3e)
 for i in buses:
     for t in time_periods:
         model.addConstr(
-            V_min[i] * V_min[i] <= c_ijt[i, i, t], name=f"cosine_lowerbound_{i}_{t}"
+            V_min[i] * V_min[i] <= c_iit[i, t], name=f"cosine_lowerbound_{i}_{t}"
         )
         model.addConstr(
-            c_ijt[i, i, t] <= V_max[i] * V_max[i], name=f"cosine_upperbound_{i}_{t}"
+            c_iit[i, t] <= V_max[i] * V_max[i], name=f"cosine_upperbound_{i}_{t}"
         )
 
 # SOCP relaxation constraint (5)
-# for i, j in lines:
-#     for t in time_periods:
-for i in buses:
-    for j in buses:
-        for t in time_periods:
-            if i in neighbors and j in neighbors[i]:
-                model.addConstr(
-                    c_ijt[i, j, t] ** 2 + s_ijt[i, j, t] ** 2
-                    <= c_ijt[i, i, t] * c_ijt[i, j, t],
-                    name=f"SOCP_{i}_{j}_{t}",
-                )
+for i, j in lines: 
+    for t in time_periods:
+        model.addConstr(
+            c_ijt[i, j, t] *  c_ijt[i, j, t] + s_ijt[i, j, t] * s_ijt[i, j, t]
+            <= c_iit[i, t] * c_iit[j, t],
+            name=f"SOCP_{i}_{j}_{t}",
+        )
 # Voltage constraints (1f)
 for i in buses:
     for t in time_periods:
@@ -382,24 +384,25 @@ for i in buses:
 for i, j in lines:
     for t in time_periods:
         model.addConstr(
-            P_ijt[i, j, t] ** 2 + Q_ijt[i, j, t] ** 2 <= S_max[(i, j)],
+            P_ijt[i, j, t] * P_ijt[i, j, t] + Q_ijt[i, j, t] * Q_ijt[i, j, t] <= S_max[(i, j)] * S_max[(i, j)],
             name=f"Line_loading_{i}_{j}_{t}",
         )
 
-# Phase angle difference constraints (1j)
-for i in buses:
-    for j in buses:
-        for t in time_periods:
-            if i in neighbors and j in neighbors[i]:
-                # Add the constraints for both positive and negative bounds
-                model.addConstr(
-                    theta[i, j, t] <= theta_max,
-                    name=f"Phase_angle_diff_upper_{i}_{j}_{t}",
-                )
-                model.addConstr(
-                    theta[i, j, t] >= -theta_max,
-                    name=f"Phase_angle_diff_lower_{i}_{j}_{t}",
-                )
+# Phase angle difference constraints (1j)  #TODO: How about other i, j pairs? Should we set constraints for them?
+# for i in buses:
+#     for j in buses:
+#         for t in time_periods:
+#             if i in neighbors and j in neighbors[i]:
+for i, j in lines:
+    # Add the constraints for both positive and negative bounds
+    model.addConstr(
+        theta[i, j, t] <= theta_max,
+        name=f"Phase_angle_diff_upper_{i}_{j}_{t}",
+    )
+    model.addConstr(
+        theta[i, j, t] >= -theta_max,
+        name=f"Phase_angle_diff_lower_{i}_{j}_{t}",
+    )
 
 # SOC balance equation (1k)
 for i in buses:
@@ -428,6 +431,8 @@ for i in buses:
         model.addConstr(P_c[i, t] >= 0, name=f"Charging_power_lb_{i}_{t}")
         model.addConstr(P_d[i, t] >= 0, name=f"Discharging_power_lb_{i}_{t}")
 
+# model.setParam('NumericFocus', 3)
+
 # model.write("Multi-Period OPF.lp")
 # Optimize the model
 model.optimize()
@@ -439,7 +444,7 @@ else:
     print("Model did not solve to optimality. Status: ", model.status)
     model.computeIIS()
     # Write the model to a file
-    model.write("Multi-Period OPF.ilp")
+    model.write("Scripts/Multi-Period OPF.ilp")
 
     # print("\nThe following constraints and variables are in the IIS:")
     # for c in model.getConstrs():
