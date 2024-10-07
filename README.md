@@ -20,11 +20,15 @@ Reinforcement Learning (RL) is a type of machine learning where an agent learns 
 ## File Structure
 + Scripts: This is where all the codes are. It contains
   - CustEnv: customized power grid environment
-  - main.py: main script to execute the training of the model for any IEEE test case.
-  - main_simple_example.py: main script to train the model for a simple case study.
+  - grid_loader.py: a module to load grid from different sources.
+  - main_train.py: main script to execute the training of the model for any IEEE test case.
+  - evaluate.py: to evaluate DRL model and generate the data input for SOCP.
+  - SOCP.py: main script to solve OPF with Second-order Conic Programming (SOCP) 
   - requirements.txt: a script contains all the dependencies.
   - text_env.py: a script to test whether the environment works as it should.
+  - test_code.pyynb: a jupyter notebook to help creating/debugging other scripts.
 + Training: This is where the trained log files and models are saved.
++ Evaluation: This is where the output of evaluate.py stores.
 + Literature_Review.xlsx: This contains a table of all the related literatures for this project.
 ## EV Profile Data Source: https://zenodo.org/records/4514928
 **This Project is still in progress. Therefore, there are still some vital components missing.**
