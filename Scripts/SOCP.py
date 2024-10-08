@@ -57,12 +57,18 @@ S_max = get_rateA(lines_data)
 g_i = {}
 b_i = {}
 for i in buses:
-    g_i[i] = sum(net.line.loc[net.line["from_bus"] == i, "g_us_per_km"].values 
+    g_i[i] = (sum(net.line.loc[net.line["from_bus"] == i, "g_us_per_km"].values 
                  * net.line.loc[net.line["from_bus"] == i, "length_km"].values
-                 * net.line.loc[net.line["from_bus"] == i, "parallel"].values) * 1e-6 / 2
-    b_i[i] = sum(net.line.loc[net.line["from_bus"] == i, "c_nf_per_km"].values 
+                 * net.line.loc[net.line["from_bus"] == i, "parallel"].values)+ \
+                sum(net.line.loc[net.line["to_bus"] == i, "g_us_per_km"].values 
+                 * net.line.loc[net.line["to_bus"] == i, "length_km"].values
+                 * net.line.loc[net.line["to_bus"] == i, "parallel"].values)) * 1e-6 / 2
+    b_i[i] = (sum(net.line.loc[net.line["from_bus"] == i, "c_nf_per_km"].values 
                  * net.line.loc[net.line["from_bus"] == i, "length_km"].values
-                 * net.line.loc[net.line["from_bus"] == i, "parallel"].values) * 2 * math.pi * 50 * 1e-9 / 2
+                 * net.line.loc[net.line["from_bus"] == i, "parallel"].values) + \
+                sum(net.line.loc[net.line["to_bus"] == i, "c_nf_per_km"].values 
+                 * net.line.loc[net.line["to_bus"] == i, "length_km"].values
+                 * net.line.loc[net.line["to_bus"] == i, "parallel"].values))* 2 * math.pi * 50 * 1e-9 / 2
 
 # Get load data
 df_load_p = pd.read_csv("Evaluation/Case14_EV/load_p.csv").transpose()
@@ -181,18 +187,18 @@ model = gp.Model("Multi-Period OPF")
 """Decision Variables"""
 # GENERATOR
 # Variables for generation (P_G for active power, Q_G for reactive power)
-P_G = model.addVars(buses, time_periods, vtype=GRB.CONTINUOUS, name="P_G")
-Q_G = model.addVars(buses, time_periods, vtype=GRB.CONTINUOUS, lb=-1e20, name="Q_G")
+P_G = model.addVars(buses, time_periods, vtype=GRB.CONTINUOUS, lb=0, name="P_G")
+Q_G = model.addVars(buses, time_periods, vtype=GRB.CONTINUOUS, lb=-GRB.INFINITY, name="Q_G")
 
 
 # EXTERNAL GRID
 # Variables for external grid (P_ex for active power, Q_ex for reactive power)
-P_ex = model.addVars(buses, time_periods, vtype=GRB.CONTINUOUS, name="P_ex")
-Q_ex = model.addVars(buses, time_periods, vtype=GRB.CONTINUOUS, lb=-1e20, name="Q_ex")
+P_ex = model.addVars(buses, time_periods, vtype=GRB.CONTINUOUS, lb=0, name="P_ex")
+Q_ex = model.addVars(buses, time_periods, vtype=GRB.CONTINUOUS, lb=-GRB.INFINITY, name="Q_ex")
 
 # BUS VOLTAGE
 # Voltage magnitude (V)
-V = model.addVars(buses, time_periods, vtype=GRB.CONTINUOUS, name="V")
+V = model.addVars(buses, time_periods, vtype=GRB.CONTINUOUS, lb=0, name="V")
 
 # LINE FLOW
 # Phase angle difference (theta)
@@ -200,20 +206,20 @@ theta = model.addVars(buses, buses, time_periods, vtype=GRB.CONTINUOUS, lb=-2*ma
 # Cosine and sine related variables
 cos = model.addVars(buses, buses, time_periods, vtype=GRB.CONTINUOUS, lb=-1, ub=1, name="cosine")
 sin = model.addVars(buses, buses, time_periods, vtype=GRB.CONTINUOUS, lb=-1, ub=1, name="sine")
-v_sqrt = model.addVars(buses, buses, time_periods, vtype=GRB.CONTINUOUS, name="v_sqrt")
-c_ijt = model.addVars(buses, buses, time_periods, vtype=GRB.CONTINUOUS, lb=-1e20, name="c_ijt")
-s_ijt = model.addVars(buses, buses, time_periods, vtype=GRB.CONTINUOUS, lb=-1e20, name="s_ijt")
-c_iit = model.addVars(buses, time_periods, vtype=GRB.CONTINUOUS, lb=-1e20, name="c_iit")
+v_sqrt = model.addVars(buses, buses, time_periods, vtype=GRB.CONTINUOUS, lb=0, name="v_sqrt")
+c_ijt = model.addVars(buses, buses, time_periods, vtype=GRB.CONTINUOUS, lb=-GRB.INFINITY, name="c_ijt")
+s_ijt = model.addVars(buses, buses, time_periods, vtype=GRB.CONTINUOUS, lb=-GRB.INFINITY, name="s_ijt")
+c_iit = model.addVars(buses, time_periods, vtype=GRB.CONTINUOUS, lb=0, name="c_iit")
 # Power flow variables
-P_ijt = model.addVars(buses, buses, time_periods, vtype=GRB.CONTINUOUS, lb=-1e20, name="P_ijt")
-Q_ijt = model.addVars(buses, buses, time_periods, vtype=GRB.CONTINUOUS, lb=-1e20, name="Q_ijt")
+P_ijt = model.addVars(buses, buses, time_periods, vtype=GRB.CONTINUOUS, lb=-GRB.INFINITY, name="P_ijt")
+Q_ijt = model.addVars(buses, buses, time_periods, vtype=GRB.CONTINUOUS, lb=-GRB.INFINITY, name="Q_ijt")
 
 # EV
 # State of Charge (SOC) variables
-Z = model.addVars(buses, time_periods_plus, vtype=GRB.CONTINUOUS, name="SOC")
+Z = model.addVars(buses, time_periods_plus, vtype=GRB.CONTINUOUS, lb=0, ub=1, name="SOC")
 # Charging and discharging power
-P_c = model.addVars(buses, time_periods, vtype=GRB.CONTINUOUS, name="P_c")
-P_d = model.addVars(buses, time_periods, vtype=GRB.CONTINUOUS, name="P_d")
+P_c = model.addVars(buses, time_periods, vtype=GRB.CONTINUOUS, lb=0, name="P_c")
+P_d = model.addVars(buses, time_periods, vtype=GRB.CONTINUOUS, lb=0, name="P_d")
 
 
 """Objective Function"""
@@ -246,8 +252,6 @@ for i in buses:
             if i in neighbors and j not in neighbors[i] and j != i:
                 model.addConstr(P_ijt[i, j, t] == 0, name=f"Zero_P_{i}_{j}_{t}")
                 model.addConstr(Q_ijt[i, j, t] == 0, name=f"Zero_Q_{i}_{j}_{t}")
-                # model.addConstr(c_ijt[i, j, t] == 0, name=f"Zero_cosine_{i}_{j}_{t}")
-                # model.addConstr(s_ijt[i, j, t] == 0, name=f"Zero_sine_{i}_{j}_{t}")
 
 # Set SOC, charging and discharging power to zero for non-load buses
 for i in buses:
@@ -445,6 +449,7 @@ else:
     model.computeIIS()
     # Write the model to a file
     model.write("Scripts/Multi-Period OPF.ilp")
+
 
     # print("\nThe following constraints and variables are in the IIS:")
     # for c in model.getConstrs():
