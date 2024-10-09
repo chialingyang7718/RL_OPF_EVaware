@@ -10,7 +10,7 @@ import CustEnv
 from grid_loader import load_test_case_grid
 
 # Import the callback
-from callback_soc import SOCCallback
+# from callback_soc import SOCCallback
 
 # Import stable baselines stuff
 from stable_baselines3 import PPO
@@ -49,8 +49,8 @@ if __name__ == "__main__":
     grid = load_test_case_grid(n_case)
 
     # Parameters
-    # env_id = 'PowerGrid-v0'
-    env_id = "PowerGrid-v1"
+    # env_id = "PowerGrid-v1"
+    env_id = "PowerGrid-v2"
     num_envs = 6
     EV_aware = True
     Training = True
@@ -64,7 +64,7 @@ if __name__ == "__main__":
                 net=grid,
                 dispatching_interval=24,
                 EVaware=EV_aware,
-                Training=True,
+                Training=Training,
                 rank=i,
             )
             for i in range(num_envs)
@@ -89,7 +89,7 @@ if __name__ == "__main__":
     # the policy network architecture
     policy_kwargs = dict(
         activation_fn=th.nn.Tanh,
-        net_arch=dict(pi=[NN_size, NN_size], vf=[NN_size, NN_size]), # 2 layers
+        net_arch=dict(pi=[NN_size, NN_size], vf=[NN_size, NN_size]) # 2 layers
         # net_arch=dict(pi=[NN_size, NN_size, NN_size], vf=[NN_size, NN_size, NN_size]), # 3 layers
         # activation_fn=th.nn.Tanh, net_arch=dict(pi=[NN_size, NN_size], vf=[NN_size, NN_size])# 2 layers
     )

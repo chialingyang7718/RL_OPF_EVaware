@@ -58,10 +58,9 @@ class PowerGrid(Env):
 
         # assign other parameters
         self.stdD = stdD  # standard deviation of any random normal distribution
-        self.dispatching_intervals = (
-            dispatching_intervals  # number of dispatching intervals
-        )
+        self.dispatching_intervals = dispatching_intervals  # number of dispatching intervals
         self.EVaware = EVaware  # whether to consider the EV element
+        self.training = Training
 
         # implement EVaware
         if self.EVaware == True:
@@ -79,9 +78,7 @@ class PowerGrid(Env):
             self.N_EV = 0
 
         # initialization
-        self.theta_max = 30  # phase angle difference limit
-        self.pre_reward = 0
-        self.training = Training
+        # self.pre_reward = 0
         self.episode_length = self.dispatching_intervals
         time_step = 0
 
@@ -139,13 +136,6 @@ class PowerGrid(Env):
             reward, violated_bus, overload_lines, violated_phase = (
                 self.calculate_reward(time_step)
             )
-
-            # # check if terminated in the case of no violation
-            # if self.violation == False:
-
-            #     #terminate the episode if the reward is close to the previous reward (converged)
-            #     terminated = abs(reward-self.pre_reward) <= 0.01
-
         # output the current episode length, reward, terminated, truncated
         # print("episode length: ", self.episode_length, "Reward:", reward, "; Terminated:", terminated, "; Truncated:", truncated)
 
@@ -329,7 +319,7 @@ class PowerGrid(Env):
         self.linemax = 100  # ASSUMPTION: the max line loading is 100%
         self.Vmax = 1.06  # ASSUMPTION: the max voltage is 1.06 pu
         self.Vmin = 0.94  # ASSUMPTION: the min voltage is 0.94 pu
-        self.theata_max = 30  # ASSUMPTION: the max phase angle difference is 30 degrees
+        self.theta_max = 30  # ASSUMPTION: the max phase angle difference is 30 degrees
 
         # assign the EV limits
         if self.EVaware == True:
@@ -707,12 +697,10 @@ class PowerGrid(Env):
             self.net.res_line["va_from_degree"] - self.net.res_line["va_to_degree"]
         )
         for i in self.net.res_line.index:
-            if self.net.res_line["angle_diff"][i] > self.theata_max:
+            if self.net.res_line["angle_diff"][i] > self.theta_max:
                 self.violation = True
                 violated_phase.append(i)
-                penalty_phase_angle += (
-                    self.theta_max - self.net.res_line.loc[i, "angle_diff"]
-                ) * 10
+                penalty_phase_angle += (self.theta_max - self.net.res_line.loc[i, "angle_diff"]) * 10
 
         # EV SOC violation
         if self.EVaware:

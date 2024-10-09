@@ -16,7 +16,7 @@ if __name__ == "__main__":
     # initiate the environment for vectorizing
     env_fns = [
         lambda: gym.make(
-            "PowerGrid-v1",
+            "PowerGrid-v2",
             net=grid,
             dispatching_intervals=2,
             EVaware=True,
