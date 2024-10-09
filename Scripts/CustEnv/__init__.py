@@ -12,9 +12,3 @@ envs.register(
     max_episode_steps=1000,
     #  kwargs={}, #default key arguments pass to env
 )
-# envs.register(
-#     id="PowerGrid-v2",
-#     entry_point="CustEnv.Env.PowerGridEnv_02:PowerGrid",
-#     max_episode_steps=1000,
-#     #  kwargs={}, #default key arguments pass to env
-# )
