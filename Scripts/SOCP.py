@@ -10,10 +10,12 @@ import pandas as pd
 import numpy as np
 import math
 
+# Test case
+n_case = 14
 
 """Set"""
 # Define components of Grid
-net = gl.load_test_case_grid(14)
+net = gl.load_test_case_grid(n_case)
 generators = net.gen["bus"].to_list()
 ext_grid = net.ext_grid["bus"].to_list()
 buses = net.bus.index
@@ -50,7 +52,7 @@ net.line["admittance"] = (
 )
 net.line["conductance"] = np.real(net.line["admittance"])
 net.line["susceptance"] = np.imag(net.line["admittance"])
-buses_data, lines_data, generators_data, costs_data = Input("Scripts/Matpower/case14.m")
+buses_data, lines_data, generators_data, costs_data = Input("Scripts/Matpower/case%s.m"%n_case)
 S_max = get_rateA(lines_data)
 
 # Get shunt conductance and susceptance
@@ -71,8 +73,8 @@ for i in buses:
                  * net.line.loc[net.line["to_bus"] == i, "parallel"].values))* 2 * math.pi * 50 * 1e-9 / 2
 
 # Get load data
-df_load_p = pd.read_csv("Evaluation/Case14_EV/load_p.csv").transpose()
-df_load_q = pd.read_csv("Evaluation/Case14_EV/load_q.csv").transpose()
+df_load_p = pd.read_csv("Evaluation/Case%s_EV/load_p.csv"%n_case).transpose()
+df_load_q = pd.read_csv("Evaluation/Case%s_EV/load_q.csv"%n_case).transpose()
 df_load_p["bus"] = loads
 df_load_q["bus"] = loads
 P_D = {}
@@ -87,7 +89,7 @@ for i in buses:
 
 
 # Get renewable energy data
-df_renewable = pd.read_csv("Evaluation/Case14_EV/renewable.csv").transpose()
+df_renewable = pd.read_csv("Evaluation/Case%s_EV/renewable.csv"%n_case).transpose()
 df_renewable["bus"] = generators
 P_renew = {}
 for i in buses:
@@ -103,9 +105,9 @@ for i in buses:
 
 
 # Get EV data
-df_EV_spec = pd.read_csv("Evaluation/Case14_EV/EV_spec.csv")
-df_EV_SOC = pd.read_csv("Evaluation/Case14_EV/ev_soc.csv").transpose()
-df_EV_demand = pd.read_csv("Evaluation/Case14_EV/ev_demand.csv").transpose()
+df_EV_spec = pd.read_csv("Evaluation/Case%s_EV/EV_spec.csv"%n_case)
+df_EV_SOC = pd.read_csv("Evaluation/Case%s_EV/ev_soc.csv"%n_case).transpose()
+df_EV_demand = pd.read_csv("Evaluation/Case%s_EV/ev_demand.csv"%n_case).transpose()
 df_EV_spec["bus"] = loads
 df_EV_SOC["bus"] = loads
 df_EV_demand["bus"] = loads
@@ -356,14 +358,14 @@ for i in buses:
             c_iit[i, t] <= V_max[i] * V_max[i], name=f"cosine_upperbound_{i}_{t}"
         )
 
-# SOCP relaxation constraint (5)
-for i, j in lines: 
-    for t in time_periods:
-        model.addConstr(
-            c_ijt[i, j, t] *  c_ijt[i, j, t] + s_ijt[i, j, t] * s_ijt[i, j, t]
-            <= c_iit[i, t] * c_iit[j, t],
-            name=f"SOCP_{i}_{j}_{t}",
-        )
+# # SOCP relaxation constraint (5)
+# for i, j in lines: 
+#     for t in time_periods:
+#         model.addConstr(
+#             c_ijt[i, j, t] *  c_ijt[i, j, t] + s_ijt[i, j, t] * s_ijt[i, j, t]
+#             <= c_iit[i, t] * c_iit[j, t],
+#             name=f"SOCP_{i}_{j}_{t}",
+#         )
 # Voltage constraints (1f)
 for i in buses:
     for t in time_periods:
