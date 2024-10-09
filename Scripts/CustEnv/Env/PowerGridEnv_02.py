@@ -99,6 +99,10 @@ class PowerGrid(Env):
         self.state = self.read_state_from_grid()
 
 
+        # # add some noice to load and renewable generation
+        # self.add_noice_load_sgen_state()
+
+        
 
     def step(self, action):
         # intialize the terminated and truncated
@@ -130,10 +134,18 @@ class PowerGrid(Env):
             # calculate the reward in the case of the power flow converges
             reward, violated_bus, overload_lines = self.calculate_reward(time_step)
 
+
+            # # check if terminated in the case of no violation
+            # if self.violation == False:
+
+            #     #terminate the episode if the reward is close to the previous reward (converged)
+            #     terminated = abs(reward-self.pre_reward) <= 0.01
+
         # output the current episode length, reward, terminated, truncated
         # print("episode length: ", self.episode_length, "Reward:", reward, "; Terminated:", terminated, "; Truncated:", truncated)
         
         # save the reward for the current step
+        # self.pre_reward = reward
         gen_cost = self.calculate_gen_cost()
 
         # update the info 
@@ -188,6 +200,7 @@ class PowerGrid(Env):
 
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
+        # self.pre_reward = 0
         self.episode_length = self.dispatching_intervals
         time_step = 0
 
@@ -196,8 +209,8 @@ class PowerGrid(Env):
 
 
 
-        # update EV spec in the info
-        info = {"EV_spec": self.net.storage}
+        # # update load states in the info
+        info = {}
         # info = {
         #     "load_p": self.net.load.loc[:, ['p_mw']],
         #     "load_q": self.net.load.loc[:, ['q_mvar']],
@@ -285,8 +298,6 @@ class PowerGrid(Env):
         self.linemax = 100  # ASSUMPTION: the max line loading is 100%
         self.Vmax = 1.06 # ASSUMPTION: the max voltage is 1.06 pu
         self.Vmin = 0.94 # ASSUMPTION: the min voltage is 0.94 pu
-        self.theta_max = 30 # ASSUMPTION: the max phase angle difference is 30 degrees
-
 
         # assign the EV limits
         if self.EVaware == True:
@@ -296,6 +307,7 @@ class PowerGrid(Env):
 
             # update the EV (dis)charging limit
             self.update_EV_limit(time_step)
+
 
     # update EV (dis)charging limit
     def update_EV_limit(self, time_step):
@@ -329,6 +341,7 @@ class PowerGrid(Env):
         # add some noice to PGcap
         self.PGcap = np.random.uniform(self.PGmin,self.PGmax)
         self.state[2*self.NL:2*self.NL+self.NG] = self.PGcap
+
 
     
     # read the active and reactive power of the loads, active power of gen from self.net.load
@@ -447,9 +460,7 @@ class PowerGrid(Env):
         for i in grid.load.index:
             bus = grid.load.loc[i, "bus"]
             n_car = int(grid.load.loc[i, "p_mw"]) # number of EVs connected to the bus is assumed to be integer of nominal power of the loads
-            pp.create_storage(grid, bus=bus, p_mw=0, 
-                              max_e_mwh= self.df_EV_spec.loc[0, str(i)] * n_car / 1000, 
-                              soc_percent=0.5, min_e_mwh=0, evid = i, n_car = n_car)
+            pp.create_storage(grid, bus=bus, p_mw=0, max_e_mwh= self.df_EV_spec.loc[0, str(i)] * n_car / 1000, soc_percent=0.5, min_e_mwh=0, evid = i, n_car = n_car)
 
     def select_randomly_day_EV_profile(self):
         # randomly select the EV profile from the df_EV
@@ -527,7 +538,6 @@ class PowerGrid(Env):
         overload_lines = tb.overloaded_lines(self.net, self.linemax) 
         penalty_voltage = 0
         penalty_line = 0
-        penalty_phase_angle = 0
         self.violation = False 
 
         # bus voltage violation 
@@ -544,13 +554,6 @@ class PowerGrid(Env):
             self.violation = True
             for overload_line in overload_lines:
                 penalty_line += (self.linemax - self.net.res_line.loc[overload_line, "loading_percent"]) * 10
-
-        # phase angle violation
-        self.net.res_line["angle_diff"] = abs(self.net.res_line["va_from_degree"] - self.net.res_line["va_to_degree"])
-        for i in self.net.res_line.index:
-            if self.net.res_line["angle_diff"][i] > self.theta_max:
-                self.violation = True
-                penalty_phase_angle += (self.theta_max-self.net.res_line.loc[i, "angle_diff"]) * 10
 
         # EV SOC violation
         if self.EVaware:
@@ -592,11 +595,11 @@ class PowerGrid(Env):
                     p0, p1, c01 = points
                     if p0 <= self.net.res_gen.p_mw[i] < p1:
                         gen_cost += c01 * self.net.res_gen.p_mw[i]
-            for i in self.net.ext_grid.index:
-                for points in points_list:
-                    p0, p1, c01 = points
-                    if p0 <= self.net.res_ext_grid.p_mw[i] < p1:
-                        gen_cost += c01 * self.net.res_ext_grid.p_mw[i]
+            # for i in self.net.ext_grid.index:
+            #     for points in points_list:
+            #         p0, p1, c01 = points
+            #         if p0 <= self.net.res_ext_grid.p_mw[i] < p1:
+            #             gen_cost += c01 * self.net.res_ext_grid.p_mw[i]
         #if the cost function is missing 
         else:
             total_gen = self.net.res_gen['p_mw'].sum() + self.net.res_ext_grid['p_mw'].sum()
@@ -604,7 +607,9 @@ class PowerGrid(Env):
             # print("No cost function found for generators. Assume the cost function is 0.1 * p_tot**2 + 40 * p_tot.")
         return gen_cost
     
-
+    # fetch SOC state
+    def get_soc(self):
+        return self.net.storage["soc_percent"].values
     
 ####################################
 # Unused Code
@@ -729,7 +734,3 @@ class PowerGrid(Env):
             max_load = grid.load['p_mw'].idxmax()
             if EV_ID:
                 grid.load.loc[max_load, 'EV_ID'].extend(EV_ID)
-
-    # fetch SOC state
-    def get_soc(self):
-        return self.net.storage["soc_percent"].values
