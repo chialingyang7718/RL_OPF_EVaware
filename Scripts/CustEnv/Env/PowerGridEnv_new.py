@@ -131,6 +131,11 @@ class PowerGrid(Env):
 
             # assign the reward in the case of the power flow does not converge
             reward = -5000
+            info = {
+                "bus_violation": violated_bus.tolist(),
+                "line_violation": overload_lines.tolist(),
+                "phase_angle_violation": violated_phase
+            }
         else:
             # calculate the reward in the case of the power flow converges
             reward, violated_bus, overload_lines, violated_phase = (
@@ -153,9 +158,6 @@ class PowerGrid(Env):
             "generation_v": self.net.res_gen.loc[:, ["vm_pu"]],
             "bus_voltage": self.net.res_bus.loc[:, ["vm_pu"]],
             "line_loading": self.net.res_line.loc[:, ["loading_percent"]],
-            "bus_violation": violated_bus.tolist(),
-            "line_violation": overload_lines.tolist(),
-            "phase_angle_violation": violated_phase,
             "generation_cost": gen_cost,
         }
 

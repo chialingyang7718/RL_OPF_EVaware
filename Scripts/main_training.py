@@ -50,7 +50,7 @@ if __name__ == "__main__":
 
     # Parameters
     # env_id = "PowerGrid-v1"
-    env_id = "PowerGrid-v2"
+    env_id = "PowerGrid-v1"
     num_envs = 6
     EV_aware = True
     Training = True
@@ -135,7 +135,7 @@ if __name__ == "__main__":
     model = PPO(
         policy="MlpPolicy",
         env=env,
-        # n_steps=1,  # update every 5 days
+        n_steps=120,  # update every 5 days 
         gamma=0.99,
         verbose=0,
         policy_kwargs=policy_kwargs,

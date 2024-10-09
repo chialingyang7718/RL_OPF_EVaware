@@ -9,14 +9,14 @@ import CustEnv
 from grid_loader import load_test_case_grid
 
 # load the grid for the environment
-grid = load_test_case_grid(57)
+grid = load_test_case_grid(14)
 
 
 if __name__ == "__main__":
     # initiate the environment for vectorizing
     env_fns = [
         lambda: gym.make(
-            "PowerGrid-v2",
+            "PowerGrid-v1",
             net=grid,
             dispatching_intervals=2,
             EVaware=True,
