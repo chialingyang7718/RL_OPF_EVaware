@@ -127,20 +127,21 @@ class PowerGrid(Env):
         except:
             # output the diagnostic report when the power flow does not converge
             print("Power flow does not converge!")
-            print(pp.diagnostic(self.net, report_style="detailed"))
+            # print(pp.diagnostic(self.net, report_style="detailed"))
 
             # assign the reward in the case of the power flow does not converge
             reward = -5000
-            info = {
-                "bus_violation": violated_bus.tolist(),
-                "line_violation": overload_lines.tolist(),
-                "phase_angle_violation": violated_phase
-            }
+
         else:
             # calculate the reward in the case of the power flow converges
             reward, violated_bus, overload_lines, violated_phase = (
                 self.calculate_reward(time_step)
             )
+            info = {
+                "bus_violation": violated_bus.tolist(),
+                "line_violation": overload_lines.tolist(),
+                "phase_angle_violation": violated_phase
+            }
         # output the current episode length, reward, terminated, truncated
         # print("episode length: ", self.episode_length, "Reward:", reward, "; Terminated:", terminated, "; Truncated:", truncated)
 
@@ -156,8 +157,6 @@ class PowerGrid(Env):
             "generation_p": self.net.res_gen.loc[:, ["p_mw"]],
             "generation_q": self.net.res_gen.loc[:, ["q_mvar"]],
             "generation_v": self.net.res_gen.loc[:, ["vm_pu"]],
-            "bus_voltage": self.net.res_bus.loc[:, ["vm_pu"]],
-            "line_loading": self.net.res_line.loc[:, ["loading_percent"]],
             "generation_cost": gen_cost,
         }
 
