@@ -54,7 +54,7 @@ if __name__ == "__main__":
     num_envs = 6
     EV_aware = True
     Training = True
-    total_timesteps = 500000
+
 
     # Create the vectorized environment
     env = SubprocVecEnv(
@@ -92,12 +92,16 @@ if __name__ == "__main__":
             activation_fn=th.nn.Tanh,
             net_arch=dict(pi=[NN_size, NN_size], vf=[NN_size, NN_size])  # 2 layers
         )
+        n_steps = 120
+        total_timesteps = 100000 * (int(n_case/10) + 1)
     elif n_case > 20:
         policy_kwargs = dict(
             activation_fn=th.nn.Tanh,
             net_arch=dict(pi=[NN_size, NN_size, NN_size], vf=[NN_size, NN_size, NN_size])  # 3 layers
         )
-
+        n_steps = 60
+        total_timesteps = 100000 * (int(n_case/10) + 3)
+        
     def create_unique_soc_log_path(base_log_dir):
         # Ensure the base log directory exists
         os.makedirs(base_log_dir, exist_ok=True)
@@ -136,10 +140,11 @@ if __name__ == "__main__":
     )
 
     # create the agent
+
     model = PPO(
         policy="MlpPolicy",
         env=env,
-        n_steps=60,  # update every 2.5 days 
+        n_steps=n_steps,
         gamma=0.99,
         verbose=0,
         policy_kwargs=policy_kwargs,
@@ -149,7 +154,7 @@ if __name__ == "__main__":
     # train the agent
     if EV_aware:
         # model.learn(total_timesteps=500000, callback=[soc_callback], progress_bar=True)
-        model.learn(total_timesteps=500000, callback=checkpoint_callback, progress_bar=True)
+        model.learn(total_timesteps=total_timesteps, callback=checkpoint_callback, progress_bar=True)
 
     # save the model
     model.save("Training/Model/Case%s" %n_case)
