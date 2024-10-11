@@ -300,17 +300,33 @@ class PowerGrid(Env):
         self.QGmin = (
             self.net.gen.loc[:, "min_q_mvar"].to_numpy().flatten("F").astype(np.float64)
         )
-        self.VGmax = 1.06  # ASSUMPTION: the max voltage of generators is 1.06 pu
-        self.VGmin = 0.94  # ASSUMPTION: the min voltage of generators is 0.94 pu
+        # assign the voltage limits
+        self.Vmax = (
+            self.net.bus.loc[:, "max_vm_pu"].to_numpy().flatten("F").astype(np.float64)
+        )
+        self.Vmin = (
+            self.net.bus.loc[:, "min_vm_pu"].to_numpy().flatten("F").astype(np.float64)
+        )
+        self.VGmax = np.array([], dtype=np.float64)
+        self.VGmin = np.array([], dtype=np.float64)
+        for i in self.net.gen.loc[:, "bus"]:
+            self.VGmax = np.append(self.VGmax, self.Vmax[i])
+            self.VGmin = np.append(self.VGmin, self.Vmin[i])
+
+        # assign the line limits
+        self.linemax = (
+            self.net.line.loc[:, "max_loading_percent"].to_numpy().flatten("F").astype(np.float64)
+        )
+        # assign phase angle difference limits
+        self.theta_max = 30  # ASSUMPTION: the max phase angle difference is 30 degrees
+
 
         # assign the load limits (PQ bus)
         PLmax = (
             self.net.load.loc[:, "p_mw"] * 1.5
         )  # ASSUMPTION: the max active power consumption is 1.5 times the default value in the net
         self.PLmax = PLmax.to_numpy().flatten("F").astype(np.float64)
-        self.PLmin = np.zeros(
-            self.NL
-        )  # ASSUMPTION: the min active power consumption is 0 MW
+        self.PLmin = np.zeros(self.NL)  # ASSUMPTION: the min active power consumption is 0 MW
         QLmax = (
             abs(self.net.load.loc[:, "q_mvar"]) * 1.5
         )  # ASSUMPTION: the max reactive power consumption is 1.5 times the default value in the net
@@ -319,11 +335,6 @@ class PowerGrid(Env):
             -self.QLmax
         )  # ASSUMPTION: the reactive power consumption range is zero-centered
 
-        # assign the voltage and line loading limits (valid for all buses other than generators)
-        self.linemax = 100  # ASSUMPTION: the max line loading is 100%
-        self.Vmax = 1.06  # ASSUMPTION: the max voltage is 1.06 pu
-        self.Vmin = 0.94  # ASSUMPTION: the min voltage is 0.94 pu
-        self.theta_max = 30  # ASSUMPTION: the max phase angle difference is 30 degrees
 
         # assign the EV limits
         if self.EVaware == True:
@@ -635,7 +646,7 @@ class PowerGrid(Env):
             else:
                 self.net.gen.loc[i, "p_mw"] = denormalized_p
             self.net.gen.loc[i, "vm_pu"] = self.denormalize(
-                action[i + self.NG], self.VGmax, self.VGmin, 1, -1
+                action[i + self.NG], self.VGmax[i], self.VGmin[i], 1, -1
             )
 
             for i in range(self.N_EV):
@@ -679,13 +690,13 @@ class PowerGrid(Env):
         if violated_buses.size != 0:
             self.violation = True
             for violated_bus in violated_buses:
-                if self.net.res_bus.loc[violated_bus, "vm_pu"] < self.Vmin:
+                if self.net.res_bus.loc[violated_bus, "vm_pu"] < self.Vmin[violated_bus]:
                     penalty_voltage += (
-                        self.net.res_bus.loc[violated_bus, "vm_pu"] - self.Vmin
+                        self.net.res_bus.loc[violated_bus, "vm_pu"] - self.Vmin[violated_bus]
                     ) * 1000
                 else:
                     penalty_voltage += (
-                        self.Vmax - self.net.res_bus.loc[violated_bus, "vm_pu"]
+                        self.Vmax[violated_bus] - self.net.res_bus.loc[violated_bus, "vm_pu"]
                     ) * 1000
 
         # line overload violation
@@ -693,13 +704,11 @@ class PowerGrid(Env):
             self.violation = True
             for overload_line in overload_lines:
                 penalty_line += (
-                    self.linemax - self.net.res_line.loc[overload_line, "loading_percent"]
+                    self.linemax[overload_line] - self.net.res_line.loc[overload_line, "loading_percent"]
                 ) * 10
 
         # phase angle violation
-        self.net.res_line["angle_diff"] = abs(
-            self.net.res_line["va_from_degree"] - self.net.res_line["va_to_degree"]
-        )
+        self.net.res_line["angle_diff"] = abs(self.net.res_line["va_from_degree"] - self.net.res_line["va_to_degree"])
         for i in self.net.res_line.index:
             if self.net.res_line["angle_diff"][i] > self.theta_max:
                 self.violation = True

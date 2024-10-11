@@ -86,12 +86,17 @@ if __name__ == "__main__":
     NN_size = nearestPowerOf2(n_case * 4)  
     
 
-    # the policy network architecture
-    policy_kwargs = dict(
-        activation_fn=th.nn.Tanh,
-        # net_arch=dict(pi=[NN_size, NN_size], vf=[NN_size, NN_size]) # 2 layers
-        net_arch=dict(pi=[NN_size, NN_size, NN_size], vf=[NN_size, NN_size, NN_size]), # 3 layers
-    )
+    # the policy network architecture (if the number of buses is less than 20, 2 layers; otherwise, 3 layers)
+    if n_case <= 20:
+        policy_kwargs = dict(
+            activation_fn=th.nn.Tanh,
+            net_arch=dict(pi=[NN_size, NN_size], vf=[NN_size, NN_size])  # 2 layers
+        )
+    elif n_case > 20:
+        policy_kwargs = dict(
+            activation_fn=th.nn.Tanh,
+            net_arch=dict(pi=[NN_size, NN_size, NN_size], vf=[NN_size, NN_size, NN_size])  # 3 layers
+        )
 
     def create_unique_soc_log_path(base_log_dir):
         # Ensure the base log directory exists
@@ -163,7 +168,7 @@ if __name__ == "__main__":
 # DONE: seperate the vlimit of generator and other buses
 
 # DONE: add phase angle difference limit into reward function
-# TODO: read voltage limit from the grid
+# DONE: read voltage limit from the grid
 # TODO: output the report of divergence to the log fileS
 # TODO: choose a comparable benchmark: interior point method, etc.
 # TODO: implement safe reinforcement learning
