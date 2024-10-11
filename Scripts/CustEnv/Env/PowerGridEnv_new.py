@@ -137,6 +137,7 @@ class PowerGrid(Env):
             reward, violated_bus, overload_lines, violated_phase = (
                 self.calculate_reward(time_step)
             )
+
             info = {
                 "bus_violation": violated_bus.tolist(),
                 "line_violation": overload_lines.tolist(),
@@ -157,6 +158,8 @@ class PowerGrid(Env):
             "generation_p": self.net.res_gen.loc[:, ["p_mw"]],
             "generation_q": self.net.res_gen.loc[:, ["q_mvar"]],
             "generation_v": self.net.res_gen.loc[:, ["vm_pu"]],
+            "bus_voltage": self.net.res_bus.loc[:, ["vm_pu"]],
+            "line_loading": self.net.res_line.loc[:, ["loading_percent"]],
             "generation_cost": gen_cost,
         }
 

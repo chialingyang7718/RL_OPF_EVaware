@@ -45,7 +45,7 @@ def make_env(env_id, net, dispatching_interval, EVaware, Training, rank):
 if __name__ == "__main__":
 
     # Load the grid
-    n_case = 14
+    n_case = 30
     grid = load_test_case_grid(n_case)
 
     # Parameters
@@ -89,9 +89,8 @@ if __name__ == "__main__":
     # the policy network architecture
     policy_kwargs = dict(
         activation_fn=th.nn.Tanh,
-        net_arch=dict(pi=[NN_size, NN_size], vf=[NN_size, NN_size]) # 2 layers
-        # net_arch=dict(pi=[NN_size, NN_size, NN_size], vf=[NN_size, NN_size, NN_size]), # 3 layers
-        # activation_fn=th.nn.Tanh, net_arch=dict(pi=[NN_size, NN_size], vf=[NN_size, NN_size])# 2 layers
+        # net_arch=dict(pi=[NN_size, NN_size], vf=[NN_size, NN_size]) # 2 layers
+        net_arch=dict(pi=[NN_size, NN_size, NN_size], vf=[NN_size, NN_size, NN_size]), # 3 layers
     )
 
     def create_unique_soc_log_path(base_log_dir):
@@ -126,7 +125,7 @@ if __name__ == "__main__":
 
     # create checkpoint callback
     checkpoint_callback = CheckpointCallback(
-        save_freq=math.floor(total_timesteps/100000),
+        save_freq=math.floor(num_envs*total_timesteps/100000),
         save_path=os.path.join(log_path, "Checkpoints"),
         name_prefix="Case%s_model"%n_case,
     )
@@ -135,7 +134,7 @@ if __name__ == "__main__":
     model = PPO(
         policy="MlpPolicy",
         env=env,
-        n_steps=120,  # update every 5 days 
+        n_steps=60,  # update every 2.5 days 
         gamma=0.99,
         verbose=0,
         policy_kwargs=policy_kwargs,
@@ -164,8 +163,7 @@ if __name__ == "__main__":
 # DONE: seperate the vlimit of generator and other buses
 
 # DONE: add phase angle difference limit into reward function
-# TODO: manually defined limits need to be adapted to the grid size e.g. q_g_mvar
+# TODO: read voltage limit from the grid
 # TODO: output the report of divergence to the log fileS
 # TODO: choose a comparable benchmark: interior point method, etc.
-# TODO: implement for other test cases -- overloading issue by case39
 # TODO: implement safe reinforcement learning
