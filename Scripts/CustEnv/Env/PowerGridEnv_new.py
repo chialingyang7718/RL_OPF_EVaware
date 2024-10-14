@@ -11,6 +11,8 @@ Assumptions --- EV
 - The EVs are connected to the same bus as the loads.
 - The number of EV in a EV group is the integer of nominal power of the loads.
 - The EVs in the same group have the same spec (max_mwh, (dis)charging eff.) and driving profile: SOCImmediateBalanced
+- Assume the EVs are connected in parallel.
+- The maximum EV (dis)charging power is 50 kW.
 
 Assumptions --- Environment
 - One timestep represents one hour.
@@ -365,12 +367,12 @@ class PowerGrid(Env):
             self.EV_power_demand[i] = EV_power_demand
             # reserve the power for EV demand (to avoid discharging too much that EVs demand is not fullfilled)
             discharge_max[i] -= EV_power_demand
-            # the fastest charging speed is 150 kw and assume all the EVs are connected in parallel
+            # the charging speed is 50 kw and assume all the EVs are connected in parallel
             self.PEVmax[i] = min(
-                0.001 * 150 * self.net.storage.loc[i, "n_car"], charging_max[i]
+                0.001 * 50 * self.net.storage.loc[i, "n_car"], charging_max[i]
             )
             self.PEVmin[i] = -min(
-                0.001 * 150 * self.net.storage.loc[i, "n_car"], discharge_max[i]
+                0.001 * 50 * self.net.storage.loc[i, "n_car"], discharge_max[i]
             )
 
     def add_noice_load_renew_state(self):
@@ -441,19 +443,23 @@ class PowerGrid(Env):
             self.EV_power_demand[i] = EV_power_demand
 
             # fetch charging efficiency from the EV spec
-            df_charging_eff = self.df_EV_spec[
-                self.df_EV_spec["Parameter"] == "Battery_charging_efficiency"
-            ].set_index("Parameter")
-            charging_efficiency = df_charging_eff[str(i)].values
-            self.net.storage.loc[i, "eta_c"] = charging_efficiency
+            # df_charging_eff = self.df_EV_spec[
+            #     self.df_EV_spec["Parameter"] == "Battery_charging_efficiency"
+            # ].set_index("Parameter")
+            # charging_efficiency = df_charging_eff[str(i)].values
+            # self.net.storage.loc[i, "eta_c"] = charging_efficiency
+        
 
             # update the SOC of the EVs
-            if (
-                self.net.res_storage.loc[i, "p_mw"] >= 0
-            ):  # charging with time step 1 hour
+            if (self.net.res_storage.loc[i, "p_mw"] >= 0):  # charging with time step 1 hour
+                # energy_aftercharging = (
+                #     energy_b4
+                #     + self.net.res_storage.loc[i, "p_mw"] * charging_efficiency * 1
+                #     - EV_power_demand * 1
+                # )
                 energy_aftercharging = (
                     energy_b4
-                    + self.net.res_storage.loc[i, "p_mw"] * charging_efficiency * 1
+                    + self.net.res_storage.loc[i, "p_mw"] * 1
                     - EV_power_demand * 1
                 )
                 if (
@@ -653,19 +659,18 @@ class PowerGrid(Env):
                 denormalized_pEV = self.denormalize(
                     action[i + 2 * self.NG], self.PEVmax[i], self.PEVmin[i], 1, -1
                 )
-                discharge_efficiency = self.df_EV_spec[
-                    self.df_EV_spec["Parameter"] == "Battery_discharging_efficiency"
-                ][str(i)].values
-                self.net.storage.loc[i, "eta_d"] = discharge_efficiency
-                # set the EV power based on the action
-                if denormalized_pEV < 0:
-                    # discharging
-                    self.net.storage.loc[i, "p_mw"] = (
-                        discharge_efficiency * denormalized_pEV
-                    )
-                else:
-                    # charging
-                    self.net.storage.loc[i, "p_mw"] = denormalized_pEV
+                # discharge_efficiency = self.df_EV_spec[
+                #     self.df_EV_spec["Parameter"] == "Battery_discharging_efficiency"
+                # ][str(i)].values
+                # self.net.storage.loc[i, "eta_d"] = discharge_efficiency
+                self.net.storage.loc[i, "p_mw"] = denormalized_pEV
+                # # set the EV power based on the action
+                # if denormalized_pEV < 0:
+                #     # discharging
+                #     self.net.storage.loc[i, "p_mw"] = (discharge_efficiency * denormalized_pEV)
+                # else:
+                #     # charging
+                #     self.net.storage.loc[i, "p_mw"] = denormalized_pEV
         return self.net
 
     # Apply the state to the load
@@ -708,12 +713,14 @@ class PowerGrid(Env):
                 ) * 10
 
         # phase angle violation
-        self.net.res_line["angle_diff"] = abs(self.net.res_line["va_from_degree"] - self.net.res_line["va_to_degree"])
-        for i in self.net.res_line.index:
-            if self.net.res_line["angle_diff"][i] > self.theta_max:
-                self.violation = True
-                violated_phase.append(i)
-                penalty_phase_angle += (self.theta_max - self.net.res_line.loc[i, "angle_diff"]) * 10
+        # self.net.res_line["angle_diff"] = abs(self.net.res_line["va_from_degree"] - self.net.res_line["va_to_degree"])
+        # for i in self.net.res_line.index:
+        #     if self.net.res_line["angle_diff"][i] > self.theta_max:
+        #         self.violation = True
+        #         violated_phase.append(i)
+        #         penalty_phase_angle += (self.theta_max - self.net.res_line.loc[i, "angle_diff"]) * 10
+            penalty_phase_angle = 0
+            violated_phase = []
 
         # EV SOC violation
         if self.EVaware:
@@ -727,7 +734,7 @@ class PowerGrid(Env):
 
         # assign rewards based on the violation condition and generation cost
         if self.violation == True:
-            reward = penalty_voltage + penalty_line + penalty_EV
+            reward = penalty_voltage + penalty_line + penalty_EV + penalty_phase_angle
         else:
             reward = 1000 - 0.1 * self.calculate_gen_cost()
 
