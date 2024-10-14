@@ -88,22 +88,20 @@ def evaluate_PPO_model(n_steps=24, n_case=14, model=None):
             df_line_loading = pd.DataFrame(info["line_loading"]).transpose()
 
             # Bus Violation
-            if info["bus_violation"]:
+            if 'bus_violation' in info:
                 df_bus_violation = pd.DataFrame(info["bus_violation"]).transpose()
             else:
                 df_bus_violation = pd.DataFrame([])
 
             # Line Violation
-            if info["line_violation"]:
+            if 'line_violation' in info:
                 df_line_violation = pd.DataFrame(info["line_violation"]).transpose()
             else:
                 df_line_violation = pd.DataFrame([])
 
             # Phase Angle Violation
-            if info["phase_angle_violation"]:
-                df_phase_angle_violation = pd.DataFrame(
-                    info["phase_angle_violation"]
-                ).transpose()
+            if 'phase_angle_violation' in info:
+                df_phase_angle_violation = pd.DataFrame(info["phase_angle_violation"]).transpose()
             else:
                 df_phase_angle_violation = pd.DataFrame([])
 
@@ -156,7 +154,7 @@ def evaluate_PPO_model(n_steps=24, n_case=14, model=None):
             )
 
             # Bus Violation
-            if info["bus_violation"]:
+            if 'bus_violation' in info:
                 df_bus_violation = pd.concat(
                     [df_bus_violation, pd.DataFrame(info["bus_violation"]).transpose()]
                 )
@@ -164,7 +162,7 @@ def evaluate_PPO_model(n_steps=24, n_case=14, model=None):
                 df_bus_violation = pd.concat([df_bus_violation, pd.DataFrame([])])
 
             # Line Violation
-            if info["line_violation"]:
+            if 'line_violation' in info:
                 df_line_violation = pd.concat(
                     [
                         df_line_violation,
@@ -175,7 +173,7 @@ def evaluate_PPO_model(n_steps=24, n_case=14, model=None):
                 df_line_violation = pd.concat([df_line_violation, pd.DataFrame([])])
 
             # Phase Angle Violation
-            if info["phase_angle_violation"]:
+            if 'phase_angle_violation' in info:
                 df_phase_angle_violation = pd.concat(
                     [
                         df_phase_angle_violation,
@@ -255,9 +253,9 @@ def visualization(df):
 
 
 if __name__ == "__main__":
-    n_case = 14
+    n_case = 30
     # Load the trained model
-    model = PPO.load("Training/Model/Case%s" %n_case)
+    model = PPO.load("Training/Model/Case%s/Case%s_2" %(n_case,n_case))
 
     # Evaluate the model
     n_steps = 24

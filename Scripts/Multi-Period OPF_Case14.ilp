@@ -1,0 +1,46 @@
+\ Model Multi-Period OPF_copy
+\ LP format - for model browsing. Use MPS format to capture full model detail.
+Minimize
+ 
+Subject To
+ Power_balance_P_8_16: P_G[8,16] + P_ex[8,16] - P_ijt[8,9,16]
+   - P_ijt[8,13,16] - P_c[8,16] + 0.95 P_d[8,16] = 26.99205264947451
+ Power_flow_P_8_9_16: 3.902049552447428 c_ijt[8,9,16]
+   - 10.36539412706091 s_ijt[8,9,16] - 3.902049552447428 c_iit[8,16]
+   + P_ijt[8,9,16] = 0
+ Power_flow_P_8_13_16: 1.424005487019931 c_ijt[8,13,16]
+   - 3.029050456930603 s_ijt[8,13,16] - 1.424005487019931 c_iit[8,16]
+   + P_ijt[8,13,16] = 0
+ Voltage_upperbound_8_16: V[8,16] <= 1.06
+ Voltage_upperbound_9_16: V[9,16] <= 1.06
+ Voltage_upperbound_13_16: V[13,16] <= 1.06
+ PG_upperbound_8_16: P_G[8,16] <= 0
+ Pex_upperbound_8_16: P_ex[8,16] <= 0
+ SOC_balance_8_16: - 1.305 SOC[8,16] + 1.305 SOC[8,17] - 0.9 P_c[8,16]
+   + P_d[8,16] = -0.05426625
+ Charging_power_ub_8_16: 1.305 SOC[8,16] + P_c[8,16] <= 1.305
+ v_sqrt_8_9_16: v_sqrt[8,9,16] + [ - V[8,16] * V[9,16] ] = 0
+ c_ijt_8_9_16: c_ijt[8,9,16] + [ - cosine[8,9,16] * v_sqrt[8,9,16] ] = 0
+ s_ijt_8_9_16: s_ijt[8,9,16] + [ sine[8,9,16] * v_sqrt[8,9,16] ] = 0
+ v_sqrt_8_13_16: v_sqrt[8,13,16] + [ - V[8,16] * V[13,16] ] = 0
+ c_ijt_8_13_16: c_ijt[8,13,16] + [ - cosine[8,13,16] * v_sqrt[8,13,16] ]
+   = 0
+ s_ijt_8_13_16: s_ijt[8,13,16] + [ sine[8,13,16] * v_sqrt[8,13,16] ] = 0
+Bounds
+ P_G[8,16] free
+ P_ex[8,16] free
+ -infinity <= cosine[8,9,16] <= 1
+ -infinity <= cosine[8,13,16] <= 1
+ -infinity <= sine[8,9,16] <= 1
+ -infinity <= sine[8,13,16] <= 1
+ v_sqrt[8,9,16] free
+ v_sqrt[8,13,16] free
+ c_ijt[8,9,16] free
+ c_ijt[8,13,16] free
+ s_ijt[8,9,16] free
+ s_ijt[8,13,16] free
+ P_ijt[8,9,16] free
+ P_ijt[8,13,16] free
+ SOC[8,16] free
+ P_d[8,16] free
+End

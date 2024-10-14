@@ -1,0 +1,22 @@
+\ Model Multi-Period OPF_copy
+\ LP format - for model browsing. Use MPS format to capture full model detail.
+Minimize
+ 
+Subject To
+ Power_flow_Q_7_1_23: - 0.0134425540852762 c_ijt[7,1,23]
+   - 0.0134425540852762 c_iit[7,23] + Q_ijt[7,1,23] = 0
+ cosine_lowerbound_7_23: c_iit[7,23] >= 96410.25
+ Phase_angle_diff_upper_7_1_23: theta[7,1,23] <= 0.5235987755982988
+ Phase_angle_diff_lower_7_1_23: theta[7,1,23] >= -0.5235987755982988
+ c_ijt_7_1_23: c_ijt[7,1,23] + [ - cosine[7,1,23] * v_sqrt[7,1,23] ] = 0
+ Line_loading_7_1_23: [ P_ijt[7,1,23] ^2 + Q_ijt[7,1,23] ^2 ] <= 62500
+Bounds
+ theta[7,1,23] free
+ cosine[7,1,23] free
+ c_ijt[7,1,23] free
+ c_iit[7,23] free
+ P_ijt[7,1,23] free
+ Q_ijt[7,1,23] free
+General Constraints
+ GC334: cosine[7,1,23] = COS ( theta[7,1,23] )
+End

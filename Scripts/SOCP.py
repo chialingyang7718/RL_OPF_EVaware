@@ -11,7 +11,7 @@ import numpy as np
 import math
 
 # Test case
-n_case = 14
+n_case = 9
 
 """Set"""
 # Define components of Grid
@@ -73,15 +73,15 @@ for i in buses:
                  * net.line.loc[net.line["to_bus"] == i, "parallel"].values))* 2 * math.pi * 50 * 1e-9 / 2
 
 # Get load data
-df_load_p = pd.read_csv("Evaluation/Case%s_EV/load_p.csv"%n_case).transpose()
-df_load_q = pd.read_csv("Evaluation/Case%s_EV/load_q.csv"%n_case).transpose()
+df_load_p = pd.read_csv("Evaluation/Case%s/load_p.csv"%n_case).transpose()
+df_load_q = pd.read_csv("Evaluation/Case%s/load_q.csv"%n_case).transpose()
 df_load_p["bus"] = loads
 df_load_q["bus"] = loads
 P_D = {}
 Q_D = {}
 for i in buses:
     if i in loads:
-        P_D[i] = df_load_p[df_load_p["bus"] == 1].drop("bus", axis=1).values[0].tolist()
+        P_D[i] = df_load_p[df_load_p["bus"] == i].drop("bus", axis=1).values[0].tolist()
         Q_D[i] = df_load_q[df_load_q["bus"] == i].drop("bus", axis=1).values[0].tolist()
     else:
         P_D[i] = [0] * len(time_periods)
@@ -89,7 +89,7 @@ for i in buses:
 
 
 # Get renewable energy data
-df_renewable = pd.read_csv("Evaluation/Case%s_EV/renewable.csv"%n_case).transpose()
+df_renewable = pd.read_csv("Evaluation/Case%s/renewable.csv"%n_case).transpose()
 df_renewable["bus"] = generators
 P_renew = {}
 for i in buses:
@@ -105,21 +105,20 @@ for i in buses:
 
 
 # Get EV data
-df_EV_spec = pd.read_csv("Evaluation/Case%s_EV/EV_spec.csv"%n_case)
-df_EV_SOC = pd.read_csv("Evaluation/Case%s_EV/ev_soc.csv"%n_case).transpose()
-df_EV_demand = pd.read_csv("Evaluation/Case%s_EV/ev_demand.csv"%n_case).transpose()
+df_EV_spec = pd.read_csv("Evaluation/Case%s/EV_spec.csv"%n_case)
+df_EV_SOC = pd.read_csv("Evaluation/Case%s/ev_soc.csv"%n_case).transpose()
+df_EV_demand = pd.read_csv("Evaluation/Case%s/ev_demand.csv"%n_case).transpose()
 df_EV_spec["bus"] = loads
 df_EV_SOC["bus"] = loads
 df_EV_demand["bus"] = loads
-# df_EV_spec["battery_capacity"] = df_EV_spec["max_e_mwh"] / df_EV_spec["n_car"]
 C = {}  # Battery capacity
 eta_d = {}  # Discharge efficiency
 eta_c = {}  # Charge efficiency
 Z_init = {}  # Initial SOC
 EV_demand = {}  # EV demand
+n_EV = {} # Number of EVs
 for i in buses:
     if i in loads:
-        # C[i] = df_EV_spec.loc[df_EV_spec["bus"] == i, "battery_capacity"].values[0]
         C[i] = df_EV_spec.loc[df_EV_spec["bus"] == i, "max_e_mwh"].values[0]
         eta_d[i] = df_EV_spec[df_EV_spec.loc[:, "bus"] == i]["eta_d"].values[0]
         eta_c[i] = df_EV_spec[df_EV_spec.loc[:, "bus"] == i]["eta_c"].values[0]
@@ -130,12 +129,14 @@ for i in buses:
             .values[0]
             .tolist()
         )
+        n_EV[i] = df_EV_spec.loc[df_EV_spec["bus"] == i, "n_car"].values[0]
     else:
         C[i] = 0
         eta_d[i] = 0
         eta_c[i] = 0
         Z_init[i] = 0
         EV_demand[i] = [0] * len(time_periods)
+        n_EV[i] = 0
 
 # Generator limits
 PG_min = {}
@@ -174,11 +175,9 @@ for i in buses:
 # Voltage limits
 V_min = (net.bus.loc[:, "min_vm_pu"] * net.bus.loc[:, "vn_kv"]).to_dict()
 V_max = (net.bus.loc[:, "max_vm_pu"] * net.bus.loc[:, "vn_kv"]).to_dict()
-# V_max_sqrt = {i: V_max[i] * V_max[i] for i in range(len(V_max))}
-# V_max_sqrt_neg = {i: -1 * V_max[i] * V_max[i] for i in range(len(V_max))}
 
 # Phase angle difference limits
-theta_max = 30 * 2 * math.pi / 360  # Assumption: maximum phase angle difference
+theta_max = 30 * math.pi / 180  # Assumption: maximum phase angle difference
 
 
 """Model"""
@@ -313,18 +312,9 @@ for i, j in lines:
 
         model.addConstr(
             Q_ijt[i, j, t]
-            == -net.line.loc[
-                (net.line["from_bus"] == i) & (net.line["to_bus"] == j), "susceptance"
-            ].values[0]
-            * c_iit[i, t]
-            - net.line.loc[
-                (net.line["from_bus"] == i) & (net.line["to_bus"] == j), "susceptance"
-            ].values[0]
-            * c_ijt[i, j, t]
-            - net.line.loc[
-                (net.line["from_bus"] == i) & (net.line["to_bus"] == j), "conductance"
-            ].values[0]
-            * s_ijt[i, j, t],
+            == -net.line.loc[(net.line["from_bus"] == i) & (net.line["to_bus"] == j), "susceptance"].values[0]* c_iit[i, t]
+            - net.line.loc[(net.line["from_bus"] == i) & (net.line["to_bus"] == j), "susceptance"].values[0]* c_ijt[i, j, t]
+            - net.line.loc[(net.line["from_bus"] == i) & (net.line["to_bus"] == j), "conductance"].values[0]* s_ijt[i, j, t],
             name=f"Power_flow_Q_{i}_{j}_{t}",
         )
 
@@ -358,14 +348,15 @@ for i in buses:
             c_iit[i, t] <= V_max[i] * V_max[i], name=f"cosine_upperbound_{i}_{t}"
         )
 
-# # SOCP relaxation constraint (5)
-# for i, j in lines: 
-#     for t in time_periods:
-#         model.addConstr(
-#             c_ijt[i, j, t] *  c_ijt[i, j, t] + s_ijt[i, j, t] * s_ijt[i, j, t]
-#             <= c_iit[i, t] * c_iit[j, t],
-#             name=f"SOCP_{i}_{j}_{t}",
-#         )
+# SOCP relaxation constraint (5)
+for i, j in lines: 
+    for t in time_periods:
+        model.addConstr(
+            c_ijt[i, j, t] *  c_ijt[i, j, t] + s_ijt[i, j, t] * s_ijt[i, j, t]
+            <= c_iit[i, t] * c_iit[j, t],
+            name=f"SOCP_{i}_{j}_{t}",
+        )
+        
 # Voltage constraints (1f)
 for i in buses:
     for t in time_periods:
@@ -432,10 +423,14 @@ for i in buses:
 # Charging and discharging power constraints (1n and 1o)
 for i in buses:
     for t in time_periods:
-        model.addConstr(P_c[i, t] <= (1 - Z[i, t]) * C[i], name=f"Charging_power_ub_{i}_{t}")
-        model.addConstr(P_d[i, t] <= Z[i, t] * C[i], name=f"Discharging_power_ub_{i}_{t}")
-        model.addConstr(P_c[i, t] >= 0, name=f"Charging_power_lb_{i}_{t}")
-        model.addConstr(P_d[i, t] >= 0, name=f"Discharging_power_lb_{i}_{t}")
+        if i in loads:
+            model.addConstr(P_c[i, t] <= 0.001*50*n_EV[i], name=f"Charging_power_ub_{i}_{t}") # Assume 50 kW is the maximum charging power
+            model.addConstr(P_d[i, t] <= 0.001*50*n_EV[i], name=f"Discharging_power_ub_{i}_{t}")
+            model.addConstr(P_c[i, t] >= 0, name=f"Charging_power_lb_{i}_{t}")
+            model.addConstr(P_d[i, t] >= 0, name=f"Discharging_power_lb_{i}_{t}")
+        else:
+            P_c[i, t] = 0
+            P_d[i, t] = 0
 
 # model.setParam('NumericFocus', 3)
 
@@ -450,7 +445,7 @@ else:
     print("Model did not solve to optimality. Status: ", model.status)
     model.computeIIS()
     # Write the model to a file
-    model.write("Scripts/Multi-Period OPF.ilp")
+    model.write("Scripts/Multi-Period OPF_Case%s.ilp" % n_case)
 
 
     # print("\nThe following constraints and variables are in the IIS:")
