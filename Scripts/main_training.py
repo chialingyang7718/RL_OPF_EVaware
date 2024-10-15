@@ -139,8 +139,8 @@ if __name__ == "__main__":
     )
 
     # create the agent or reload the model
-    if os.path.exists("Training/Model/Case%s.zip" %n_case):    # check if the model exists:
-        model = PPO.load("Training/Model/Case%s" %n_case)
+    if os.path.exists("Training/Model/Case%s/Case%s.zip" %(n_case, n_case)):    # check if the model exists:
+        model = PPO.load("Training/Model/Case%s/Case%s" %(n_case, n_case))
         # total_timesteps = 500000
     else:
         model = PPO(
@@ -161,7 +161,7 @@ if __name__ == "__main__":
         model.learn(total_timesteps=total_timesteps, callback=checkpoint_callback, progress_bar=True)
 
     # save the model
-    model.save("Training/Model/Case%s" %n_case)
+    model.save("Training/Model/Case%s/Case%s" %(n_case, n_case))
 
 
 # DONE: why the model does not end -- Ans: the n_steps was much larger than total_timesteps
