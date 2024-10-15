@@ -3,20 +3,30 @@
 Minimize
  
 Subject To
- Power_flow_Q_7_1_23: - 0.0134425540852762 c_ijt[7,1,23]
-   - 0.0134425540852762 c_iit[7,23] + Q_ijt[7,1,23] = 0
- cosine_lowerbound_7_23: c_iit[7,23] >= 96410.25
- Phase_angle_diff_upper_7_1_23: theta[7,1,23] <= 0.5235987755982988
- Phase_angle_diff_lower_7_1_23: theta[7,1,23] >= -0.5235987755982988
- c_ijt_7_1_23: c_ijt[7,1,23] + [ - cosine[7,1,23] * v_sqrt[7,1,23] ] = 0
- Line_loading_7_1_23: [ P_ijt[7,1,23] ^2 + Q_ijt[7,1,23] ^2 ] <= 62500
+ Power_flow_P_8_3_23: - 1.36518771331058 c_ijt[8,3,23]
+   - 11.60409556313993 s_ijt[8,3,23] - 1.36518771331058 c_iit[8,23]
+   + P_ijt[8,3,23] = 0
+ Power_flow_Q_8_3_23: - 11.60409556313993 c_ijt[8,3,23]
+   + 1.36518771331058 s_ijt[8,3,23] - 11.60409556313993 c_iit[8,23]
+   + Q_ijt[8,3,23] = 0
+ cosine_lowerbound_3_23: c_iit[3,23] >= 0.81
+ Voltage_lowerbound_8_23: V[8,23] >= 0.9
+ Phase_angle_diff_upper_8_3_23: theta[8,3,23] <= 0.5235987755982988
+ Phase_angle_diff_lower_8_3_23: theta[8,3,23] >= -0.5235987755982988
+ c_iit_3_23: c_iit[3,23] + [ - V[3,23] ^2 ] = 0
+ v_sqrt_8_3_23: v_sqrt[8,3,23] + [ - V[3,23] * V[8,23] ] = 0
+ c_ijt_8_3_23: c_ijt[8,3,23] + [ - cosine[8,3,23] * v_sqrt[8,3,23] ] = 0
+ Line_loading_8_3_23: [ P_ijt[8,3,23] ^2 + Q_ijt[8,3,23] ^2 ] <= 6.25
 Bounds
- theta[7,1,23] free
- cosine[7,1,23] free
- c_ijt[7,1,23] free
- c_iit[7,23] free
- P_ijt[7,1,23] free
- Q_ijt[7,1,23] free
+ V[3,23] free
+ V[8,23] free
+ theta[8,3,23] free
+ cosine[8,3,23] free
+ c_ijt[8,3,23] free
+ s_ijt[8,3,23] free
+ c_iit[3,23] free
+ P_ijt[8,3,23] free
+ Q_ijt[8,3,23] free
 General Constraints
- GC334: cosine[7,1,23] = COS ( theta[7,1,23] )
+ GC430: cosine[8,3,23] = COS ( theta[8,3,23] )
 End

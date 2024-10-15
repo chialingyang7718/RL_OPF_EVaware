@@ -3,26 +3,23 @@
 Minimize
  
 Subject To
- Power_flow_Q_20_21_23: - 40 c_ijt[20,21,23] - 20 s_ijt[20,21,23]
+ Power_flow_P_20_21_23: - 20 c_ijt[20,21,23] - 40 s_ijt[20,21,23]
+   - 20 c_iit[20,23] + P_ijt[20,21,23] = 0
+ Power_flow_Q_20_21_23: - 40 c_ijt[20,21,23] + 20 s_ijt[20,21,23]
    - 40 c_iit[20,23] + Q_ijt[20,21,23] = 0
  cosine_lowerbound_20_23: c_iit[20,23] >= 0.9025
- cosine_upperbound_21_23: c_iit[21,23] <= 1.21
  Phase_angle_diff_upper_20_21_23: theta[20,21,23] <= 0.5235987755982988
  Phase_angle_diff_lower_20_21_23: theta[20,21,23] >= -0.5235987755982988
- c_iit_20_23: c_iit[20,23] + [ - V[20,23] ^2 ] = 0
- c_iit_21_23: c_iit[21,23] + [ - V[21,23] ^2 ] = 0
- v_sqrt_20_21_23: v_sqrt[20,21,23] + [ - V[20,23] * V[21,23] ] = 0
  c_ijt_20_21_23: c_ijt[20,21,23] + [ - cosine[20,21,23] * v_sqrt[20,21,23]
    ] = 0
- SOCP_20_21_23: [ c_ijt[20,21,23] ^2 + s_ijt[20,21,23] ^2
-   - c_iit[20,23] * c_iit[21,23] ] <= 0
  Line_loading_20_21_23: [ P_ijt[20,21,23] ^2 + Q_ijt[20,21,23] ^2 ]
-   <= 1024
+   <= 0.1024
 Bounds
- -6.283185307179586 <= theta[20,21,23] <= 6.283185307179586
- -1 <= cosine[20,21,23] <= 1
+ theta[20,21,23] free
+ cosine[20,21,23] free
  c_ijt[20,21,23] free
  s_ijt[20,21,23] free
+ c_iit[20,23] free
  P_ijt[20,21,23] free
  Q_ijt[20,21,23] free
 General Constraints
