@@ -49,7 +49,6 @@ if __name__ == "__main__":
     grid = load_test_case_grid(n_case)
 
     # Parameters
-    # env_id = "PowerGrid-v1"
     env_id = "PowerGrid-v1"
     num_envs = 6
     EV_aware = True
@@ -100,7 +99,7 @@ if __name__ == "__main__":
             net_arch=dict(pi=[NN_size, NN_size, NN_size], vf=[NN_size, NN_size, NN_size])  # 3 layers
         )
         n_steps = 60
-        total_timesteps = 100000 * (int(n_case/10) + 3)
+        total_timesteps = 100000 * (int(n_case/10) + 5)
         
     def create_unique_soc_log_path(base_log_dir):
         # Ensure the base log directory exists
@@ -139,21 +138,26 @@ if __name__ == "__main__":
         name_prefix="Case%s_model"%n_case,
     )
 
-    # create the agent
+    # create the agent or reload the model
+    if os.path.exists("Training/Model/Case%s.zip" %n_case):    # check if the model exists:
+        model = PPO.load("Training/Model/Case%s" %n_case)
+        # total_timesteps = 500000
+    else:
+        model = PPO(
+            policy="MlpPolicy",
+            env=env,
+            n_steps=n_steps,
+            batch_size= int(num_envs* n_steps/10),
+            gamma=0.99,
+            verbose=0,
+            policy_kwargs=policy_kwargs,
+            tensorboard_log=log_path,
+        )
 
-    model = PPO(
-        policy="MlpPolicy",
-        env=env,
-        n_steps=n_steps,
-        gamma=0.99,
-        verbose=0,
-        policy_kwargs=policy_kwargs,
-        tensorboard_log=log_path,
-    )
 
     # train the agent
     if EV_aware:
-        # model.learn(total_timesteps=500000, callback=[soc_callback], progress_bar=True)
+        # model.learn(total_timesteps=60, progress_bar=True)
         model.learn(total_timesteps=total_timesteps, callback=checkpoint_callback, progress_bar=True)
 
     # save the model
