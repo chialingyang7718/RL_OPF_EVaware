@@ -26,13 +26,13 @@ import math
 
 
 # initialize the vectorized environment
-def make_env(env_id, net, dispatching_interval, EVaware, Training, rank):
+def make_env(env_id, net, dispatching_interval, EVScenario, Training, rank):
     def _init():
         env = gym.make(
             env_id,
             net=net,
             dispatching_intervals=dispatching_interval,
-            EVaware=EVaware,
+            EVScenario=EVScenario,
             Training=Training,
         )
         env.reset(seed=rank)
@@ -41,67 +41,14 @@ def make_env(env_id, net, dispatching_interval, EVaware, Training, rank):
 
     return _init
 
+# find the nearest power of 2 to the number of buses
+def nearestPowerOf2(N):
+    a = int(math.log2(N))
+    if 2**a == N:
+        return N
+    return 2 ** (a + 1)  # return the ceiling of the power of 2
 
-if __name__ == "__main__":
-
-    # Load the grid
-    n_case = 30
-    grid = load_test_case_grid(n_case)
-
-    # Parameters
-    env_id = "PowerGrid-v1"
-    num_envs = 6
-    EV_aware = True
-    Training = True
-
-
-    # Create the vectorized environment
-    env = SubprocVecEnv(
-        [
-            make_env(
-                env_id,
-                net=grid,
-                dispatching_interval=24,
-                EVaware=EV_aware,
-                Training=Training,
-                rank=i,
-            )
-            for i in range(num_envs)
-        ]
-    )
-
-    # create the log path
-    log_path = os.path.join("Training", "Logs", "Case%s" % n_case)
-
-    # custom MLP policy: network depends on the observation space, indirectly, the number of buses
-    # first, we need to find the nearest power of 2 to the number of buses
-    def nearestPowerOf2(N):
-        a = int(math.log2(N))
-        if 2**a == N:
-            return N
-        return 2 ** (a + 1)  # return the ceiling of the power of 2
-
-    # choose a network size that is slightly larger than observation space
-    NN_size = nearestPowerOf2(n_case * 4)  
-    
-
-    # the policy network architecture (if the number of buses is less than 20, 2 layers; otherwise, 3 layers)
-    if n_case <= 20:
-        policy_kwargs = dict(
-            activation_fn=th.nn.Tanh,
-            net_arch=dict(pi=[NN_size, NN_size], vf=[NN_size, NN_size])  # 2 layers
-        )
-        n_steps = 120
-        total_timesteps = 100000 * (int(n_case/10) + 1)
-    elif n_case > 20:
-        policy_kwargs = dict(
-            activation_fn=th.nn.Tanh,
-            net_arch=dict(pi=[NN_size, NN_size, NN_size], vf=[NN_size, NN_size, NN_size])  # 3 layers
-        )
-        n_steps = 60
-        total_timesteps = 100000 * (int(n_case/10) + 5)
-        
-    def create_unique_soc_log_path(base_log_dir):
+def create_unique_soc_log_path(base_log_dir):
         # Ensure the base log directory exists
         os.makedirs(base_log_dir, exist_ok=True)
 
@@ -127,42 +74,96 @@ if __name__ == "__main__":
 
         return new_soc_dir_path
 
-    # initialize callback
-    # soc_log_path = create_unique_soc_log_path(os.path.join(log_path, "SOC"))
-    # soc_callback = SOCCallback(log_dir=soc_log_path)
+if __name__ == "__main__":
 
-    # create checkpoint callback
-    checkpoint_callback = CheckpointCallback(
-        save_freq=math.floor(num_envs*total_timesteps/100000),
-        save_path=os.path.join(log_path, "Checkpoints"),
-        name_prefix="Case%s_model"%n_case,
-    )
+    # Load the grid
+    n_case = 30
+    grid = load_test_case_grid(n_case)
 
-    # create the agent or reload the model
-    if os.path.exists("Training/Model/Case%s/Case%s.zip" %(n_case, n_case)):    # check if the model exists:
-        model = PPO.load("Training/Model/Case%s/Case%s" %(n_case, n_case))
-        # total_timesteps = 500000
-    else:
-        model = PPO(
-            policy="MlpPolicy",
-            env=env,
-            n_steps=n_steps,
-            batch_size= int(num_envs* n_steps/10),
-            gamma=0.99,
-            verbose=0,
-            policy_kwargs=policy_kwargs,
-            tensorboard_log=log_path,
+    # Parameters
+    env_id = "PowerGrid-v1"
+    num_envs = 6
+    Training = True
+    EVScenarios = ["ImmediateFull", "ImmediateBalanced", "Home", "Night"]
+    
+    for i in [1]:
+    # for i in [0, 1, 2, 3]:
+        EVScenario = EVScenarios[i]
+
+        # Create the vectorized environment
+        env = SubprocVecEnv(
+            [
+                make_env(
+                    env_id,
+                    net=grid,
+                    dispatching_interval=24,
+                    EVScenario=EVScenario,
+                    Training=Training,
+                    rank=i,
+                )
+                for i in range(num_envs)
+            ]
         )
 
+        # create the log path
+        log_path = os.path.join("Training", "Logs", "Case%s", EVScenario % n_case)
 
-    # train the agent
-    if EV_aware:
-        # model.learn(total_timesteps=60, progress_bar=True)
-        model.learn(total_timesteps=total_timesteps, callback=checkpoint_callback, progress_bar=True)
+        # custom MLP policy: network depends on the observation space, indirectly, the number of buses
 
-    # save the model
-    model.save("Training/Model/Case%s/Case%s" %(n_case, n_case))
 
+        # choose a network size that is slightly larger than observation space
+        NN_size = nearestPowerOf2(n_case * 4)  
+        
+
+        # the policy network architecture (if the number of buses is less than 20, 2 layers; otherwise, 3 layers)
+        if n_case <= 20:
+            n_steps = 120
+            total_timesteps = 100000 * (int(n_case/10) + 3)
+        elif n_case > 20:
+            n_steps = 60
+            total_timesteps = 100000 * (int(n_case/10) + 5)
+        
+        n_layers = 2 + int(n_case/10)
+        policy_kwargs = dict(
+                activation_fn=th.nn.Tanh,
+                net_arch=dict(pi=[NN_size] * n_layers, vf=[NN_size] * min(n_layers, 3))  # at max 3 layers for value function
+            )
+
+        # initialize callback
+        # soc_log_path = create_unique_soc_log_path(os.path.join(log_path, "SOC"))
+        # soc_callback = SOCCallback(log_dir=soc_log_path)
+
+        # create checkpoint callback
+        checkpoint_callback = CheckpointCallback(
+            save_freq=math.floor(total_timesteps/100000),
+            save_path=os.path.join(log_path, "Checkpoints"),
+            name_prefix="Case%s_model"%n_case,
+        )
+
+        # create the agent or reload the model
+        if os.path.exists("Training/Model/Case%s/Case%s_" + EVScenario + ".zip" %(n_case, n_case)):    # check if the model exists:
+            model = PPO.load("Training/Model/Case%s/Case%s_" + EVScenario %(n_case, n_case))
+            # total_timesteps = 500000
+        else:
+            model = PPO(
+                policy="MlpPolicy",
+                env=env,
+                n_steps=n_steps,
+                batch_size= int(num_envs* n_steps/10),
+                gamma=0.99,
+                verbose=0,
+                policy_kwargs=policy_kwargs,
+                tensorboard_log=log_path,
+            )
+
+        # train the agent
+        if EVScenario is not None:
+            # model.learn(total_timesteps=60, progress_bar=True)
+            model.learn(total_timesteps=total_timesteps, callback=checkpoint_callback, progress_bar=True)
+
+        # save the model
+        model.save("Training/Model/Case%s/Case%s_" + EVScenario %(n_case, n_case))
+        env.close()
 
 # DONE: why the model does not end -- Ans: the n_steps was much larger than total_timesteps
 # DONE: implement time series data for simple case

@@ -10,7 +10,7 @@ _ The max. power capacity of the generators is uniformly distributed between PGm
 Assumptions --- EV
 - The EVs are connected to the same bus as the loads.
 - The number of EV in a EV group is the integer of nominal power of the loads.
-- The EVs in the same group have the same spec (max_mwh, (dis)charging eff.) and driving profile: SOCImmediateBalanced
+- The EVs in the same group have the same spec (max_mwh, (dis)charging eff.) and driving profile
 - Assume the EVs are connected in parallel.
 - The maximum EV (dis)charging power is 50 kW.
 
@@ -42,7 +42,7 @@ import simbench as sb
 # Create a custom environment
 class PowerGrid(Env):
     def __init__(
-        self, net, stdD=1, dispatching_intervals=24, EVaware=True, Training=False
+        self, net, stdD=1, dispatching_intervals=24, EVScenario=None, Training=False
     ):  # assuming dispatching intervals = number of hours in a day
         # inheritance from the parent class gymnasium.Env
         super(PowerGrid, self).__init__()
@@ -61,11 +61,11 @@ class PowerGrid(Env):
         # assign other parameters
         self.stdD = stdD  # standard deviation of any random normal distribution
         self.dispatching_intervals = dispatching_intervals  # number of dispatching intervals
-        self.EVaware = EVaware  # whether to consider the EV element
+        self.EVScenario = EVScenario  # define the EV scenario
         self.training = Training
 
-        # implement EVaware
-        if self.EVaware == True:
+        # implement EV element
+        if self.EVScenario is not None:
 
             # load EV spec and driving profiles
             self.load_EV_spec_profiles()
@@ -165,7 +165,7 @@ class PowerGrid(Env):
             "generation_cost": gen_cost,
         }
 
-        if self.EVaware == True:
+        if self.EVScenario is not None:
             # record the EV related info
             info["EV_demand"] = self.EV_power_demand
             info["EV_p"] = self.net.res_storage.loc[:, "p_mw"]
@@ -186,7 +186,7 @@ class PowerGrid(Env):
             self.add_noice_load_renew_state()
 
             # update EV state for the next time step
-            if self.EVaware == True:
+            if self.EVScenario is not None:
                 self.update_EV_state(time_step)
 
         # get observation for the next state
@@ -207,7 +207,7 @@ class PowerGrid(Env):
         self.add_noice_load_renew_state()
 
         # assign initial state for EV SOC
-        if self.EVaware == True:
+        if self.EVScenario is not None:
             # reselect another day for the EV profile randomly
             self.net.storage.loc[:, "soc_percent"] = (
                 self.select_randomly_day_EV_profile()
@@ -324,22 +324,17 @@ class PowerGrid(Env):
 
 
         # assign the load limits (PQ bus)
-        PLmax = (
-            self.net.load.loc[:, "p_mw"] * 1.5
-        )  # ASSUMPTION: the max active power consumption is 1.5 times the default value in the net
+        PLmax = (self.net.load.loc[:, "p_mw"] * 1.4)  # ASSUMPTION: the max active power consumption is 1.4 times the default value in the net
+        PLmin = self.net.load.loc[:, "p_mw"] * 0.6  # ASSUMPTION: the min active power consumption is 0.6 times the default value in the net
         self.PLmax = PLmax.to_numpy().flatten("F").astype(np.float64)
-        self.PLmin = np.zeros(self.NL)  # ASSUMPTION: the min active power consumption is 0 MW
-        QLmax = (
-            abs(self.net.load.loc[:, "q_mvar"]) * 1.5
-        )  # ASSUMPTION: the max reactive power consumption is 1.5 times the default value in the net
+        self.PLmin = PLmin.to_numpy().flatten("F").astype(np.float64)
+        QLmax = (abs(self.net.load.loc[:, "q_mvar"]) * 1.4)  # ASSUMPTION: the max reactive power consumption is 1.5 times the default value in the net
         self.QLmax = QLmax.to_numpy().flatten("F").astype(np.float64)
-        self.QLmin = (
-            -self.QLmax
-        )  # ASSUMPTION: the reactive power consumption range is zero-centered
+        self.QLmin = (-self.QLmax)  # ASSUMPTION: the reactive power consumption range is zero-centered
 
 
         # assign the EV limits
-        if self.EVaware == True:
+        if self.EVScenario is not None:
             # initialize the EV charging limit
             self.PEVmax = np.zeros(self.N_EV)
             self.PEVmin = np.zeros(self.N_EV)
@@ -360,7 +355,7 @@ class PowerGrid(Env):
         for i in range(self.N_EV):
             # fetch EV power demand from the EV profile
             EV_power_demand = (
-                self.df_EV.loc[(i, time_step), "ChargingPowerImmediateBalanced_kW"]
+                self.df_EV.loc[(i, time_step), "ChargingPower"+self.EVScenario+"_kW"]
                 * self.net.storage.loc[i, "n_car"]
                 / 1000
             )  # power requirement from cars in MW
@@ -400,7 +395,7 @@ class PowerGrid(Env):
         self.mu_QL = self.net.load.loc[:, ["q_mvar"]].to_numpy()
         self.PGcap = np.random.uniform(self.PGmin, self.PGmax)
         # concatenate state
-        if self.EVaware == False:
+        if self.EVScenario is None:
             state = np.concatenate(
                 (
                     self.mu_PL.flatten("F").astype(np.float32),
@@ -410,7 +405,7 @@ class PowerGrid(Env):
                 axis=None,
             )
         else:
-            # randomly select SOC of the EVs under ImmediateBalanced condition as the initial SOC
+            # randomly select SOC of the EVs under defined EV scenario as the initial SOC
             initial_soc = self.select_randomly_day_EV_profile()
             self.net.storage.loc[:, "soc_percent"] = initial_soc
             state = np.concatenate(
@@ -436,7 +431,7 @@ class PowerGrid(Env):
 
             # fetch EV power demand from the EV profile
             EV_power_demand = (
-                self.df_EV.loc[(i, time_step), "ChargingPowerImmediateBalanced_kW"]
+                self.df_EV.loc[(i, time_step), "ChargingPower"+self.EVScenario+"_kW"]
                 * self.net.storage.loc[i, "n_car"]
                 / 1000
             )  # power requirement from cars in MW
@@ -589,7 +584,7 @@ class PowerGrid(Env):
         # randomly select the EV profile from the df_EV
         selected_day = random.randint(0, 364) * 24
         return self.df_EV.loc[
-            (slice(None), selected_day), "SOCImmediateBalanced"
+            (slice(None), selected_day), "SOC"+self.EVScenario
         ].to_numpy()
 
     # normalize the value to the range of space
@@ -635,7 +630,7 @@ class PowerGrid(Env):
             )
 
         # directly assign the SOC of the EVs to the observation
-        if self.EVaware == True:
+        if self.EVScenario is not None:
             normalized_obs.extend(self.state[self.NL * 2 + self.NG :])
 
         return np.array(normalized_obs).astype(np.float32)
@@ -723,10 +718,10 @@ class PowerGrid(Env):
             # violated_phase = []
 
         # EV SOC violation
-        if self.EVaware:
+        if self.EVScenario is not None:
             penalty_EV = 0
             for i in range(self.N_EV):
-                SOC_threshold = self.df_EV.loc[(i, time_step), "SOCImmediateBalanced"]
+                SOC_threshold = self.df_EV.loc[(i, time_step), "SOC"+self.EVScenario]
                 SOC_value = self.net.storage.loc[i, "soc_percent"]
                 if SOC_threshold > SOC_value:
                     self.violation = True
