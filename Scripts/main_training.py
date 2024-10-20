@@ -77,7 +77,7 @@ def create_unique_soc_log_path(base_log_dir):
 if __name__ == "__main__":
 
     # Load the grid
-    n_case = 30
+    n_case = 57
     grid = load_test_case_grid(n_case)
 
     # Parameters
@@ -106,7 +106,7 @@ if __name__ == "__main__":
         )
 
         # create the log path
-        log_path = os.path.join("Training", "Logs", "Case%s", EVScenario % n_case)
+        log_path = os.path.join("Training", "Logs", "Case%s_%s" % (n_case, EVScenario))
 
         # custom MLP policy: network depends on the observation space, indirectly, the number of buses
 
@@ -119,15 +119,31 @@ if __name__ == "__main__":
         if n_case <= 20:
             n_steps = 120
             total_timesteps = 100000 * (int(n_case/10) + 3)
+            n_layers = 2 + int(n_case/10)
+            policy_kwargs = dict(
+                    activation_fn=th.nn.Tanh,
+                    net_arch=dict(pi=[NN_size] * n_layers, vf=[NN_size] * min(n_layers, 3))  # at max 3 layers for value function
+                )
+
         elif n_case > 20:
             n_steps = 60
             total_timesteps = 100000 * (int(n_case/10) + 5)
+            if n_case == 30:
+                policy_kwargs = dict(
+                        activation_fn=th.nn.Tanh,
+                        net_arch=dict(pi=[NN_size*4, NN_size*2, NN_size*2, NN_size, NN_size], vf=[NN_size*4, int(NN_size/2), int(NN_size/4)])  # at max 3 layers for value function
+                    )
+            elif n_case == 39:
+                policy_kwargs = dict(
+                        activation_fn=th.nn.Tanh,
+                        net_arch=dict(pi=[NN_size*4, NN_size*2, NN_size*2, NN_size*2, NN_size, NN_size], vf=[NN_size*4, int(NN_size/2), int(NN_size/4)])  # at max 3 layers for value function
+                    )
+            elif n_case == 57:
+                policy_kwargs = dict(
+                        activation_fn=th.nn.Tanh,
+                        net_arch=dict(pi=[NN_size*4, NN_size*2, NN_size*2, NN_size*2, NN_size, NN_size], vf=[NN_size*4, int(NN_size/2), int(NN_size/4)])  # at max 3 layers for value function
+                    )
         
-        n_layers = 2 + int(n_case/10)
-        policy_kwargs = dict(
-                activation_fn=th.nn.Tanh,
-                net_arch=dict(pi=[NN_size] * n_layers, vf=[NN_size] * min(n_layers, 3))  # at max 3 layers for value function
-            )
 
         # initialize callback
         # soc_log_path = create_unique_soc_log_path(os.path.join(log_path, "SOC"))
@@ -135,14 +151,14 @@ if __name__ == "__main__":
 
         # create checkpoint callback
         checkpoint_callback = CheckpointCallback(
-            save_freq=math.floor(total_timesteps/100000),
+            save_freq=20000,
             save_path=os.path.join(log_path, "Checkpoints"),
             name_prefix="Case%s_model"%n_case,
         )
 
         # create the agent or reload the model
-        if os.path.exists("Training/Model/Case%s/Case%s_" + EVScenario + ".zip" %(n_case, n_case)):    # check if the model exists:
-            model = PPO.load("Training/Model/Case%s/Case%s_" + EVScenario %(n_case, n_case))
+        if os.path.exists("Training/Model/Case%s/Case%s_%s.zip" %(n_case, n_case, EVScenario)):    # check if the model exists:
+            model = PPO.load("Training/Model/Case%s/Case%s_%s" %(n_case, n_case, EVScenario))
             # total_timesteps = 500000
         else:
             model = PPO(
@@ -162,7 +178,7 @@ if __name__ == "__main__":
             model.learn(total_timesteps=total_timesteps, callback=checkpoint_callback, progress_bar=True)
 
         # save the model
-        model.save("Training/Model/Case%s/Case%s_" + EVScenario %(n_case, n_case))
+        model.save("Training/Model/Case%s/Case%s_%s" %(n_case, n_case, EVScenario))
         env.close()
 
 # DONE: why the model does not end -- Ans: the n_steps was much larger than total_timesteps

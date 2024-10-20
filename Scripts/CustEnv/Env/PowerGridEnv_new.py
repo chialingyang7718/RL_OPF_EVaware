@@ -372,17 +372,19 @@ class PowerGrid(Env):
 
     def add_noice_load_renew_state(self):
         # add some noice to PL and QL
-        for i in self.net.load.index:
-            while True:
-                random_PL = np.random.normal(self.mu_PL[i], self.stdD)
-                if self.PLmin[i] <= random_PL <= self.PLmax[i]:
-                    self.state[i] = random_PL
-                    break
-            while True:
-                random_QL = np.random.normal(self.mu_QL[i], self.stdD)
-                if self.QLmin[i] <= random_QL <= self.QLmax[i]:
-                    self.state[i + self.NL] = random_QL
-                    break
+        # for i in self.net.load.index:
+        #     while True:
+        #         random_PL = np.random.normal(self.mu_PL[i], self.stdD)
+        #         if self.PLmin[i] <= random_PL <= self.PLmax[i]:
+        #             self.state[i] = random_PL
+        #             break
+        #     while True:
+        #         random_QL = np.random.normal(self.mu_QL[i], self.stdD)
+        #         if self.QLmin[i] <= random_QL <= self.QLmax[i]:
+        #             self.state[i + self.NL] = random_QL
+        #             break
+        self.state[: self.NL] = np.random.uniform(self.PLmin, self.PLmax)
+        self.state[self.NL : 2 * self.NL] = np.random.uniform(self.QLmin, self.QLmax)
 
         # add some noice to PGcap
         self.PGcap = np.random.uniform(self.PGmin, self.PGmax)
