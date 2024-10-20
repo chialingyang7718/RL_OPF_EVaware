@@ -145,6 +145,7 @@ if __name__ == "__main__":
                     )
         
 
+
         # initialize callback
         # soc_log_path = create_unique_soc_log_path(os.path.join(log_path, "SOC"))
         # soc_callback = SOCCallback(log_dir=soc_log_path)
@@ -154,7 +155,7 @@ if __name__ == "__main__":
             save_freq=20000,
             save_path=os.path.join(log_path, "Checkpoints"),
             name_prefix="Case%s_model"%n_case,
-        )
+            )
 
         # create the agent or reload the model
         if os.path.exists("Training/Model/Case%s/Case%s_%s.zip" %(n_case, n_case, EVScenario)):    # check if the model exists:
