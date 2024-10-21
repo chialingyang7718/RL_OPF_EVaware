@@ -63,6 +63,7 @@ class PowerGrid(Env):
         self.dispatching_intervals = dispatching_intervals  # number of dispatching intervals
         self.EVScenario = EVScenario  # define the EV scenario
         self.training = Training
+        self.SOCviolation = 0
 
         # implement EV element
         if self.EVScenario is not None:
@@ -170,6 +171,7 @@ class PowerGrid(Env):
             info["EV_demand"] = self.EV_power_demand
             info["EV_p"] = self.net.res_storage.loc[:, "p_mw"]
             info["EV_SOC_beginning"] = self.net.storage.loc[:, "soc_percent"]
+            info["soc_violation"] = self.SOCviolation
 
         # decrease the episode length and update time step
         self.episode_length -= 1
@@ -727,7 +729,10 @@ class PowerGrid(Env):
                 SOC_value = self.net.storage.loc[i, "soc_percent"]
                 if SOC_threshold > SOC_value:
                     self.violation = True
+                    self.SOCviolation = 1
                     penalty_EV += (SOC_value - SOC_threshold) * 1000
+                else:
+                    self.SOCviolation = 0
 
         # assign rewards based on the violation condition and generation cost
         if self.violation == True:
