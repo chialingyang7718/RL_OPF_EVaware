@@ -77,7 +77,7 @@ def create_unique_soc_log_path(base_log_dir):
 if __name__ == "__main__":
 
     # Load the grid
-    n_case = 57
+    n_case = int(input("Enter Test Case Number (9, 14, 30, 39, 57, 118...): "))
     grid = load_test_case_grid(n_case)
 
     # Parameters
@@ -86,8 +86,8 @@ if __name__ == "__main__":
     Training = True
     EVScenarios = ["ImmediateFull", "ImmediateBalanced", "Home", "Night"]
     
-    for i in [1]:
-    # for i in [0, 1, 2, 3]:
+    # for i in [1]:
+    for i in [0, 1, 2, 3]:
         EVScenario = EVScenarios[i]
 
         # Create the vectorized environment
@@ -113,12 +113,12 @@ if __name__ == "__main__":
 
         # choose a network size that is slightly larger than observation space
         NN_size = nearestPowerOf2(n_case * 4)  
-        
+
 
         # the policy network architecture (if the number of buses is less than 20, 2 layers; otherwise, 3 layers)
         if n_case <= 20:
             n_steps = 120
-            total_timesteps = 100000 * (int(n_case/10) + 3)
+
             n_layers = 2 + int(n_case/10)
             policy_kwargs = dict(
                     activation_fn=th.nn.Tanh,
@@ -127,21 +127,20 @@ if __name__ == "__main__":
 
         elif n_case > 20:
             n_steps = 60
-            total_timesteps = 100000 * (int(n_case/10) + 5)
             if n_case == 30:
                 policy_kwargs = dict(
                         activation_fn=th.nn.Tanh,
-                        net_arch=dict(pi=[NN_size*4, NN_size*2, NN_size*2, NN_size, NN_size], vf=[NN_size*4, int(NN_size/2), int(NN_size/4)])  # at max 3 layers for value function
+                        net_arch=dict(pi=[NN_size*4, NN_size*2, NN_size*2, NN_size, NN_size], vf=[NN_size*4, int(NN_size/2), int(NN_size/4)])  
                     )
             elif n_case == 39:
                 policy_kwargs = dict(
                         activation_fn=th.nn.Tanh,
-                        net_arch=dict(pi=[NN_size*4, NN_size*2, NN_size*2, NN_size*2, NN_size, NN_size], vf=[NN_size*4, int(NN_size/2), int(NN_size/4)])  # at max 3 layers for value function
+                        net_arch=dict(pi=[NN_size*4, NN_size*2, NN_size*2, NN_size*2, NN_size, NN_size], vf=[NN_size*4, int(NN_size/2), int(NN_size/4)])  
                     )
             elif n_case == 57:
                 policy_kwargs = dict(
                         activation_fn=th.nn.Tanh,
-                        net_arch=dict(pi=[NN_size*4, NN_size*2, NN_size*2, NN_size*2, NN_size, NN_size], vf=[NN_size*4, int(NN_size/2), int(NN_size/4)])  # at max 3 layers for value function
+                        net_arch=dict(pi=[NN_size*4, NN_size*2, NN_size*2, NN_size*2, NN_size, NN_size], vf=[NN_size*4, int(NN_size/2), int(NN_size/4)]) 
                     )
         
 
@@ -159,8 +158,10 @@ if __name__ == "__main__":
 
         # create the agent or reload the model
         if os.path.exists("Training/Model/Case%s/Case%s_%s.zip" %(n_case, n_case, EVScenario)):    # check if the model exists:
-            model = PPO.load("Training/Model/Case%s/Case%s_%s" %(n_case, n_case, EVScenario))
-            # total_timesteps = 500000
+            model = PPO.load("Training/Model/Case%s/Case%s_%s" %(n_case, n_case, EVScenario), env=env)
+            # Continue training the model
+            model.learn(total_timesteps=200000, reset_num_timesteps=False, tb_log_name="PPO_continue", callback=checkpoint_callback, progress_bar=True)
+
         else:
             model = PPO(
                 policy="MlpPolicy",
@@ -172,11 +173,11 @@ if __name__ == "__main__":
                 policy_kwargs=policy_kwargs,
                 tensorboard_log=log_path,
             )
-
-        # train the agent
-        if EVScenario is not None:
+            # total_timesteps = 100000 * (int(n_case/10) + 5)
+            total_timesteps = 500000
             # model.learn(total_timesteps=60, progress_bar=True)
             model.learn(total_timesteps=total_timesteps, callback=checkpoint_callback, progress_bar=True)
+
 
         # save the model
         model.save("Training/Model/Case%s/Case%s_%s" %(n_case, n_case, EVScenario))

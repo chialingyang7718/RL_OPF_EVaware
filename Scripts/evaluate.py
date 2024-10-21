@@ -17,6 +17,7 @@ import pandas as pd
 import os
 import seaborn as sns
 import time
+import pickle
 
 
 def evaluate_PPO_model(n_steps=24, n_case=14, EVScenario=None, model=None):
@@ -184,11 +185,17 @@ def evaluate_PPO_model(n_steps=24, n_case=14, EVScenario=None, model=None):
                     [df_phase_angle_violation, pd.DataFrame([])]
                 )
 
+            # SOC Violation
+            if info["soc_violation"]:
+                SOCviolation = 1
+            else:
+                SOCviolation = 0
+
             # Generation Cost
             generation_cost.append(info["generation_cost"])
 
         if terminated or truncated:
-            print(f"Episode finished after {step + 1} steps")
+            # print(f"Episode finished after {step + 1} steps")
 
             # Set dataframes index
             df_load_p.reset_index(drop=True, inplace=True)
@@ -206,78 +213,105 @@ def evaluate_PPO_model(n_steps=24, n_case=14, EVScenario=None, model=None):
             df_phase_angle_violation.reset_index(drop=True, inplace=True)
             df_generation_cost = pd.DataFrame(generation_cost)
 
-            # Create the directory if it does not exist
-            if not os.path.exists("Evaluation/Case%s/Case%s_%s" %(n_case, n_case, EVScenario)):
-                os.makedirs("Evaluation/Case%s/Case%s_%s" %(n_case, n_case, EVScenario))
-
             # Save the dataframes to a csv file
-            df_EV_spec.to_csv("Evaluation/Case%s/Case%s_%s/EV_spec.csv" %(n_case, n_case, EVScenario), index=False)
-            df_load_p.to_csv("Evaluation/Case%s/Case%s_%s/load_p.csv" %(n_case, n_case, EVScenario), index=False)
-            df_load_q.to_csv("Evaluation/Case%s/Case%s_%s/load_q.csv" %(n_case, n_case, EVScenario), index=False)
-            df_renewable.to_csv("Evaluation/Case%s/Case%s_%s/renewable.csv" %(n_case, n_case, EVScenario), index=False)
-            df_ev_demand.to_csv("Evaluation/Case%s/Case%s_%s/ev_demand.csv" %(n_case, n_case, EVScenario), index=False)
-            df_ev_soc.to_csv("Evaluation/Case%s/Case%s_%s/ev_soc.csv" %(n_case, n_case, EVScenario), index=False)
-            df_gen_p.to_csv("Evaluation/Case%s/Case%s_%s/gen_p.csv" %(n_case, n_case, EVScenario), index=False)
-            df_gen_v.to_csv("Evaluation/Case%s/Case%s_%s/gen_v.csv" %(n_case, n_case, EVScenario), index=False)
-            df_ev_action.to_csv("Evaluation/Case%s/Case%s_%s/ev_action.csv" %(n_case, n_case, EVScenario), index=False)
-            df_voltage.to_csv("Evaluation/Case%s/Case%s_%s/voltage.csv" %(n_case, n_case, EVScenario), index=False)
-            df_line_loading.to_csv("Evaluation/Case%s/Case%s_%s/line_loading.csv" %(n_case, n_case, EVScenario), index=False)
-            df_bus_violation.to_csv(
-                "Evaluation/Case%s/Case%s_%s/bus_violation.csv" %(n_case, n_case, EVScenario), index=False
-            )
-            df_line_violation.to_csv(
-                "Evaluation/Case%s/Case%s_%s/line_violation.csv" %(n_case, n_case, EVScenario), index=False
-            )
-            df_phase_angle_violation.to_csv(
-                "Evaluation/Case%s/Case%s_%s/phase_angle_violation.csv" %(n_case, n_case, EVScenario), index=False
-            )
-            df_generation_cost.to_csv(
-                "Evaluation/Case%s/Case%s_%s/generation_cost.csv" %(n_case, n_case, EVScenario), index=False
-            )
+            # save_all_df_to_csv(n_case, EVScenario, df_EV_spec, df_load_p, df_load_q, df_renewable, df_ev_demand, df_ev_soc, df_gen_p, df_gen_v, df_ev_action, df_voltage, df_line_loading, df_bus_violation, df_line_violation, df_phase_angle_violation, df_generation_cost)
+            # Record the time taken for RL model prediction
+            Time = sum(RLtime)
+
+            # Record the total cost
+            Cost = sum(df_generation_cost[0])
+
+            # Record the violation
+            if len(df_bus_violation) & len(df_line_violation) & len(df_phase_angle_violation) & SOCviolation == 0:
+                N_violation = 0
+            else:
+                N_violation = 1
+
+            if len(df_bus_violation) & len(df_line_violation) & len(df_phase_angle_violation) == 0:
+                N_violation_relax = 0 
+            else:
+                N_violation_relax = 1
 
             # Reset the environment for a new episode
             obs, info = eval_env.reset()
     eval_env.close()
-    # return rewards, df_load_p, df_load_q, df_renewable, df_ev_demand, df_ev_soc, df_gen_p, df_gen_q, df_ev_action, df_voltage, df_line_loading
-    # return rewards, df_load_p, df_load_q, df_renewable, df_ev_demand,\
-    #         df_ev_soc, df_gen_p, df_gen_v, df_ev_action, df_voltage, \
-    #         df_line_loading, df_bus_violation, df_line_violation, df_generation_cost, RLtime
-    return rewards, df_generation_cost, RLtime
 
+    return rewards, Time, Cost, N_violation, N_violation_relax
 
-def visualization(df):
-    sns.lineplot(data=df)
+def save_all_df_to_csv(n_case, EVScenario, df_EV_spec, df_load_p, df_load_q, df_renewable, df_ev_demand, df_ev_soc, df_gen_p, df_gen_v, df_ev_action, df_voltage, df_line_loading, df_bus_violation, df_line_violation, df_phase_angle_violation, df_generation_cost):
+    # Create the directory if it does not exist
+        if not os.path.exists("Evaluation/Case%s/Case%s_%s" %(n_case, n_case, EVScenario)):
+            os.makedirs("Evaluation/Case%s/Case%s_%s" %(n_case, n_case, EVScenario))
 
+        # Save the dataframes to a csv file
+        df_EV_spec.to_csv("Evaluation/Case%s/Case%s_%s/EV_spec.csv" %(n_case, n_case, EVScenario), index=False)
+        df_load_p.to_csv("Evaluation/Case%s/Case%s_%s/load_p.csv" %(n_case, n_case, EVScenario), index=False)
+        df_load_q.to_csv("Evaluation/Case%s/Case%s_%s/load_q.csv" %(n_case, n_case, EVScenario), index=False)
+        df_renewable.to_csv("Evaluation/Case%s/Case%s_%s/renewable.csv" %(n_case, n_case, EVScenario), index=False)
+        df_ev_demand.to_csv("Evaluation/Case%s/Case%s_%s/ev_demand.csv" %(n_case, n_case, EVScenario), index=False)
+        df_ev_soc.to_csv("Evaluation/Case%s/Case%s_%s/ev_soc.csv" %(n_case, n_case, EVScenario), index=False)
+        df_gen_p.to_csv("Evaluation/Case%s/Case%s_%s/gen_p.csv" %(n_case, n_case, EVScenario), index=False)
+        df_gen_v.to_csv("Evaluation/Case%s/Case%s_%s/gen_v.csv" %(n_case, n_case, EVScenario), index=False)
+        df_ev_action.to_csv("Evaluation/Case%s/Case%s_%s/ev_action.csv" %(n_case, n_case, EVScenario), index=False)
+        df_voltage.to_csv("Evaluation/Case%s/Case%s_%s/voltage.csv" %(n_case, n_case, EVScenario), index=False)
+        df_line_loading.to_csv("Evaluation/Case%s/Case%s_%s/line_loading.csv" %(n_case, n_case, EVScenario), index=False)
+        df_bus_violation.to_csv(
+            "Evaluation/Case%s/Case%s_%s/bus_violation.csv" %(n_case, n_case, EVScenario), index=False
+        )
+        df_line_violation.to_csv(
+            "Evaluation/Case%s/Case%s_%s/line_violation.csv" %(n_case, n_case, EVScenario), index=False
+        )
+        df_phase_angle_violation.to_csv(
+            "Evaluation/Case%s/Case%s_%s/phase_angle_violation.csv" %(n_case, n_case, EVScenario), index=False
+        )
+        df_generation_cost.to_csv(
+            "Evaluation/Case%s/Case%s_%s/generation_cost.csv" %(n_case, n_case, EVScenario), index=False
+        )
 
 if __name__ == "__main__":
 
     EVScenarios = ["ImmediateFull", "ImmediateBalanced", "Home", "Night"]
-    EVScenario = EVScenarios[1]
-    n_case = 30
-    # Load the trained model
-    model = PPO.load("Training/Model/Case%s/Case%s_%s/" %(n_case,n_case, EVScenario))
+    n_case = int(input("Enter Test Case Number (9, 14, 30, 39, 57): "))
+    sample_size = int(input('Enter the number of samples: '))
+    # using dictionary comprehension to construct
+    Times = {EVScenario: [] for EVScenario in EVScenarios}
+    Costs = {EVScenario: [] for EVScenario in EVScenarios}
+    N_violations = {EVScenario: [] for EVScenario in EVScenarios}
+    N_violations_relax = {EVScenario: [] for EVScenario in EVScenarios}
 
-    # Evaluate the model
-    n_steps = 24
-    # rewards,  df_load_p, df_load_q, df_renewable, df_ev_demand, df_ev_soc, df_gen_p, df_gen_q, df_ev_action, df_voltage, df_line_loading = evaluate_PPO_model(n_steps=n_steps, n_case=14, model=model)
-    # rewards,  df_load_p, df_load_q, df_renewable, df_ev_demand,\
-    # df_ev_soc, df_gen_p, df_gen_v, df_ev_action, df_voltage,\
-    # df_line_loading, df_bus_vioation, df_line_violation, df_generation_cost, RLtime =\
-    rewards, df_generation_cost, RLtime = evaluate_PPO_model(
-        n_steps=n_steps, n_case=n_case, EVScenario=EVScenario, model=model
-    )
+    for random_seed in range(sample_size):
+        for i in range(len(EVScenarios)):
+            # Define Parameters
+            EVScenario = EVScenarios[i]
+            n_steps = 24
+            # Load the trained model
+            model = PPO.load("Training/Model/Case%s/Case%s_%s/" %(n_case, n_case, EVScenario))
+            model.set_random_seed(random_seed)
+            # Evaluate the model
+            rewards, Time, Cost, N_violation, N_violation_relax = evaluate_PPO_model(
+                n_steps=n_steps, n_case=n_case, EVScenario=EVScenario, model=model
+            )
+            Times[EVScenario].append(Time)
+            Costs[EVScenario].append(Cost)
+            N_violations[EVScenario].append(N_violation)
+            N_violations_relax[EVScenario].append(N_violation_relax)
 
-    print(f"Mean Reward: {sum(rewards)/n_steps}")
-    print(f"Total Time: {sum(RLtime)}")
+            # print(f"{EVScenario} Mean Reward: {sum(rewards)/n_steps}")
 
-    # Plot rewards over time
-    plt.plot(rewards, "-o")
-    plt.title("Reward at Each Time Step")
-    plt.xlabel("Time Steps")
-    plt.ylabel("Reward")
-    for i in range(len(rewards)):
-        plt.annotate("%s" % rewards[i], xy=(i, rewards[i]), textcoords="data")
-    plt.show()
+
+    # Save the metrics dicts
+    with open("Evaluation/Case%s/Case%s_metrics.pkl" %(n_case, n_case), "wb") as f:
+        pickle.dump([Times, Costs, N_violations, N_violations_relax], f)
+
+
+        # # Plot rewards over time
+        # plt.plot(rewards, "-o")
+        # plt.title("Reward at Each Time Step")
+        # plt.xlabel("Time Steps")
+        # plt.ylabel("Reward")
+        # for i in range(len(rewards)):
+        #     plt.annotate("%s" % rewards[i], xy=(i, rewards[i]), textcoords="data")
+        # plt.show()
     # mean_reward, std_reward = evaluate_policy(model, eval_env, n_eval_episodes=1, deterministic=True, return_episode_rewards=False)
     # reward_list, episode_len = evaluate_policy(model, eval_env, n_eval_episodes=1, callback=, deterministic=True, return_episode_rewards=True)
 
