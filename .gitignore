@@ -9,3 +9,5 @@ Evaluation/
 Scripts/main_simple_example.py
 Images_Report/
 Thesis_Latex/
+Training/Logs/archieved_logs/
+Training/Model/archieved_models/
