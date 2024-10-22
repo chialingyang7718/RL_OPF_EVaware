@@ -88,22 +88,14 @@ def evaluate_PPO_model(n_steps=24, n_case=14, EVScenario=None, model=None):
             df_line_loading = pd.DataFrame(info["line_loading"]).transpose()
 
             # Bus Violation
-            if 'bus_violation' in info:
-                df_bus_violation = pd.DataFrame(info["bus_violation"]).transpose()
-            else:
-                df_bus_violation = pd.DataFrame([])
+            df_bus_violation = pd.DataFrame(info["bus_violation"]).transpose()
+
 
             # Line Violation
-            if 'line_violation' in info:
-                df_line_violation = pd.DataFrame(info["line_violation"]).transpose()
-            else:
-                df_line_violation = pd.DataFrame([])
+            df_line_violation = pd.DataFrame(info["line_violation"]).transpose()
 
             # Phase Angle Violation
-            if 'phase_angle_violation' in info:
-                df_phase_angle_violation = pd.DataFrame(info["phase_angle_violation"]).transpose()
-            else:
-                df_phase_angle_violation = pd.DataFrame([])
+            df_phase_angle_violation = pd.DataFrame(info["phase_angle_violation"]).transpose()
 
             # Generation Cost
             generation_cost = [info["generation_cost"]]
@@ -152,39 +144,20 @@ def evaluate_PPO_model(n_steps=24, n_case=14, EVScenario=None, model=None):
             df_line_loading = pd.concat(
                 [df_line_loading, pd.DataFrame(info["line_loading"]).transpose()]
             )
-
+     
             # Bus Violation
-            if 'bus_violation' in info:
-                df_bus_violation = pd.concat(
-                    [df_bus_violation, pd.DataFrame(info["bus_violation"]).transpose()]
-                )
-            else:
-                df_bus_violation = pd.concat([df_bus_violation, pd.DataFrame([])])
+            # if 'bus_violation' in info:
+            df_bus_violation = pd.concat(
+                [df_bus_violation, pd.DataFrame(info["bus_violation"]).transpose()]
+            )
 
             # Line Violation
-            if 'line_violation' in info:
-                df_line_violation = pd.concat(
-                    [
-                        df_line_violation,
-                        pd.DataFrame(info["line_violation"]).transpose(),
-                    ]
-                )
-            else:
-                df_line_violation = pd.concat([df_line_violation, pd.DataFrame([])])
+            df_line_violation = pd.concat([df_line_violation,pd.DataFrame(info["line_violation"]).transpose()])
+
 
             # Phase Angle Violation
-            if 'phase_angle_violation' in info:
-                df_phase_angle_violation = pd.concat(
-                    [
-                        df_phase_angle_violation,
-                        pd.DataFrame(info["phase_angle_violation"]).transpose(),
-                    ]
-                )
-            else:
-                df_phase_angle_violation = pd.concat(
-                    [df_phase_angle_violation, pd.DataFrame([])]
-                )
-
+            df_phase_angle_violation = pd.concat([df_phase_angle_violation,pd.DataFrame(info["phase_angle_violation"]).transpose()])
+ 
             # SOC Violation
             if info["soc_violation"]:
                 SOCviolation = 1
@@ -214,7 +187,7 @@ def evaluate_PPO_model(n_steps=24, n_case=14, EVScenario=None, model=None):
             df_generation_cost = pd.DataFrame(generation_cost)
 
             # Save the dataframes to a csv file
-            # save_all_df_to_csv(n_case, EVScenario, df_EV_spec, df_load_p, df_load_q, df_renewable, df_ev_demand, df_ev_soc, df_gen_p, df_gen_v, df_ev_action, df_voltage, df_line_loading, df_bus_violation, df_line_violation, df_phase_angle_violation, df_generation_cost)
+            save_all_df_to_csv(n_case, EVScenario, df_EV_spec, df_load_p, df_load_q, df_renewable, df_ev_demand, df_ev_soc, df_gen_p, df_gen_v, df_ev_action, df_voltage, df_line_loading, df_bus_violation, df_line_violation, df_phase_angle_violation, df_generation_cost)
             # Record the time taken for RL model prediction
             Time = sum(RLtime)
 
@@ -222,12 +195,12 @@ def evaluate_PPO_model(n_steps=24, n_case=14, EVScenario=None, model=None):
             Cost = sum(df_generation_cost[0])
 
             # Record the violation
-            if len(df_bus_violation) & len(df_line_violation) & len(df_phase_angle_violation) & SOCviolation == 0:
+            if len(df_bus_violation.index)+ len(df_line_violation.index) + len(df_phase_angle_violation.index) + SOCviolation == 0:
                 N_violation = 0
             else:
                 N_violation = 1
 
-            if len(df_bus_violation) & len(df_line_violation) & len(df_phase_angle_violation) == 0:
+            if len(df_bus_violation.index) + len(df_line_violation.index) + len(df_phase_angle_violation.index) == 0:
                 N_violation_relax = 0 
             else:
                 N_violation_relax = 1
@@ -280,7 +253,8 @@ if __name__ == "__main__":
     N_violations_relax = {EVScenario: [] for EVScenario in EVScenarios}
 
     for random_seed in range(sample_size):
-        for i in range(len(EVScenarios)):
+        # for i in range(len(EVScenarios)):
+        for i in range(1, 2):
             # Define Parameters
             EVScenario = EVScenarios[i]
             n_steps = 24
@@ -296,7 +270,7 @@ if __name__ == "__main__":
             N_violations[EVScenario].append(N_violation)
             N_violations_relax[EVScenario].append(N_violation_relax)
 
-            # print(f"{EVScenario} Mean Reward: {sum(rewards)/n_steps}")
+            print(f"{EVScenario} Mean Reward: {sum(rewards)/n_steps}")
 
 
     # Save the metrics dicts

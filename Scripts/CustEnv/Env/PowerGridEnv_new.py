@@ -129,23 +129,21 @@ class PowerGrid(Env):
 
         except:
             # output the diagnostic report when the power flow does not converge
-            print("Power flow does not converge!")
+            # print("Power flow does not converge!")
             # print(pp.diagnostic(self.net, report_style="detailed"))
 
             # assign the reward in the case of the power flow does not converge
             reward = -5000
+            diverged = True
 
         else:
+            diverged = False
             # calculate the reward in the case of the power flow converges
-            reward, violated_bus, overload_lines, violated_phase = (
+            reward, violated_buses, overload_lines, violated_phase = (
                 self.calculate_reward(time_step)
             )
 
-            info = {
-                "bus_violation": violated_bus.tolist(),
-                "line_violation": overload_lines.tolist(),
-                "phase_angle_violation": violated_phase
-            }
+
         # output the current episode length, reward, terminated, truncated
         # print("episode length: ", self.episode_length, "Reward:", reward, "; Terminated:", terminated, "; Truncated:", truncated)
 
@@ -165,6 +163,16 @@ class PowerGrid(Env):
             "line_loading": self.net.res_line.loc[:, ["loading_percent"]],
             "generation_cost": gen_cost,
         }
+        if not diverged:
+            if violated_buses is not None:
+                info["bus_violation"] = violated_buses
+            else:
+                info["bus_violation"] = []
+            if overload_lines is not None:
+                info["line_violation"] = overload_lines
+            else:
+                info["line_violation"] = []
+            info["phase_angle_violation"] = violated_phase
 
         if self.EVScenario is not None:
             # record the EV related info
@@ -691,7 +699,7 @@ class PowerGrid(Env):
         self.violation = False
 
         # bus voltage violation
-        if violated_buses.size != 0:
+        if violated_buses is not None:
             self.violation = True
             for violated_bus in violated_buses:
                 if self.net.res_bus.loc[violated_bus, "vm_pu"] < self.Vmin[violated_bus]:
@@ -704,7 +712,7 @@ class PowerGrid(Env):
                     ) * 1000
 
         # line overload violation
-        if overload_lines.size != 0:
+        if overload_lines is not None:
             self.violation = True
             for overload_line in overload_lines:
                 penalty_line += (

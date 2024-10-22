@@ -77,7 +77,8 @@ def create_unique_soc_log_path(base_log_dir):
 if __name__ == "__main__":
 
     # Load the grid
-    n_case = int(input("Enter Test Case Number (9, 14, 30, 39, 57, 118...): "))
+    # n_case = int(input("Enter Test Case Number (9, 14, 30, 39, 57, 118...): "))
+    n_case = 14
     grid = load_test_case_grid(n_case)
 
     # Parameters
