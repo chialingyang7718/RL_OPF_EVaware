@@ -78,7 +78,7 @@ if __name__ == "__main__":
 
     # Load the grid
     # n_case = int(input("Enter Test Case Number (9, 14, 30, 39, 57, 118...): "))
-    n_case = 14
+    n_case = 9
     grid = load_test_case_grid(n_case)
 
     # Parameters
@@ -87,8 +87,8 @@ if __name__ == "__main__":
     Training = True
     EVScenarios = ["ImmediateFull", "ImmediateBalanced", "Home", "Night"]
     
-    # for i in [1]:
-    for i in [0, 1, 2, 3]:
+    for i in [1]:
+    # for i in [0, 1, 2, 3]:
         EVScenario = EVScenarios[i]
 
         # Create the vectorized environment

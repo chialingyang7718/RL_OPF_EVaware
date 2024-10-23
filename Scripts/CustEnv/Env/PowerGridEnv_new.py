@@ -699,7 +699,7 @@ class PowerGrid(Env):
         self.violation = False
 
         # bus voltage violation
-        if violated_buses is not None:
+        if violated_buses.size != 0:
             self.violation = True
             for violated_bus in violated_buses:
                 if self.net.res_bus.loc[violated_bus, "vm_pu"] < self.Vmin[violated_bus]:
@@ -712,7 +712,7 @@ class PowerGrid(Env):
                     ) * 1000
 
         # line overload violation
-        if overload_lines is not None:
+        if overload_lines.size != 0:
             self.violation = True
             for overload_line in overload_lines:
                 penalty_line += (
@@ -746,7 +746,7 @@ class PowerGrid(Env):
         if self.violation == True:
             reward = penalty_voltage + penalty_line + penalty_EV + penalty_phase_angle
         else:
-            reward = 1000 - 0.1 * self.calculate_gen_cost()
+            reward = 1000 - 0.01 * self.calculate_gen_cost()
 
         return reward, violated_buses, overload_lines, violated_phase
 
