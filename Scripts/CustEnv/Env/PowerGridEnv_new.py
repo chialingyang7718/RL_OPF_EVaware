@@ -746,7 +746,7 @@ class PowerGrid(Env):
         if self.violation == True:
             reward = penalty_voltage + penalty_line + penalty_EV + penalty_phase_angle
         else:
-            reward = 1000 - 0.01 * self.calculate_gen_cost()
+            reward = 1000 - 0.1 * self.calculate_gen_cost()
 
         return reward, violated_buses, overload_lines, violated_phase
 
