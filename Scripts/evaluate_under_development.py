@@ -9,7 +9,7 @@ import gymnasium as gym
 
 # Import stable baselines stuff
 from stable_baselines3 import PPO
-from stable_baselines3.common.evaluation import evaluate_policy
+# from stable_baselines3.common.evaluation import evaluate_policy
 
 # Import other stuff
 import matplotlib.pyplot as plt
@@ -23,24 +23,36 @@ import pickle
 def evaluate_PPO_model(n_steps=24, n_case=14, EVScenario=None, model=None):
     # Load the environment
     grid = load_test_case_grid(n_case)
-    # eval_env = gym.make('PowerGrid-v0', net=grid, dispatching_intervals=24, EVaware=True, Training=True)
+    
     eval_env = gym.make(
         "PowerGrid-v1", net=grid, dispatching_intervals=n_steps, EVScenario=EVScenario, Training=False
     )
 
     # Initialize variables for tracking metrics
     rewards = []
+    generation_cost = []
+    RLtime = []
     truncated = False
     terminated = False
+    load_p = {}
+    load_q = {}
+    renewable_p = {}
+    EV_demand = {}
+    EV_SOC = {}
+    generation_p = {}
+    generation_v = {}
+    EV_p = {}
+    bus_voltage = {}
+    line_loading = {}
+    bus_violation = {}
+    line_violation = {}
+    phase_angle_violation = {}
 
-    # Evaluate the model
+ 
     obs, info = eval_env.reset()
-
     # Record EV battery capacity
     df_EV_spec = info["EV_spec"]
-
-    # Initialize time list for RL model prediction
-    RLtime = []
+   
 
     for step in range(n_steps):
         # set start time for RL model prediction
@@ -48,148 +60,52 @@ def evaluate_PPO_model(n_steps=24, n_case=14, EVScenario=None, model=None):
 
         # Predict the action
         action, _state = model.predict(obs, deterministic=False)
-        obs, reward, terminated, truncated, info = eval_env.step(action)
-
+        
         # Record the time taken for RL model prediction
         RLtime.append(time.process_time() - start)
-
-        # Log the metrics
-        # rewards
-        rewards.append(round(reward, 3))
+        
+        # Update the state, reward and info...
+        obs, reward, terminated, truncated, info = eval_env.step(action)
 
         # infos
-        if step == 0:
-            # Load
-            df_load_p = pd.DataFrame(info["load_p"]).transpose()
-            df_load_q = pd.DataFrame(info["load_q"]).transpose()
-
-            # Renewables
-            df_renewable = pd.DataFrame(info["renewable_p"]).transpose()
-
-            # EV demand, SOC
-            df_ev_demand = pd.DataFrame(info["EV_demand"]).transpose()
-            df_ev_soc = pd.DataFrame(info["EV_SOC_beginning"]).transpose()
-
-            # Generation
-            df_gen_p = pd.DataFrame(info["generation_p"]).transpose()
-            df_gen_v = pd.DataFrame(info["generation_v"]).transpose()
-
-            # EV charging
-            df_ev_action = pd.DataFrame(info["EV_p"]).transpose()
-
-            # Voltage
-            df_voltage = pd.DataFrame(info["bus_voltage"]).transpose()
-
-            # Line loading
-            df_line_loading = pd.DataFrame(info["line_loading"]).transpose()
-
-            # Bus Violation
-            df_bus_violation = pd.DataFrame(info["bus_violation"]).transpose()
-
-            # Line Violation
-            df_line_violation = pd.DataFrame(info["line_violation"]).transpose()
-
-            # Phase Angle Violation
-            df_phase_angle_violation = pd.DataFrame(info["phase_angle_violation"]).transpose()
-
-
+        load_p, load_q, renewable_p, EV_demand, EV_SOC, generation_p, generation_v, EV_p, bus_voltage, line_loading, bus_violation, line_violation, phase_angle_violation\
+        = convert_info_to_dict(step, info, load_p, load_q, renewable_p, EV_demand, EV_SOC, generation_p, generation_v, EV_p, bus_voltage, line_loading, bus_violation, line_violation, phase_angle_violation)
+        
+	    # Record cost, and reward
+        rewards.append(round(reward, 3))
+        generation_cost.append(info["generation_cost"])
+        
+        # SOC Violation
+        if info["soc_violation"]:
+            SOCviolation = 1
         else:
-            ## State
-            # Load
-            df_load_p = pd.concat([df_load_p, pd.DataFrame(info["load_p"]).transpose()])
-            df_load_q = pd.concat([df_load_q, pd.DataFrame(info["load_q"]).transpose()])
-
-            # Renewables
-            df_renewable = pd.concat(
-                [df_renewable, pd.DataFrame(info["renewable_p"]).transpose()]
-            )
-
-            # EV demand, SOC
-            df_ev_demand = pd.concat(
-                [df_ev_demand, pd.DataFrame(info["EV_demand"]).transpose()]
-            )
-            df_ev_soc = pd.concat(
-                [df_ev_soc, pd.DataFrame(info["EV_SOC_beginning"]).transpose()]
-            )
-
-            ## Action
-            # Generation
-            df_gen_p = pd.concat(
-                [df_gen_p, pd.DataFrame(info["generation_p"]).transpose()]
-            )
-            # df_gen_q = pd.concat([df_gen_q, pd.DataFrame(info["generation_q"]).transpose()])
-            df_gen_v = pd.concat(
-                [df_gen_v, pd.DataFrame(info["generation_v"]).transpose()]
-            )
-
-            # EV charging
-            df_ev_action = pd.concat(
-                [df_ev_action, pd.DataFrame(info["EV_p"]).transpose()]
-            )
-
-            ## Others
-            # Voltage
-            df_voltage = pd.concat(
-                [df_voltage, pd.DataFrame(info["bus_voltage"]).transpose()]
-            )
-
-            # Line loading
-            df_line_loading = pd.concat(
-                [df_line_loading, pd.DataFrame(info["line_loading"]).transpose()]
-            )
-     
-            # Bus Violation
-            # if 'bus_violation' in info:
-            df_bus_violation = pd.concat(
-                [df_bus_violation, pd.DataFrame(info["bus_violation"]).transpose()]
-            )
-
-            # Line Violation
-            df_line_violation = pd.concat([df_line_violation,pd.DataFrame(info["line_violation"]).transpose()])
-
-
-            # Phase Angle Violation
-            df_phase_angle_violation = pd.concat([df_phase_angle_violation,pd.DataFrame(info["phase_angle_violation"]).transpose()])
- 
-            # SOC Violation
-            if info["soc_violation"]:
-                SOCviolation = 1
-            else:
-                SOCviolation = 0
-
-            # Generation Cost
-            generation_cost.append(info["generation_cost"])
+            SOCviolation = 0
+                
 
         if terminated or truncated:
-            # print(f"Episode finished after {step + 1} steps")
+            df_load_p = pd.DataFrame(load_p).T
+            df_load_q = pd.DataFrame(load_q).T
+            df_renewable = pd.DataFrame(renewable_p).T
+            df_ev_demand = pd.DataFrame(EV_demand).T
+            df_ev_soc = pd.DataFrame(EV_SOC).T
+            df_gen_p = pd.DataFrame(generation_p).T
+            df_gen_v = pd.DataFrame(generation_v).T
+            df_ev_action = pd.DataFrame(EV_p).T
+            df_voltage = pd.DataFrame(bus_voltage).T
+            df_line_loading = pd.DataFrame(line_loading).T
+            df_bus_violation = pd.DataFrame(bus_violation).T
+            df_line_violation = pd.DataFrame(line_violation).T
+            df_phase_angle_violation = pd.DataFrame(phase_angle_violation).T
 
-            # Set dataframes index
-            df_load_p.reset_index(drop=True, inplace=True)
-            df_load_q.reset_index(drop=True, inplace=True)
-            df_renewable.reset_index(drop=True, inplace=True)
-            df_ev_demand.reset_index(drop=True, inplace=True)
-            df_ev_soc.reset_index(drop=True, inplace=True)
-            df_gen_p.reset_index(drop=True, inplace=True)
-            df_gen_v.reset_index(drop=True, inplace=True)
-            df_ev_action.reset_index(drop=True, inplace=True)
-            df_voltage.reset_index(drop=True, inplace=True)
-            df_line_loading.reset_index(drop=True, inplace=True)
-            df_bus_violation.reset_index(drop=True, inplace=True)
-            df_line_violation.reset_index(drop=True, inplace=True)
-            df_phase_angle_violation.reset_index(drop=True, inplace=True)
-            df_generation_cost = pd.DataFrame(generation_cost)
+            print(df_load_p)
 
-
-            """Save the dataframes to a csv file"""
-            # Save the dataframes to a csv file
-            save_all_df_to_csv(n_case, EVScenario, df_EV_spec, df_load_p, df_load_q, df_renewable, df_ev_demand, df_ev_soc, df_gen_p, df_gen_v, df_ev_action, df_voltage, df_line_loading, df_bus_violation, df_line_violation, df_phase_angle_violation, df_generation_cost)
+            # print(f"Episode finished after {step + 1} steps"
+            save_all_df_to_csv(n_case, EVScenario, df_EV_spec, df_load_p, df_load_q, df_renewable, df_ev_demand, df_ev_soc, df_gen_p, df_gen_v, df_ev_action, df_voltage, df_line_loading, df_bus_violation, df_line_violation, df_phase_angle_violation)
             
             """Metrices"""
             # Record the time taken for RL model prediction
             Time = sum(RLtime)
-
-            # Record the total cost
-            Cost = sum(df_generation_cost[0])
+            Cost = sum(generation_cost)
 
             # Record the violation
 
@@ -203,11 +119,26 @@ def evaluate_PPO_model(n_steps=24, n_case=14, EVScenario=None, model=None):
             # Reset the environment for a new episode
             obs, info = eval_env.reset()
     eval_env.close()
-
     return rewards, Time, Cost, N_violation, N_violation_relax
 
+def convert_info_to_dict(step, info, load_p, load_q, renewable_p, EV_demand, EV_SOC, generation_p, generation_v, EV_p, bus_voltage, line_loading, bus_violation, line_violation, phase_angle_violation):
+    load_p[step] = info["load_p"]
+    load_q[step] = info["load_q"]
+    renewable_p[step] = info["renewable_p"]
+    EV_demand[step] = info["EV_demand"]
+    EV_SOC[step] = info["EV_SOC_beginning"]
+    generation_p[step] = info["generation_p"]
+    generation_v[step] = info["generation_v"]
+    EV_p[step] = info["EV_p"]
+    bus_voltage[step] = info["bus_voltage"]
+    line_loading[step] = info["line_loading"]
+    bus_violation[step] = info["bus_violation"]
+    line_violation[step] = info["line_violation"]
+    phase_angle_violation[step] = info["phase_angle_violation"]
+    return load_p, load_q, renewable_p, EV_demand, EV_SOC, generation_p, generation_v, EV_p, bus_voltage, line_loading, bus_violation, line_violation, phase_angle_violation
+
 def save_all_df_to_csv(n_case, EVScenario, df_EV_spec, df_load_p, df_load_q, df_renewable, df_ev_demand, df_ev_soc, df_gen_p, df_gen_v, df_ev_action, df_voltage, df_line_loading, df_bus_violation, df_line_violation, df_phase_angle_violation, df_generation_cost):
-    # Create the directory if it does not exist
+    	# Create the directory if it does not exist
         if not os.path.exists("Evaluation/Case%s/Case%s_%s" %(n_case, n_case, EVScenario)):
             os.makedirs("Evaluation/Case%s/Case%s_%s" %(n_case, n_case, EVScenario))
 
@@ -256,7 +187,7 @@ if __name__ == "__main__":
             EVScenario = EVScenarios[i]
             n_steps = 24
             # Load the trained model
-            model = PPO.load("Training/Model/Case%s/Case%s_%s" %(n_case, n_case, EVScenario))
+            model = PPO.load("Training/Model/Case%s/PPO2/Case%s_%s" %(n_case, n_case, EVScenario))
             # model = PPO.load("Training/Model/Case%s/Case%s_2" %(n_case, n_case))
             model.set_random_seed(random_seed)
             # Evaluate the model
