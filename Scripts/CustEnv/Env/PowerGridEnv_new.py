@@ -179,7 +179,6 @@ class PowerGrid(Env):
             info["EV_SOC"] = self.net.storage.loc[:, "soc_percent"]
             info["soc_violation"] = self.SOCviolation
             info["SOC_threshold"] = self.df_EV.loc[(slice(None), self.time_step), "SOC"+self.EVScenario]
-
         # decrease the episode length and update time step
         self.episode_length -= 1
         self.time_step = self.time_step + 1
@@ -211,7 +210,6 @@ class PowerGrid(Env):
         super().reset(seed=seed)
         # self.pre_reward = 0
         self.episode_length = self.dispatching_intervals
-        self.time_step = 0
 
         # assign initial states for load and generation states by adding noice
         self.add_noice_load_renew_state()
@@ -219,8 +217,7 @@ class PowerGrid(Env):
         # assign initial state for EV SOC
         if self.EVScenario is not None:
             # reselect another day for the EV profile randomly
-
-            self.net.storage.loc[:, "soc_percent"],selected_start_time = self.select_randomly_day_EV_profile()
+            self.net.storage.loc[:, "soc_percent"], selected_start_time = self.select_randomly_day_EV_profile()
             self.time_step = selected_start_time
             self.state[2 * self.NL + self.NG: 2 * self.NL + self.NG+ self.N_EV] = self.net.storage.loc[:, "soc_percent"]
             self.state[2 * self.NL + self.NG + self.N_EV:] = self.df_EV.loc[(slice(None), self.time_step), "SOC"+self.EVScenario]
