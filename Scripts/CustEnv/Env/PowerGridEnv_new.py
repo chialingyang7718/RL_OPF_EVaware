@@ -587,7 +587,6 @@ class PowerGrid(Env):
                 evid=i,
                 n_car=n_car,
             )
-            print()
 
             
 
