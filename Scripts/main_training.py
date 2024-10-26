@@ -77,9 +77,9 @@ def create_unique_soc_log_path(base_log_dir):
 if __name__ == "__main__":
 
     # Load the grid
-    # n_case = int(input("Enter Test Case Number (9, 14, 30, 39, 57, 118...): "))
-    n_case = 33
-    grid = load_test_case_grid(n_case, "bw")
+    # n_case = int(input("Enter Test Case Number (9, 14, 30, 33bw, 39, 57, 118...): "))
+    n_case = 57
+    grid = load_test_case_grid(n_case)
 
     # Parameters
     env_id = "PowerGrid-v1"

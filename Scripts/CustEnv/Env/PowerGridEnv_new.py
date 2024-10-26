@@ -582,19 +582,21 @@ class PowerGrid(Env):
         # add the EV group to where the loads are
         for i in grid.load.index:
             bus = grid.load.loc[i, "bus"]
-            n_car = int(
-                grid.load.loc[i, "p_mw"]
-            )  # number of EVs connected to the bus is assumed to be integer of nominal power of the loads
+            n_car = int(grid.load.loc[i, "p_mw"])  # number of EVs connected to the bus is assumed to be integer of nominal power of the loads
+            if n_car == 0:
+                n_car = 1 # if the nominal power of the load is close to zero, assume one EV is connected
             pp.create_storage(
                 grid,
                 bus=bus,
                 p_mw=0,
-                max_e_mwh=self.df_EV_spec.loc[0, str(i)] * n_car / 1000,
+                max_e_mwh=0.05 * self.df_EV_spec.loc[0, str(i)] * n_car / 1000,
                 soc_percent=0.5,
                 min_e_mwh=0,
                 evid=i,
                 n_car=n_car,
             )
+
+            
 
     def select_randomly_day_EV_profile(self):
         # randomly select the EV profile from the df_EV
