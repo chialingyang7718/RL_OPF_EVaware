@@ -581,12 +581,13 @@ class PowerGrid(Env):
                 grid,
                 bus=bus,
                 p_mw=0,
-                max_e_mwh=0.05 * self.df_EV_spec.loc[0, str(i)] * n_car / 1000,
+                max_e_mwh = self.df_EV_spec.loc[0, str(i)] * n_car / 1000,
                 soc_percent=0.5,
                 min_e_mwh=0,
                 evid=i,
                 n_car=n_car,
             )
+            print()
 
             
 
