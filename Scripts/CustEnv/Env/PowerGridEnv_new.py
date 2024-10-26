@@ -361,9 +361,7 @@ class PowerGrid(Env):
             self.net.storage.loc[:, "max_e_mwh"]
             * self.net.storage.loc[:, "soc_percent"]
         )
-        charging_max = self.net.storage.loc[:, "max_e_mwh"] * (
-            1 - self.net.storage.loc[:, "soc_percent"]
-        )
+        charging_max = self.net.storage.loc[:, "max_e_mwh"] * (1 - self.net.storage.loc[:, "soc_percent"])
         self.EV_power_demand = np.zeros(self.N_EV)
 
         for i in range(self.N_EV):
@@ -376,13 +374,11 @@ class PowerGrid(Env):
             self.EV_power_demand[i] = EV_power_demand
             # reserve the power for EV demand (to avoid discharging too much that EVs demand is not fullfilled)
             discharge_max[i] -= EV_power_demand
-            # the charging speed is 50 kw and assume all the EVs are connected in parallel
-            self.PEVmax[i] = min(
-                0.001 * 22 * self.net.storage.loc[i, "n_car"], charging_max[i]
-            )
-            self.PEVmin[i] = -min(
-                0.001 * 22 * self.net.storage.loc[i, "n_car"], discharge_max[i]
-            )
+            # the charging speed is 22 kw and assume all the EVs are connected in parallel
+            self.PEVmax[i] = min(0.001 * 22 * self.net.storage.loc[i, "n_car"], charging_max[i])
+    
+            self.PEVmin[i] = -min(0.001 * 22 * self.net.storage.loc[i, "n_car"], discharge_max[i])
+        
 
     def add_noice_load_renew_state(self):
         # add some noice to PL and QL
@@ -463,40 +459,37 @@ class PowerGrid(Env):
         
 
             # update the SOC of the EVs
-            if (self.net.res_storage.loc[i, "p_mw"] >= 0):  # charging with time step 1 hour
+            # if (self.net.res_storage.loc[i, "p_mw"] >= 0):  # charging with time step 1 hour
             #     energy_aftercharging = (
             #         energy_b4
             #         + self.net.res_storage.loc[i, "p_mw"] * charging_efficiency * 1
             #         - EV_power_demand * 1
             #     )
-                energy_aftercharging = (
-                    energy_b4
-                    + self.net.res_storage.loc[i, "p_mw"] * 1
-                    - EV_power_demand * 1
+            energy_after = energy_b4 + self.net.res_storage.loc[i, "p_mw"] - EV_power_demand 
+        
+            if energy_after > self.net.storage.loc[i, "max_e_mwh"] :
+                print("Overcharging!")
+                self.net.storage.loc[i, "soc_percent"] = 1
+            elif energy_after < 0:
+                print("Negative SOC!")
+                self.net.storage.loc[i, "soc_percent"] = 0
+            else:
+                self.net.storage.loc[i, "soc_percent"] = (
+                    energy_after / self.net.storage.loc[i, "max_e_mwh"]
                 )
-                if (
-                    energy_aftercharging >= 0
-                    and self.net.storage.loc[i, "max_e_mwh"] < energy_aftercharging
-                ):
-                    print("Overcharging!")
-                    self.net.storage.loc[i, "soc_percent"] = 1
-                else:
-                    self.net.storage.loc[i, "soc_percent"] = (
-                        energy_aftercharging / self.net.storage.loc[i, "max_e_mwh"]
-                    )
-            else:  # discharging with time step 1 hour
-                energy_afterdischarging = (
-                    energy_b4
-                    + self.net.res_storage.loc[i, "p_mw"] * 1
-                    - EV_power_demand * 1
-                )
-                if energy_afterdischarging >= 0:
-                    self.net.storage.loc[i, "soc_percent"] = (
-                        energy_afterdischarging / self.net.storage.loc[i, "max_e_mwh"]
-                    )
-                else:
-                    self.net.storage.loc[i, "soc_percent"] = 0
-                    print("Negative SOC!")
+            # else:  # discharging with time step 1 hour
+            #     energy_afterdischarging = (
+            #         energy_b4
+            #         + self.net.res_storage.loc[i, "p_mw"] * 1
+            #         - EV_power_demand * 1
+            #     )
+            #     if energy_afterdischarging >= 0:
+            #         self.net.storage.loc[i, "soc_percent"] = (
+            #             energy_afterdischarging / self.net.storage.loc[i, "max_e_mwh"]
+            #         )
+            #     else:
+            #         self.net.storage.loc[i, "soc_percent"] = 0
+            #         print("Negative SOC!")
             self.state[self.NL * 2 + self.NG + i] = self.net.storage.loc[i, "soc_percent"]
 
             # update the EV charging limit since SOC is changed
