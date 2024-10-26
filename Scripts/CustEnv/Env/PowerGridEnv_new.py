@@ -19,7 +19,7 @@ Assumptions --- Environment
 - The environment is deterministic.
 - Actions: generation active power, generation voltage (omitted ext. grid since it is typically not a direct control target),
 EV (dis)charging power
-- States: load active power, load reactive power, active power generation from PV or wind, EV SOC
+- States: load active power, load reactive power, active power generation from PV or wind, EV SOC, SOC threshold
 """
 
 # Import pandapower stuff
@@ -93,11 +93,11 @@ class PowerGrid(Env):
             dtype=np.float32,
         )
 
-        # define the observation space: PL, QL, P_renewable(max generation from renewable energy sources), SOC_EV
+        # define the observation space: PL, QL, P_renewable(max generation from renewable energy sources), SOC_EV, SOC_threshold
         self.observation_space = Box(
-            low=np.zeros((2 * self.NL + self.NG + self.N_EV,)),
-            high=np.full((2 * self.NL + self.NG + self.N_EV,), 1),
-            shape=(2 * self.NL + self.NG + self.N_EV,),
+            low=np.zeros((2 * self.NL + self.NG + 2 * self.N_EV,)),
+            high=np.full((2 * self.NL + self.NG + 2 * self.N_EV,), 1),
+            shape=(2 * self.NL + self.NG + 2 * self.N_EV,),
             dtype=np.float32,
         )
 
@@ -192,7 +192,6 @@ class PowerGrid(Env):
         # update the next state if the episode is not terminated
         if terminated == False:
 
-
             # add some noice to load and renewable generation
             self.add_noice_load_renew_state()
 
@@ -223,7 +222,8 @@ class PowerGrid(Env):
 
             self.net.storage.loc[:, "soc_percent"],selected_start_time = self.select_randomly_day_EV_profile()
             self.time_step = selected_start_time
-            self.state[2 * self.NL + self.NG :] = self.net.storage.loc[:, "soc_percent"]
+            self.state[2 * self.NL + self.NG: 2 * self.NL + self.NG+ self.N_EV] = self.net.storage.loc[:, "soc_percent"]
+            self.state[2 * self.NL + self.NG + self.N_EV:] = self.df_EV.loc[(slice(None), self.time_step), "SOC"+self.EVScenario]
             # update the EV (dis)charging limit since SOC is changed
             self.update_EV_limit()
             # update info with EV related info
@@ -400,6 +400,7 @@ class PowerGrid(Env):
         self.PGcap = np.random.uniform(self.PGmin, self.PGmax)
         self.state[2 * self.NL : 2 * self.NL + self.NG] = self.PGcap
 
+
     # read the active and reactive power of the loads, active power of gen from self.net.load
     def read_state_from_grid(self):
         # read the active and reactive power of the loads
@@ -426,6 +427,7 @@ class PowerGrid(Env):
                     self.mu_PL.flatten("F").astype(np.float32),
                     self.mu_QL.flatten("F").astype(np.float32),
                     self.PGcap,
+                    initial_soc.flatten("F").astype(np.float32),
                     initial_soc.flatten("F").astype(np.float32),
                 ),
                 axis=None,
@@ -491,9 +493,10 @@ class PowerGrid(Env):
             #         self.net.storage.loc[i, "soc_percent"] = 0
             #         print("Negative SOC!")
             self.state[self.NL * 2 + self.NG + i] = self.net.storage.loc[i, "soc_percent"]
-
-            # update the EV charging limit since SOC is changed
-            self.update_EV_limit()
+            
+        self.state[self.NL * 2 + self.NG + self.N_EV: ] = self.df_EV.loc[(slice(None), self.time_step), "SOC"+self.EVScenario]
+        # update the EV charging limit since SOC is changed
+        self.update_EV_limit()
 
     def load_EV_spec_profiles(self):
         # Load the EV specification
