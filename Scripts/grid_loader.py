@@ -107,9 +107,9 @@ def change_sgen_into_gen(grid):
 #     return grid
 
 
-def load_test_case_grid(n):
+def load_test_case_grid(n, str = ""):
     # load the test grid from pandapower
-    case = f"case{n}"  # n: case number in pandapower
+    case = f"case{n}" + str  # n: case number in pandapower
     grid = getattr(pn, case)()
     # grid = change_gen_into_sgen(grid) # change the generators into static generators
     # grid = change_sgen_into_gen(grid) # change any static generators into generators

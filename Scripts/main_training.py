@@ -78,8 +78,8 @@ if __name__ == "__main__":
 
     # Load the grid
     # n_case = int(input("Enter Test Case Number (9, 14, 30, 39, 57, 118...): "))
-    n_case = 14
-    grid = load_test_case_grid(n_case)
+    n_case = 33
+    grid = load_test_case_grid(n_case, "bw")
 
     # Parameters
     env_id = "PowerGrid-v1"
@@ -87,8 +87,8 @@ if __name__ == "__main__":
     Training = True
     EVScenarios = ["ImmediateFull", "ImmediateBalanced", "Home", "Night"]
     
-    # for i in [1]:
-    for i in [0, 1, 2, 3]:
+    for i in [1]:
+    # for i in [0, 1, 2, 3]:
         EVScenario = EVScenarios[i]
 
         # Create the vectorized environment
@@ -128,7 +128,7 @@ if __name__ == "__main__":
 
         elif n_case > 20:
             n_steps = 60
-            if n_case == 30:
+            if n_case == 30 or n_case == 33:
                 policy_kwargs = dict(
                         activation_fn=th.nn.Tanh,
                         net_arch=dict(pi=[NN_size*4, NN_size*2, NN_size*2, NN_size, NN_size], vf=[NN_size*4, int(NN_size/2), int(NN_size/4)])  
