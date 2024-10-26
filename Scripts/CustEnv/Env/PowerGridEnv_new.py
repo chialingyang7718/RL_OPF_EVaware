@@ -178,7 +178,7 @@ class PowerGrid(Env):
             info["EV_p"] = self.net.res_storage.loc[:, "p_mw"]
             info["EV_SOC"] = self.net.storage.loc[:, "soc_percent"]
             info["soc_violation"] = self.SOCviolation
-            info["SOC_threshold"] = self.df_EV.loc[(slice(None), self.time_step), "SOC"+self.EVScenario]
+            info["SOC_threshold"] = self.df_EV.loc[(slice(None), self.time_step), "SOC"+self.EVScenario].values
         # decrease the episode length and update time step
         self.episode_length -= 1
         self.time_step = self.time_step + 1
