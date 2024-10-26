@@ -78,7 +78,7 @@ if __name__ == "__main__":
 
     # Load the grid
     # n_case = int(input("Enter Test Case Number (9, 14, 30, 33bw, 39, 57, 118...): "))
-    n_case = 57
+    n_case = 9
     grid = load_test_case_grid(n_case)
 
     # Parameters
