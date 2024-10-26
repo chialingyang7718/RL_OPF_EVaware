@@ -12,7 +12,7 @@ Assumptions --- EV
 - The number of EV in a EV group is the integer of nominal power of the loads.
 - The EVs in the same group have the same spec (max_mwh, (dis)charging eff.) and driving profile
 - Assume the EVs are connected in parallel.
-- The maximum EV (dis)charging power is 50 kW.
+- The maximum EV (dis)charging power is 22 kW.
 
 Assumptions --- Environment
 - One timestep represents one hour.
@@ -174,16 +174,18 @@ class PowerGrid(Env):
                 info["line_violation"] = []
             info["phase_angle_violation"] = violated_phase
 
+        # decrease the episode length and update time step
+        self.episode_length -= 1
+        time_step = self.dispatching_intervals - self.episode_length
+
         if self.EVScenario is not None:
             # record the EV related info
             info["EV_demand"] = self.EV_power_demand
             info["EV_p"] = self.net.res_storage.loc[:, "p_mw"]
-            info["EV_SOC_beginning"] = self.net.storage.loc[:, "soc_percent"]
+            info["EV_SOC"] = self.net.storage.loc[:, "soc_percent"]
             info["soc_violation"] = self.SOCviolation
+            info["SOC_threshold"] = self.df_EV.loc[(slice(None), time_step), "SOC"+self.EVScenario].values
 
-        # decrease the episode length and update time step
-        self.episode_length -= 1
-        time_step = self.dispatching_intervals - self.episode_length
 
         # check if the episode is terminated in the case of reaching the end of the episode
         terminated = self.episode_length == 0
@@ -227,7 +229,9 @@ class PowerGrid(Env):
             self.update_EV_limit(time_step)
             # update info with EV related info
             # update EV spec in the info
-            info = {"EV_spec": self.net.storage}
+            info = {"EV_spec": self.net.storage,
+                    "SOC_threshold": self.df_EV.loc[(slice(None), time_step), "SOC"+self.EVScenario].values}
+                    
 
         # get observation of the states
         observation = self._get_observation()
@@ -374,10 +378,10 @@ class PowerGrid(Env):
             discharge_max[i] -= EV_power_demand
             # the charging speed is 50 kw and assume all the EVs are connected in parallel
             self.PEVmax[i] = min(
-                0.001 * 50 * self.net.storage.loc[i, "n_car"], charging_max[i]
+                0.001 * 22 * self.net.storage.loc[i, "n_car"], charging_max[i]
             )
             self.PEVmin[i] = -min(
-                0.001 * 50 * self.net.storage.loc[i, "n_car"], discharge_max[i]
+                0.001 * 22 * self.net.storage.loc[i, "n_car"], discharge_max[i]
             )
 
     def add_noice_load_renew_state(self):
