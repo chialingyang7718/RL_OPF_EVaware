@@ -200,7 +200,6 @@ class PowerGrid(Env):
 
         # get observation for the next state
         observation = self._get_observation()
-
         return observation, reward, terminated, truncated, info
 
     def render(self):
@@ -364,7 +363,7 @@ class PowerGrid(Env):
         for i in range(self.N_EV):
             # fetch EV power demand from the EV profile
             EV_power_demand = (
-                self.df_EV.loc[(i, self.time_step), "ChargingPower"+self.EVScenario+"_kW"]
+                self.df_EV.loc[(i, self.time_step), "DrivingConsumption_kWh"]
                 * self.net.storage.loc[i, "n_car"]
                 / 1000
             )  # power requirement from cars in MW
@@ -443,7 +442,7 @@ class PowerGrid(Env):
 
             # fetch EV power demand from the EV profile
             EV_power_demand = (
-                self.df_EV.loc[(i, self.time_step), "ChargingPower"+self.EVScenario+"_kW"]
+                self.df_EV.loc[(i, self.time_step), "DrivingConsumption_kWh"]
                 * self.net.storage.loc[i, "n_car"]
                 / 1000
             )  # power requirement from cars in MW
