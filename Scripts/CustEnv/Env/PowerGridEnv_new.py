@@ -83,7 +83,7 @@ class PowerGrid(Env):
         # initialization
         # self.pre_reward = 0
         self.episode_length = self.dispatching_intervals
-        time_step = 0
+        self.time_step = 0
 
         # define the action space: PG, VG, P_EV(positive for charging, negative for discharging)
         self.action_space = Box(
@@ -102,7 +102,7 @@ class PowerGrid(Env):
         )
 
         # assign state and action limits
-        self.define_limit(time_step)
+        self.define_limit()
 
         # initialize the state with existing single data saved in the grid
         self.state = self.read_state_from_grid()
@@ -112,9 +112,6 @@ class PowerGrid(Env):
         # intialize the terminated and truncated
         terminated = False
         truncated = False
-
-        # calculate the current time step
-        time_step = self.dispatching_intervals - self.episode_length
 
         # apply state to load
         self.net = self.apply_state_to_load()
@@ -140,7 +137,7 @@ class PowerGrid(Env):
             diverged = False
             # calculate the reward in the case of the power flow converges
             reward, violated_buses, overload_lines, violated_phase = (
-                self.calculate_reward(time_step)
+                self.calculate_reward()
             )
 
 
@@ -174,9 +171,6 @@ class PowerGrid(Env):
                 info["line_violation"] = []
             info["phase_angle_violation"] = violated_phase
 
-        # decrease the episode length and update time step
-        self.episode_length -= 1
-        time_step = self.dispatching_intervals - self.episode_length
 
         if self.EVScenario is not None:
             # record the EV related info
@@ -184,8 +178,11 @@ class PowerGrid(Env):
             info["EV_p"] = self.net.res_storage.loc[:, "p_mw"]
             info["EV_SOC"] = self.net.storage.loc[:, "soc_percent"]
             info["soc_violation"] = self.SOCviolation
-            info["SOC_threshold"] = self.df_EV.loc[(slice(None), time_step), "SOC"+self.EVScenario].values
+            info["SOC_threshold"] = self.df_EV.loc[(slice(None), self.time_step), "SOC"+self.EVScenario]
 
+        # decrease the episode length and update time step
+        self.episode_length -= 1
+        self.time_step = self.time_step + 1
 
         # check if the episode is terminated in the case of reaching the end of the episode
         terminated = self.episode_length == 0
@@ -194,12 +191,14 @@ class PowerGrid(Env):
 
         # update the next state if the episode is not terminated
         if terminated == False:
+
+
             # add some noice to load and renewable generation
             self.add_noice_load_renew_state()
 
             # update EV state for the next time step
             if self.EVScenario is not None:
-                self.update_EV_state(time_step)
+                self.update_EV_state()
 
         # get observation for the next state
         observation = self._get_observation()
@@ -213,7 +212,7 @@ class PowerGrid(Env):
         super().reset(seed=seed)
         # self.pre_reward = 0
         self.episode_length = self.dispatching_intervals
-        time_step = 0
+        self.time_step = 0
 
         # assign initial states for load and generation states by adding noice
         self.add_noice_load_renew_state()
@@ -221,16 +220,16 @@ class PowerGrid(Env):
         # assign initial state for EV SOC
         if self.EVScenario is not None:
             # reselect another day for the EV profile randomly
-            self.net.storage.loc[:, "soc_percent"] = (
-                self.select_randomly_day_EV_profile()
-            )
+
+            self.net.storage.loc[:, "soc_percent"],selected_start_time = self.select_randomly_day_EV_profile()
+            self.time_step = selected_start_time
             self.state[2 * self.NL + self.NG :] = self.net.storage.loc[:, "soc_percent"]
             # update the EV (dis)charging limit since SOC is changed
-            self.update_EV_limit(time_step)
+            self.update_EV_limit()
             # update info with EV related info
             # update EV spec in the info
             info = {"EV_spec": self.net.storage,
-                    "SOC_threshold": self.df_EV.loc[(slice(None), time_step), "SOC"+self.EVScenario].values}
+                    "SOC_threshold":  self.net.storage.loc[:, "soc_percent"]}
                     
 
         # get observation of the states
@@ -286,7 +285,7 @@ class PowerGrid(Env):
         return grid
 
     # assign the state and action limits
-    def define_limit(self, time_step):
+    def define_limit(self):
         # assign the generator limits
         if "max_p_mw" not in self.net.gen:
             self.net.gen.loc[:, "max_p_mw"] = (
@@ -354,10 +353,10 @@ class PowerGrid(Env):
             self.PEVmin = np.zeros(self.N_EV)
 
             # update the EV (dis)charging limit
-            self.update_EV_limit(time_step)
+            self.update_EV_limit()
 
     # update EV (dis)charging limit
-    def update_EV_limit(self, time_step):
+    def update_EV_limit(self):
         discharge_max = (
             self.net.storage.loc[:, "max_e_mwh"]
             * self.net.storage.loc[:, "soc_percent"]
@@ -366,10 +365,11 @@ class PowerGrid(Env):
             1 - self.net.storage.loc[:, "soc_percent"]
         )
         self.EV_power_demand = np.zeros(self.N_EV)
+
         for i in range(self.N_EV):
             # fetch EV power demand from the EV profile
             EV_power_demand = (
-                self.df_EV.loc[(i, time_step), "ChargingPower"+self.EVScenario+"_kW"]
+                self.df_EV.loc[(i, self.time_step), "ChargingPower"+self.EVScenario+"_kW"]
                 * self.net.storage.loc[i, "n_car"]
                 / 1000
             )  # power requirement from cars in MW
@@ -422,7 +422,8 @@ class PowerGrid(Env):
             )
         else:
             # randomly select SOC of the EVs under defined EV scenario as the initial SOC
-            initial_soc = self.select_randomly_day_EV_profile()
+            initial_soc, selected_start_time = self.select_randomly_day_EV_profile()
+            self.time_step = selected_start_time
             self.net.storage.loc[:, "soc_percent"] = initial_soc
             state = np.concatenate(
                 (
@@ -435,7 +436,7 @@ class PowerGrid(Env):
             )
         return state
 
-    def update_EV_state(self, time_step):
+    def update_EV_state(self):
         # update SOC of the EVs
         for i in range(self.N_EV):
 
@@ -447,7 +448,7 @@ class PowerGrid(Env):
 
             # fetch EV power demand from the EV profile
             EV_power_demand = (
-                self.df_EV.loc[(i, time_step), "ChargingPower"+self.EVScenario+"_kW"]
+                self.df_EV.loc[(i, self.time_step), "ChargingPower"+self.EVScenario+"_kW"]
                 * self.net.storage.loc[i, "n_car"]
                 / 1000
             )  # power requirement from cars in MW
@@ -496,12 +497,10 @@ class PowerGrid(Env):
                 else:
                     self.net.storage.loc[i, "soc_percent"] = 0
                     print("Negative SOC!")
-            self.state[self.NL * 2 + self.NG + i] = self.net.storage.loc[
-                i, "soc_percent"
-            ]
+            self.state[self.NL * 2 + self.NG + i] = self.net.storage.loc[i, "soc_percent"]
 
             # update the EV charging limit since SOC is changed
-            self.update_EV_limit(time_step)
+            self.update_EV_limit()
 
     def load_EV_spec_profiles(self):
         # Load the EV specification
@@ -576,7 +575,8 @@ class PowerGrid(Env):
             - self.df_EV["Time"].astype("int64").min()
         ) // (3600 * 10**9)
         self.df_EV.set_index(["ID", "Time_step"], inplace=True)
-        # Now the df_EV is a two-level indexed DataFrame with the ID and Time as the indices in which only relevant IDs are extracted
+        # Now the df_EV is a two-level indexed DataFrame with the ID and Time_step as the indices in which only relevant IDs are extracted.
+        # Notice that all days are included. Thus, the total time steps are 365*24 = 8760.
 
     def add_EV_group(self, grid):
         # add the EV group to where the loads are
@@ -598,10 +598,10 @@ class PowerGrid(Env):
 
     def select_randomly_day_EV_profile(self):
         # randomly select the EV profile from the df_EV
-        selected_day = random.randint(0, 364) * 24
-        return self.df_EV.loc[
-            (slice(None), selected_day), "SOC"+self.EVScenario
-        ].to_numpy()
+        selected_time = random.randint(0, 364) * 24
+        df_SOC_threshold = self.df_EV.loc[(slice(None), slice(selected_time, selected_time + 23)), "SOC"+self.EVScenario]
+        inital_soc = df_SOC_threshold.groupby(level='ID').first().to_numpy()
+        return inital_soc, selected_time
 
     # normalize the value to the range of space
     def normalize(self, value, max_value, min_value, max_space, min_space):
@@ -692,7 +692,7 @@ class PowerGrid(Env):
         return self.net
 
     # calculate the reward
-    def calculate_reward(self, time_step):
+    def calculate_reward(self):
         # check the violation in the grid and assign penalty
         violated_buses = tb.violated_buses(self.net, self.Vmin, self.Vmax)
         overload_lines = tb.overloaded_lines(self.net, self.linemax)
@@ -737,7 +737,7 @@ class PowerGrid(Env):
         if self.EVScenario is not None:
             penalty_EV = 0
             for i in range(self.N_EV):
-                SOC_threshold = self.df_EV.loc[(i, time_step), "SOC"+self.EVScenario]
+                SOC_threshold = self.df_EV.loc[(i, self.time_step), "SOC"+self.EVScenario]
                 SOC_value = self.net.storage.loc[i, "soc_percent"]
                 if SOC_threshold > SOC_value:
                     self.violation = True
