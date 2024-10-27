@@ -41,9 +41,7 @@ import simbench as sb
 
 # Create a custom environment
 class PowerGrid(Env):
-    def __init__(
-        self, net, stdD=1, dispatching_intervals=24, EVScenario=None, Training=False
-    ):  # assuming dispatching intervals = number of hours in a day
+    def __init__(self, net, stdD=1, dispatching_intervals=24, EVScenario=None, Training=False):  # assuming dispatching intervals = number of hours in a day
         # inheritance from the parent class gymnasium.Env
         super(PowerGrid, self).__init__()
 
@@ -63,7 +61,8 @@ class PowerGrid(Env):
         self.dispatching_intervals = dispatching_intervals  # number of dispatching intervals
         self.EVScenario = EVScenario  # define the EV scenario
         self.training = Training
-        self.SOCviolation = 0
+        self.episode_length = self.dispatching_intervals
+        self.time_step = 0
 
         # implement EV element
         if self.EVScenario is not None:
@@ -71,19 +70,18 @@ class PowerGrid(Env):
             # load EV spec and driving profiles
             self.load_EV_spec_profiles()
 
-            # assume the number of EV groups is the same as the number of loads
+            # initialize the EV paramenters
             self.N_EV = self.NL
-
+            self.SOCviolation = 0
+            self.EV_power_demand = np.zeros(self.N_EV)
+            self.connect_EV_to_grid = np.ones(self.N_EV) # 1: connected, 0: disconnected
+            
             # assign the EV group to the load buses
             if self.net.storage.index.size == 0:
                 self.add_EV_group(self.net)
         else:
             self.N_EV = 0
 
-        # initialization
-        # self.pre_reward = 0
-        self.episode_length = self.dispatching_intervals
-        self.time_step = 0
 
         # define the action space: PG, VG, P_EV(positive for charging, negative for discharging)
         self.action_space = Box(
@@ -93,11 +91,11 @@ class PowerGrid(Env):
             dtype=np.float32,
         )
 
-        # define the observation space: PL, QL, P_renewable(max generation from renewable energy sources), SOC_EV, SOC_threshold
+        # define the observation space: PL, QL, P_renewable(max generation from renewable energy sources), SOC_EV, SOC_threshold, connetion status
         self.observation_space = Box(
-            low=np.zeros((2 * self.NL + self.NG + 2 * self.N_EV,)),
-            high=np.full((2 * self.NL + self.NG + 2 * self.N_EV,), 1),
-            shape=(2 * self.NL + self.NG + 2 * self.N_EV,),
+            low=np.zeros((2 * self.NL + self.NG + 3 * self.N_EV,)),
+            high=np.full((2 * self.NL + self.NG + 3 * self.N_EV,), 1),
+            shape=(2 * self.NL + self.NG + 3 * self.N_EV,),
             dtype=np.float32,
         )
 
@@ -113,10 +111,8 @@ class PowerGrid(Env):
         terminated = False
         truncated = False
 
-        # apply state to load
+        # update net with action and state
         self.net = self.apply_state_to_load()
-
-        # apply action to net
         self.net = self.apply_action_to_net(action)
 
         # run the power flow (Newton-Raphson method)
@@ -179,6 +175,7 @@ class PowerGrid(Env):
             info["EV_SOC"] = self.net.storage.loc[:, "soc_percent"]
             info["soc_violation"] = self.SOCviolation
             info["SOC_threshold"] = self.df_EV.loc[(slice(None), self.time_step), "SOC"+self.EVScenario].values
+
         # decrease the episode length and update time step
         self.episode_length -= 1
         self.time_step = self.time_step + 1
@@ -196,7 +193,9 @@ class PowerGrid(Env):
 
             # update EV state for the next time step
             if self.EVScenario is not None:
-                self.update_EV_state()
+                self.update_EV_SOC()
+                self.update_driving_consumption()
+                self.state[2 * self.NL + self.NG + 2 * self.N_EV: ] = self.connect_EV_to_grid
 
         # get observation for the next state
         observation = self._get_observation()
@@ -207,7 +206,7 @@ class PowerGrid(Env):
 
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
-        # self.pre_reward = 0
+
         self.episode_length = self.dispatching_intervals
 
         # assign initial states for load and generation states by adding noice
@@ -219,9 +218,12 @@ class PowerGrid(Env):
             self.net.storage.loc[:, "soc_percent"], selected_start_time = self.select_randomly_day_EV_profile()
             self.time_step = selected_start_time
             self.state[2 * self.NL + self.NG: 2 * self.NL + self.NG+ self.N_EV] = self.net.storage.loc[:, "soc_percent"]
-            self.state[2 * self.NL + self.NG + self.N_EV:] = self.df_EV.loc[(slice(None), self.time_step), "SOC"+self.EVScenario]
+            self.state[2 * self.NL + self.NG + self.N_EV: 2 * self.NL + self.NG+ 2 * self.N_EV] = self.df_EV.loc[(slice(None), self.time_step), "SOC"+self.EVScenario]
+
             # update the EV (dis)charging limit since SOC is changed
-            self.update_EV_limit()
+            self.update_EV_consumption_limit()
+            self.update_driving_consumption()
+            self.state[2 * self.NL + self.NG + 2 * self.N_EV: ] = self.connect_EV_to_grid
             # update info with EV related info
             # update EV spec in the info
             info = {"EV_spec": self.net.storage,
@@ -230,6 +232,7 @@ class PowerGrid(Env):
 
         # get observation of the states
         observation = self._get_observation()
+
 
         return observation, info
 
@@ -337,7 +340,7 @@ class PowerGrid(Env):
         PLmin = self.net.load.loc[:, "p_mw"] * 0.6  # ASSUMPTION: the min active power consumption is 0.6 times the default value in the net
         self.PLmax = PLmax.to_numpy().flatten("F").astype(np.float64)
         self.PLmin = PLmin.to_numpy().flatten("F").astype(np.float64)
-        QLmax = (abs(self.net.load.loc[:, "q_mvar"]) * 1.4)  # ASSUMPTION: the max reactive power consumption is 1.5 times the default value in the net
+        QLmax = (abs(self.net.load.loc[:, "q_mvar"]) * 1.4)  
         self.QLmax = QLmax.to_numpy().flatten("F").astype(np.float64)
         self.QLmin = (-self.QLmax)  # ASSUMPTION: the reactive power consumption range is zero-centered
 
@@ -349,17 +352,12 @@ class PowerGrid(Env):
             self.PEVmin = np.zeros(self.N_EV)
 
             # update the EV (dis)charging limit
-            self.update_EV_limit()
+            self.update_EV_consumption_limit()
 
     # update EV (dis)charging limit
-    def update_EV_limit(self):
-        discharge_max = (
-            self.net.storage.loc[:, "max_e_mwh"]
-            * self.net.storage.loc[:, "soc_percent"]
-        )
+    def update_EV_consumption_limit(self):
+        discharge_max = (self.net.storage.loc[:, "max_e_mwh"] * self.net.storage.loc[:, "soc_percent"])
         charging_max = self.net.storage.loc[:, "max_e_mwh"] * (1 - self.net.storage.loc[:, "soc_percent"])
-        self.EV_power_demand = np.zeros(self.N_EV)
-
         for i in range(self.N_EV):
             # fetch EV power demand from the EV profile
             EV_power_demand = (
@@ -374,7 +372,25 @@ class PowerGrid(Env):
             self.PEVmax[i] = min(0.001 * 22 * self.net.storage.loc[i, "n_car"], charging_max[i])
     
             self.PEVmin[i] = -min(0.001 * 22 * self.net.storage.loc[i, "n_car"], discharge_max[i])
-        
+    
+
+    def update_driving_consumption(self):
+        for i in range(self.N_EV):
+            # fetch EV power demand from the EV profile
+            EV_power_demand = (
+                self.df_EV.loc[(i, self.time_step), "DrivingConsumption_kWh"]
+                * self.net.storage.loc[i, "n_car"]
+                / 1000
+            )  # power requirement from cars in MW
+            self.EV_power_demand[i] = EV_power_demand
+
+            if self.EV_power_demand[i] != 0:
+                self.connect_EV_to_grid[i] = 0
+                self.net.storage.loc[i, "in_service"] = False
+            else:
+                self.connect_EV_to_grid[i] = 1
+                self.net.storage.loc[i, "in_service"] = True
+
 
     def add_noice_load_renew_state(self):
         # add some noice to PL and QL
@@ -418,6 +434,7 @@ class PowerGrid(Env):
             initial_soc, selected_start_time = self.select_randomly_day_EV_profile()
             self.time_step = selected_start_time
             self.net.storage.loc[:, "soc_percent"] = initial_soc
+            self.update_driving_consumption()
             state = np.concatenate(
                 (
                     self.mu_PL.flatten("F").astype(np.float32),
@@ -425,13 +442,13 @@ class PowerGrid(Env):
                     self.PGcap,
                     initial_soc.flatten("F").astype(np.float32),
                     initial_soc.flatten("F").astype(np.float32),
+                    self.connect_EV_to_grid
                 ),
                 axis=None,
             )
         return state
 
-    def update_EV_state(self):
-        # update SOC of the EVs
+    def update_EV_SOC(self):
         for i in range(self.N_EV):
 
             # calculate the energy before (dis)charging
@@ -439,14 +456,6 @@ class PowerGrid(Env):
                 self.net.storage.loc[i, "max_e_mwh"]
                 * self.net.storage.loc[i, "soc_percent"]
             )
-
-            # fetch EV power demand from the EV profile
-            EV_power_demand = (
-                self.df_EV.loc[(i, self.time_step), "DrivingConsumption_kWh"]
-                * self.net.storage.loc[i, "n_car"]
-                / 1000
-            )  # power requirement from cars in MW
-            self.EV_power_demand[i] = EV_power_demand
 
             # # fetch charging efficiency from the EV spec
             # df_charging_eff = self.df_EV_spec[
@@ -463,7 +472,7 @@ class PowerGrid(Env):
             #         + self.net.res_storage.loc[i, "p_mw"] * charging_efficiency * 1
             #         - EV_power_demand * 1
             #     )
-            energy_after = energy_b4 + self.net.res_storage.loc[i, "p_mw"] - EV_power_demand 
+            energy_after = energy_b4 + self.net.res_storage.loc[i, "p_mw"] - self.EV_power_demand[i] 
         
             if energy_after > self.net.storage.loc[i, "max_e_mwh"] :
                 print("Overcharging!")
@@ -490,9 +499,9 @@ class PowerGrid(Env):
             #         print("Negative SOC!")
             self.state[self.NL * 2 + self.NG + i] = self.net.storage.loc[i, "soc_percent"]
             
-        self.state[self.NL * 2 + self.NG + self.N_EV: ] = self.df_EV.loc[(slice(None), self.time_step), "SOC"+self.EVScenario]
+        self.state[self.NL * 2 + self.NG + self.N_EV: self.NL * 2 + self.NG + 2 * self.N_EV] = self.df_EV.loc[(slice(None), self.time_step), "SOC"+self.EVScenario]
         # update the EV charging limit since SOC is changed
-        self.update_EV_limit()
+        self.update_EV_consumption_limit()
 
     def load_EV_spec_profiles(self):
         # Load the EV specification
@@ -724,8 +733,7 @@ class PowerGrid(Env):
                 self.violation = True
                 violated_phase.append(i)
                 penalty_phase_angle += (self.theta_max - self.net.res_line.loc[i, "angle_diff"]) * 10
-            # penalty_phase_angle = 0
-            # violated_phase = []
+
 
         # EV SOC violation
         if self.EVScenario is not None:
