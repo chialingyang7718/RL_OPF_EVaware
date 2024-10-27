@@ -153,14 +153,8 @@ class PowerGrid(Env):
             "generation_cost": gen_cost,
         }
         if not diverged:
-            if violated_buses is not None:
-                info["bus_violation"] = violated_buses
-            else:
-                info["bus_violation"] = []
-            if overload_lines is not None:
-                info["line_violation"] = overload_lines
-            else:
-                info["line_violation"] = []
+            info["bus_violation"] = violated_buses
+            info["line_violation"] = overload_lines
             info["phase_angle_violation"] = violated_phase
 
 
@@ -186,6 +180,7 @@ class PowerGrid(Env):
             # add some noice to load and renewable generation
             self.add_noice_load_renew_state()
             self.update_EV_SOC()
+            self.update_EV_limit()
             self.update_consumption_connection_state()
 
 
@@ -219,7 +214,6 @@ class PowerGrid(Env):
 
         # update info with EV related info
         # update EV spec in the info
-
         info["EV_spec"] = self.net.storage
         # get observation of the states
         observation = self._get_observation()
@@ -335,7 +329,6 @@ class PowerGrid(Env):
 
 
         # assign the EV limits
-
         # initialize the EV charging limit
         self.PEVmax = np.zeros(self.N_EV)
         self.PEVmin = np.zeros(self.N_EV)
@@ -785,193 +778,3 @@ class PowerGrid(Env):
     # fetch SOC state
     def get_soc(self):
         return self.net.storage["soc_percent"].values
-
-    ####################################
-    # Unused Code
-    ####################################
-
-    # convert the generator into static generator
-    def change_gen_into_sgen(self, grid):
-        for i in grid.gen.index:
-            bus = grid.gen.loc[i, "bus"]
-            p_mw = grid.gen.loc[i, "p_mw"]
-            if "max_p_mw" not in grid.gen:
-                max_p_mw = (
-                    grid.gen.loc[i, "p_mw"] * 1.5
-                )  # assume the max power output is 1.5 times the current power output if not specified
-            else:
-                max_p_mw = grid.gen.loc[i, "max_p_mw"]
-            if "min_p_mw" not in grid.gen:
-                min_p_mw = (
-                    grid.gen.loc[i, "p_mw"] * 0
-                )  # assume the min power output is 0 if not specified
-            else:
-                min_p_mw = grid.gen.loc[i, "min_p_mw"]
-            if "max_q_mvar" not in grid.gen and "q_mvar" in grid.gen:
-                max_q_mvar = (
-                    grid.gen.loc[i, "q_mvar"] * 1.5
-                )  # assume the max reactive power output is 1.5 times the current reactive power output if not specified
-            elif "q_mvar" not in grid.gen:
-                max_q_mvar = 100  # assume the max reactive power output is 100 MVar
-            else:
-                max_q_mvar = grid.gen.loc[i, "max_q_mvar"]
-            if "min_q_mvar" not in grid.gen and "q_mvar" in grid.gen:
-                min_q_mvar = (
-                    abs(grid.gen.loc[i, "q_mvar"]) * -1.5
-                )  # assume the min reactive power output is 1.5 times the current reactive power output if not specified
-            elif "q_mvar" not in grid.gen:
-                min_q_mvar = -100  # assume the min reactive power output is -100 MVar
-            else:
-                min_q_mvar = grid.gen.loc[i, "min_q_mvar"]
-            grid.gen.drop(i, inplace=True)
-            pp.create_sgen(
-                grid,
-                bus,
-                p_mw=p_mw,
-                q_mvar=0,
-                max_p_mw=max_p_mw,
-                min_p_mw=min_p_mw,
-                max_q_mvar=max_q_mvar,
-                min_q_mvar=min_q_mvar,
-            )
-        return grid
-
-    # assign the state based on the data source
-    def assign_state_with_datasource(self):
-        # load the data source profiles
-        self.load_profiles()
-        # assign limits based on data source profiles
-        self.define_limit_with_profile()
-        # sampling the startpoint from the load profile and save the sampled profile into self.XX_profile
-        self.load_ts_sampling()
-        # update the state with the sampled profile
-        self.state = np.concatenate(
-            (
-                self.load_pmw_profile[0],
-                self.load_qvar_profile[0],
-                self.re_pmw_profile[0],
-            ),
-            axis=None,
-        )
-
-    # update the state with the sampled profile
-    def update_state_with_datasource(self):
-        self.state[0 : self.NL] = self.load_pmw_profile[
-            (self.dispatching_intervals - self.episode_length - 1)
-        ]
-        self.state[self.NL : 2 * self.NL] = self.load_qvar_profile[
-            (self.dispatching_intervals - self.episode_length - 1)
-        ]
-        self.state[2 * self.NL :] = self.re_pmw_profile[
-            (self.dispatching_intervals - self.episode_length - 1)
-        ]
-
-    def load_profiles(self, UseSimbench):
-        if UseSimbench == False:
-            # import the profile from json file
-            self.profiles = pd.read_json(
-                "/Users/YANG_Chialing/Desktop/Master_Thesis_TUM/pandapower/tutorials/cigre_timeseries_15min.json"
-            )  # profile for a day
-        else:
-            # import the profile from simbench
-            self.profiles = sb.get_absolute_values(
-                self.net, profiles_instead_of_study_cases=True
-            )  # profiles for a year
-
-    # assign the limits based on the datasource profile
-    def define_limit_with_profile(self):
-        # assign the static generator limits (PQ bus)
-        self.PGmax = (
-            self.profiles[("sgen", "p_mw")].max() * 1.5
-        )  # ASSUMPTION: the max power generation from static generator is 1.5 times the max value in the profile
-        self.PGmin = np.zeros(
-            self.NG
-        )  # ASSUMPTION: the min power generation from static generator is 0 MW
-        self.QGmax = np.full(
-            (self.NG,), 10
-        )  # ASSUMPTION: the max reactive power generation from static generator is 10 MVar
-        self.QGmin = (
-            -self.QGmax
-        )  # ASSUMPTION: the reactive power generation range is zero-centered
-        # assign the load limits (PQ bus)
-        self.PLmax = (
-            self.profiles[("load", "p_mw")].max() * 10
-        )  # ASSUMPTION: the max active power consumption is 10 times the max value in the profile
-        self.PLmin = np.zeros(
-            self.NL
-        )  # ASSUMPTION: the min active power consumption is 0 MW
-        self.QLmax = (
-            abs(self.profiles[("load", "q_mvar")]).max() * 10
-        )  # ASSUMPTION: the max reactive power consumption is 10 times the max value in the profile
-        self.QLmin = (
-            -self.QLmax
-        )  # ASSUMPTION: the reactive power consumption range is zero-centered
-        # assign the voltage and line loading limits (valid for all buses)
-        self.VGmin = 0.94  # ASSUMPTION: the min voltage is 0.94 pu
-        self.VGmax = 1.06  # ASSUMPTION: the max voltage is 1.06 pu
-        self.linemax = 100  # ASSUMPTION: the max line loading is 100%
-
-    # randomly sample the starting time of the load profile
-    def load_ts_sampling(self):
-        # read the load active and reactive power prfiles, power generation profile
-        load_pmw = self.profiles[("load", "p_mw")]
-        load_qvar = self.profiles[("load", "q_mvar")]
-        re_pmw = self.profiles[("sgen", "p_mw")]
-        # fetch the total time step of the profile
-        total_time_step = load_pmw.index.size
-        # randomly sample the starting time
-        sampled_starting_time = random.randint(
-            0, total_time_step - 1 - self.dispatching_intervals
-        )
-        # save the sampled profile into self.XX_profile
-        self.load_pmw_profile = load_pmw.loc[
-            sampled_starting_time : sampled_starting_time
-            + self.dispatching_intervals
-            - 1,
-            :,
-        ].to_numpy()
-        self.load_qvar_profile = load_qvar.loc[
-            sampled_starting_time : sampled_starting_time
-            + self.dispatching_intervals
-            - 1,
-            :,
-        ].to_numpy()
-        self.re_pmw_profile = re_pmw.loc[
-            sampled_starting_time : sampled_starting_time
-            + self.dispatching_intervals
-            - 1,
-            :,
-        ].to_numpy()
-
-    # assign EV to load buses if we decide to differentiate the EV driving profile within the same group
-    def assign_EV_to_loads(self, grid):
-        total_EV = (
-            self.NL * 10
-        )  # total number of EVs is assumed to be 10 times the number of loads
-        EV_ID = []
-
-        # randomly extract EV ID list range from 0 to 199
-        for i in range(total_EV):
-            EV_ID.append(random.randint(0, 199))
-
-        # assign the EV(ID) to the loads depending on the nominal power of the loads. If there are EV(ID) left, assign them to the loads with the highest nominal power
-        load_sum = grid.load.loc[:, "p_mw"].sum()
-        grid.load["EV_ID"] = [
-            [] for _ in grid.load.index
-        ]  # Initialize each cell with an empty list
-        for i in grid.load.index:
-            weight = grid.load.loc[i, "p_mw"] / load_sum
-            n_EV_bus = int(weight * total_EV)  # number of EVs connected to the bus
-
-            for _ in range(n_EV_bus):
-                if EV_ID:  # Check if there are still EV_IDs available
-                    grid.load.loc[i, "EV_ID"].append(
-                        EV_ID.pop(0)
-                    )  # Assign and remove the first available EV_ID
-                else:
-                    break  # No more EV_IDs to assign
-
-            # assign the remaining EV_IDs to the load with the highest nominal power
-            max_load = grid.load["p_mw"].idxmax()
-            if EV_ID:
-                grid.load.loc[max_load, "EV_ID"].extend(EV_ID)
