@@ -88,7 +88,7 @@ if __name__ == "__main__":
     EVScenarios = ["ImmediateFull", "ImmediateBalanced", "Home", "Night"]
     
     for i in [1]:
-    # for i in [0, 1, 2, 3]:
+    # for i in [0, 2, 3]:
         EVScenario = EVScenarios[i]
 
         # Create the vectorized environment
