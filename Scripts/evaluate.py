@@ -241,7 +241,7 @@ if __name__ == "__main__":
     # EVScenarios = ["ImmediateFull", "ImmediateBalanced", "Home", "Night"]
     n_case = 9
     # n_case = int(input("Enter Test Case Number (9, 14, 30, 39, 57): "))
-    sample_size = 1
+    sample_size = 2
     # sample_size = int(input('Enter the number of samples: '))
     # using dictionary comprehension to construct
     # Times = {EVScenario: [] for EVScenario in EVScenarios}
