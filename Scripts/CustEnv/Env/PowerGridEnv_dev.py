@@ -198,9 +198,8 @@ class PowerGrid(Env):
 
     def reset(self, seed=None, options=None):
         super().reset(seed=seed)
-
         self.episode_length = self.dispatching_intervals
-
+        info = {}
         # assign initial states for load and generation states by adding noice
         self.add_noice_load_renew_state()
         # reselect another day for the EV profile randomly
@@ -216,13 +215,10 @@ class PowerGrid(Env):
         self.state[2 * self.NL + self.NG + 2 * self.N_EV: ] = self.connect_EV_to_grid
         # update info with EV related info
         # update EV spec in the info
-        info = {"EV_spec": self.net.storage}
-                
 
+        info["EV_spec"] = self.net.storage
         # get observation of the states
         observation = self._get_observation()
-
-
         return observation, info
 
     def close(self):
