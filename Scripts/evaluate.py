@@ -248,6 +248,10 @@ if __name__ == "__main__":
     # Costs = {EVScenario: [] for EVScenario in EVScenarios}
     # N_violations = {EVScenario: [] for EVScenario in EVScenarios}
     # N_violations_relax = {EVScenario: [] for EVScenario in EVScenarios}
+    Times = []
+    Costs = []
+    N_violations = []
+    N_violations_relax = []
 
     for random_seed in range(sample_size):
         # for i in range(len(EVScenarios)):
@@ -264,8 +268,11 @@ if __name__ == "__main__":
             n_steps=n_steps, n_case=n_case, model=model
         )
         
-
-        print(f"Mean Reward: {sum(rewards)/n_steps}")
+        # append the metrics to the lists
+        Times.append(Time)
+        Costs.append(Cost)
+        N_violations.append(N_violation)
+        N_violations_relax.append(N_violation_relax)
 
 
     # Save the metrics dicts
