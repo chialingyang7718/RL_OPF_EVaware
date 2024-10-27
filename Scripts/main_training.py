@@ -150,39 +150,39 @@ if __name__ == "__main__":
         # soc_log_path = create_unique_soc_log_path(os.path.join(log_path, "SOC"))
         # soc_callback = SOCCallback(log_dir=soc_log_path)
 
-        # create checkpoint callback
-        checkpoint_callback = CheckpointCallback(
-            save_freq=20000,
-            save_path=os.path.join(log_path, "Checkpoints"),
-            name_prefix="Case%s_model"%n_case,
-            )
+    # create checkpoint callback
+    checkpoint_callback = CheckpointCallback(
+        save_freq=20000,
+        save_path=os.path.join(log_path, "Checkpoints"),
+        name_prefix="Case%s_model"%n_case,
+        )
 
-        # create the agent or reload the model
-        if os.path.exists("Training/Model/Case%s/Case%s.zip" %(n_case, n_case)):    # check if the model exists:
-            model = PPO.load("Training/Model/Case%s/Case%s" %(n_case, n_case), env=env)
-            # Continue training the model
-            model.learn(total_timesteps=200000, reset_num_timesteps=False, tb_log_name="PPO_continue", callback=checkpoint_callback, progress_bar=True)
+    # create the agent or reload the model
+    if os.path.exists("Training/Model/Case%s/Case%s.zip" %(n_case, n_case)):    # check if the model exists:
+        model = PPO.load("Training/Model/Case%s/Case%s" %(n_case, n_case), env=env)
+        # Continue training the model
+        model.learn(total_timesteps=200000, reset_num_timesteps=False, tb_log_name="PPO_continue", callback=checkpoint_callback, progress_bar=True)
 
-        else:
-            model = PPO(
-                policy="MlpPolicy",
-                env=env,
-                n_steps=n_steps,
-                batch_size= int(num_envs* n_steps/10),
-                gamma=0.99,
-                verbose=0,
-                policy_kwargs=policy_kwargs,
-                tensorboard_log=log_path,
-            )
-            # total_timesteps = 100000 * (int(n_case/10) + 5)
-            total_timesteps = 500000
-            # model.learn(total_timesteps=60, progress_bar=True)
-            model.learn(total_timesteps=total_timesteps, callback=checkpoint_callback, progress_bar=True)
+    else:
+        model = PPO(
+            policy="MlpPolicy",
+            env=env,
+            n_steps=n_steps,
+            batch_size= int(num_envs* n_steps/10),
+            gamma=0.99,
+            verbose=0,
+            policy_kwargs=policy_kwargs,
+            tensorboard_log=log_path,
+        )
+        # total_timesteps = 100000 * (int(n_case/10) + 5)
+        total_timesteps = 500000
+        # model.learn(total_timesteps=60, progress_bar=True)
+        model.learn(total_timesteps=total_timesteps, callback=checkpoint_callback, progress_bar=True)
 
 
-        # save the model
-        model.save("Training/Model/Case%s/Case%s" %(n_case, n_case))
-        env.close()
+    # save the model
+    model.save("Training/Model/Case%s/Case%s" %(n_case, n_case))
+    env.close()
 
 # DONE: why the model does not end -- Ans: the n_steps was much larger than total_timesteps
 # DONE: implement time series data for simple case
