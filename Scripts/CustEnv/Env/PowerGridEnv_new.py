@@ -19,7 +19,7 @@ Assumptions --- Environment
 - The environment is deterministic.
 - Actions: generation active power, generation voltage (omitted ext. grid since it is typically not a direct control target),
 EV (dis)charging power
-- States: load active power, load reactive power, active power generation from PV or wind, EV SOC, SOC threshold
+- States: load active power, load reactive power, active power generation from PV or wind, EV SOC, SOC threshold, EV connections
 """
 
 # Import pandapower stuff

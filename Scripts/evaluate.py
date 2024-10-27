@@ -41,6 +41,7 @@ def evaluate_PPO_model(n_steps=24, n_case=14, EVScenario=None, model=None):
 
     # Initialize time list for RL model prediction
     RLtime = []
+    generation_cost = []
 
     for step in range(n_steps):
         # set start time for RL model prediction
@@ -48,10 +49,10 @@ def evaluate_PPO_model(n_steps=24, n_case=14, EVScenario=None, model=None):
 
         # Predict the action
         action, _state = model.predict(obs, deterministic=False)
-        obs, reward, terminated, truncated, info = eval_env.step(action)
-
         # Record the time taken for RL model prediction
         RLtime.append(time.process_time() - start)
+        obs, reward, terminated, truncated, info = eval_env.step(action)
+
 
         # Log the metrics
         # rewards
@@ -68,7 +69,7 @@ def evaluate_PPO_model(n_steps=24, n_case=14, EVScenario=None, model=None):
 
             # EV demand, SOC
             df_ev_demand = pd.DataFrame(info["EV_demand"]).transpose()
-            df_ev_soc = pd.DataFrame(info["EV_SOC_beginning"]).transpose()
+            df_ev_soc = pd.DataFrame(info["EV_SOC"]).transpose()
 
             # Generation
             df_gen_p = pd.DataFrame(info["generation_p"]).transpose()
@@ -109,7 +110,7 @@ def evaluate_PPO_model(n_steps=24, n_case=14, EVScenario=None, model=None):
                 [df_ev_demand, pd.DataFrame(info["EV_demand"]).transpose()]
             )
             df_ev_soc = pd.concat(
-                [df_ev_soc, pd.DataFrame(info["EV_SOC_beginning"]).transpose()]
+                [df_ev_soc, pd.DataFrame(info["EV_SOC"]).transpose()]
             )
 
             ## Action
@@ -177,19 +178,19 @@ def evaluate_PPO_model(n_steps=24, n_case=14, EVScenario=None, model=None):
             df_bus_violation.reset_index(drop=True, inplace=True)
             df_line_violation.reset_index(drop=True, inplace=True)
             df_phase_angle_violation.reset_index(drop=True, inplace=True)
-            df_generation_cost = pd.DataFrame(generation_cost)
+            # df_generation_cost = pd.DataFrame(generation_cost)
 
 
             """Save the dataframes to a csv file"""
             # Save the dataframes to a csv file
-            save_all_df_to_csv(n_case, EVScenario, df_EV_spec, df_load_p, df_load_q, df_renewable, df_ev_demand, df_ev_soc, df_gen_p, df_gen_v, df_ev_action, df_voltage, df_line_loading, df_bus_violation, df_line_violation, df_phase_angle_violation, df_generation_cost)
+            save_all_df_to_csv(n_case, EVScenario, df_EV_spec, df_load_p, df_load_q, df_renewable, df_ev_demand, df_ev_soc, df_gen_p, df_gen_v, df_ev_action, df_voltage, df_line_loading, df_bus_violation, df_line_violation, df_phase_angle_violation) #, df_generation_cost)
             
             """Metrices"""
             # Record the time taken for RL model prediction
             Time = sum(RLtime)
 
             # Record the total cost
-            Cost = sum(df_generation_cost[0])
+            Cost = sum(generation_cost)
 
             # Record the violation
 
@@ -206,7 +207,7 @@ def evaluate_PPO_model(n_steps=24, n_case=14, EVScenario=None, model=None):
 
     return rewards, Time, Cost, N_violation, N_violation_relax
 
-def save_all_df_to_csv(n_case, EVScenario, df_EV_spec, df_load_p, df_load_q, df_renewable, df_ev_demand, df_ev_soc, df_gen_p, df_gen_v, df_ev_action, df_voltage, df_line_loading, df_bus_violation, df_line_violation, df_phase_angle_violation, df_generation_cost):
+def save_all_df_to_csv(n_case, EVScenario, df_EV_spec, df_load_p, df_load_q, df_renewable, df_ev_demand, df_ev_soc, df_gen_p, df_gen_v, df_ev_action, df_voltage, df_line_loading, df_bus_violation, df_line_violation, df_phase_angle_violation): #, df_generation_cost):
     # Create the directory if it does not exist
         if not os.path.exists("Evaluation/Case%s/Case%s_%s" %(n_case, n_case, EVScenario)):
             os.makedirs("Evaluation/Case%s/Case%s_%s" %(n_case, n_case, EVScenario))
@@ -232,16 +233,14 @@ def save_all_df_to_csv(n_case, EVScenario, df_EV_spec, df_load_p, df_load_q, df_
         df_phase_angle_violation.to_csv(
             "Evaluation/Case%s/Case%s_%s/phase_angle_violation.csv" %(n_case, n_case, EVScenario), index=False
         )
-        df_generation_cost.to_csv(
-            "Evaluation/Case%s/Case%s_%s/generation_cost.csv" %(n_case, n_case, EVScenario), index=False
-        )
+
 
 if __name__ == "__main__":
 
     EVScenarios = ["ImmediateFull", "ImmediateBalanced", "Home", "Night"]
     n_case = 9
     # n_case = int(input("Enter Test Case Number (9, 14, 30, 39, 57): "))
-    sample_size = 1
+    sample_size = 2
     # sample_size = int(input('Enter the number of samples: '))
     # using dictionary comprehension to construct
     Times = {EVScenario: [] for EVScenario in EVScenarios}
