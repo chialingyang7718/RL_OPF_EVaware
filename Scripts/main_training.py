@@ -26,13 +26,13 @@ import math
 
 
 # initialize the vectorized environment
-def make_env(env_id, net, dispatching_interval, EVScenario, Training, rank):
+def make_env(env_id, net, dispatching_interval, Training, rank):
     def _init():
         env = gym.make(
             env_id,
             net=net,
             dispatching_intervals=dispatching_interval,
-            EVScenario=EVScenario,
+            # EVScenario=EVScenario,
             Training=Training,
         )
         env.reset(seed=rank)
@@ -85,64 +85,64 @@ if __name__ == "__main__":
     env_id = "PowerGrid-v1"
     num_envs = 6
     Training = True
-    EVScenarios = ["ImmediateFull", "ImmediateBalanced", "Home", "Night"]
+    # EVScenarios = ["ImmediateFull", "ImmediateBalanced", "Home", "Night"]
     
-    for i in [1]:
-    # for i in [0, 2, 3]:
-        EVScenario = EVScenarios[i]
+    # for i in [1]:
+    # # for i in [0, 2, 3]:
+    #     EVScenario = EVScenarios[i]
 
-        # Create the vectorized environment
-        env = SubprocVecEnv(
-            [
-                make_env(
-                    env_id,
-                    net=grid,
-                    dispatching_interval=24,
-                    EVScenario=EVScenario,
-                    Training=Training,
-                    rank=i,
-                )
-                for i in range(num_envs)
-            ]
-        )
+    # Create the vectorized environment
+    env = SubprocVecEnv(
+        [
+            make_env(
+                env_id,
+                net=grid,
+                dispatching_interval=24,
+                # EVScenario=EVScenario,
+                Training=Training,
+                rank=i,
+            )
+            for i in range(num_envs)
+        ]
+    )
 
-        # create the log path
-        log_path = os.path.join("Training", "Logs", "Case%s_%s" % (n_case, EVScenario))
+    # create the log path
+    log_path = os.path.join("Training", "Logs", "Case%s" % (n_case))
 
-        # custom MLP policy: network depends on the observation space, indirectly, the number of buses
-
-
-        # choose a network size that is slightly larger than observation space
-        NN_size = nearestPowerOf2(n_case * 4)  
+    # custom MLP policy: network depends on the observation space, indirectly, the number of buses
 
 
-        # the policy network architecture (if the number of buses is less than 20, 2 layers; otherwise, 3 layers)
-        if n_case <= 20:
-            n_steps = 120
+    # choose a network size that is slightly larger than observation space
+    NN_size = nearestPowerOf2(n_case * 4)  
 
-            n_layers = 2 + int(n_case/10)
+
+    # the policy network architecture (if the number of buses is less than 20, 2 layers; otherwise, 3 layers)
+    if n_case <= 20:
+        n_steps = 120
+
+        n_layers = 2 + int(n_case/10)
+        policy_kwargs = dict(
+                activation_fn=th.nn.Tanh,
+                net_arch=dict(pi=[NN_size] * n_layers, vf=[NN_size] * min(n_layers, 3))  # at max 3 layers for value function
+            )
+
+    elif n_case > 20:
+        n_steps = 60
+        if n_case == 30 or n_case == 33:
             policy_kwargs = dict(
                     activation_fn=th.nn.Tanh,
-                    net_arch=dict(pi=[NN_size] * n_layers, vf=[NN_size] * min(n_layers, 3))  # at max 3 layers for value function
+                    net_arch=dict(pi=[NN_size*4, NN_size*2, NN_size*2, NN_size, NN_size], vf=[NN_size*4, int(NN_size/2), int(NN_size/4)])  
                 )
-
-        elif n_case > 20:
-            n_steps = 60
-            if n_case == 30 or n_case == 33:
-                policy_kwargs = dict(
-                        activation_fn=th.nn.Tanh,
-                        net_arch=dict(pi=[NN_size*4, NN_size*2, NN_size*2, NN_size, NN_size], vf=[NN_size*4, int(NN_size/2), int(NN_size/4)])  
-                    )
-            elif n_case == 39:
-                policy_kwargs = dict(
-                        activation_fn=th.nn.Tanh,
-                        net_arch=dict(pi=[NN_size*4, NN_size*2, NN_size*2, NN_size*2, NN_size, NN_size], vf=[NN_size*4, int(NN_size/2), int(NN_size/4)])  
-                    )
-            elif n_case == 57:
-                policy_kwargs = dict(
-                        activation_fn=th.nn.Tanh,
-                        net_arch=dict(pi=[NN_size*4, NN_size*2, NN_size*2, NN_size*2, NN_size, NN_size], vf=[NN_size*4, int(NN_size/2), int(NN_size/4)]) 
-                    )
+        elif n_case == 39:
+            policy_kwargs = dict(
+                    activation_fn=th.nn.Tanh,
+                    net_arch=dict(pi=[NN_size*4, NN_size*2, NN_size*2, NN_size*2, NN_size, NN_size], vf=[NN_size*4, int(NN_size/2), int(NN_size/4)])  
+                )
+        elif n_case == 57:
+            policy_kwargs = dict(
+                    activation_fn=th.nn.Tanh,
+                    net_arch=dict(pi=[NN_size*4, NN_size*2, NN_size*2, NN_size*2, NN_size, NN_size], vf=[NN_size*4, int(NN_size/2), int(NN_size/4)]) 
+                )
         
 
 
@@ -158,8 +158,8 @@ if __name__ == "__main__":
             )
 
         # create the agent or reload the model
-        if os.path.exists("Training/Model/Case%s/Case%s_%s.zip" %(n_case, n_case, EVScenario)):    # check if the model exists:
-            model = PPO.load("Training/Model/Case%s/Case%s_%s" %(n_case, n_case, EVScenario), env=env)
+        if os.path.exists("Training/Model/Case%s/Case%s.zip" %(n_case, n_case)):    # check if the model exists:
+            model = PPO.load("Training/Model/Case%s/Case%s" %(n_case, n_case), env=env)
             # Continue training the model
             model.learn(total_timesteps=200000, reset_num_timesteps=False, tb_log_name="PPO_continue", callback=checkpoint_callback, progress_bar=True)
 
@@ -181,7 +181,7 @@ if __name__ == "__main__":
 
 
         # save the model
-        model.save("Training/Model/Case%s/Case%s_%s" %(n_case, n_case, EVScenario))
+        model.save("Training/Model/Case%s/Case%s" %(n_case, n_case))
         env.close()
 
 # DONE: why the model does not end -- Ans: the n_steps was much larger than total_timesteps
