@@ -119,8 +119,9 @@ if __name__ == "__main__":
         # the policy network architecture (if the number of buses is less than 20, 2 layers; otherwise, 3 layers)
         if n_case <= 20:
             n_steps = 120
-
-            n_layers = 2 + int(n_case/10)
+            
+            n_layers = 3
+            # n_layers = 2 + int(n_case/10)
             policy_kwargs = dict(
                     activation_fn=th.nn.Tanh,
                     net_arch=dict(pi=[NN_size] * n_layers, vf=[NN_size] * min(n_layers, 3))  # at max 3 layers for value function

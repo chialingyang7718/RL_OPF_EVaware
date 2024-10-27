@@ -103,7 +103,7 @@ class PowerGrid(Env):
         self.define_limit()
 
         # initialize the state with existing single data saved in the grid
-        self.state = self.read_state_from_grid()
+        self.state = self.create_state()
 
 
     def step(self, action):
@@ -194,8 +194,8 @@ class PowerGrid(Env):
             # update EV state for the next time step
             if self.EVScenario is not None:
                 self.update_EV_SOC()
-                self.update_driving_consumption()
-                self.state[2 * self.NL + self.NG + 2 * self.N_EV: ] = self.connect_EV_to_grid
+                self.update_EV_limit()
+                self.update_consumption_connection_state()
 
         # get observation for the next state
         observation = self._get_observation()
@@ -215,15 +215,17 @@ class PowerGrid(Env):
         # assign initial state for EV SOC
         if self.EVScenario is not None:
             # reselect another day for the EV profile randomly
-            self.net.storage.loc[:, "soc_percent"], selected_start_time = self.select_randomly_day_EV_profile()
+            initial_soc, selected_start_time = self.select_randomly_day_EV_profile()
+            # initialize the time step and soc of the EVs
             self.time_step = selected_start_time
+            self.net.storage.loc[:, "soc_percent"] = initial_soc
             self.state[2 * self.NL + self.NG: 2 * self.NL + self.NG+ self.N_EV] = self.net.storage.loc[:, "soc_percent"]
-            self.state[2 * self.NL + self.NG + self.N_EV: 2 * self.NL + self.NG+ 2 * self.N_EV] = self.df_EV.loc[(slice(None), self.time_step), "SOC"+self.EVScenario]
+            self.state[2 * self.NL + self.NG + self.N_EV: 2 * self.NL + self.NG+ 2 * self.N_EV] = self.df_EV.loc[(slice(None), self.time_step), "SOC"+self.EVScenario].to_numpy()
 
             # update the EV (dis)charging limit since SOC is changed
-            self.update_EV_consumption_limit()
-            self.update_driving_consumption()
-            self.state[2 * self.NL + self.NG + 2 * self.N_EV: ] = self.connect_EV_to_grid
+            self.update_EV_limit()
+            self.update_consumption_connection_state()
+
             # update info with EV related info
             # update EV spec in the info
             info = {"EV_spec": self.net.storage,
@@ -352,10 +354,10 @@ class PowerGrid(Env):
             self.PEVmin = np.zeros(self.N_EV)
 
             # update the EV (dis)charging limit
-            self.update_EV_consumption_limit()
+            self.update_EV_limit()
 
     # update EV (dis)charging limit
-    def update_EV_consumption_limit(self):
+    def update_EV_limit(self):
         discharge_max = (self.net.storage.loc[:, "max_e_mwh"] * self.net.storage.loc[:, "soc_percent"])
         charging_max = self.net.storage.loc[:, "max_e_mwh"] * (1 - self.net.storage.loc[:, "soc_percent"])
         for i in range(self.N_EV):
@@ -365,16 +367,14 @@ class PowerGrid(Env):
                 * self.net.storage.loc[i, "n_car"]
                 / 1000
             )  # power requirement from cars in MW
-            self.EV_power_demand[i] = EV_power_demand
             # reserve the power for EV demand (to avoid discharging too much that EVs demand is not fullfilled)
             discharge_max[i] -= EV_power_demand
             # the charging speed is 22 kw and assume all the EVs are connected in parallel
             self.PEVmax[i] = min(0.001 * 22 * self.net.storage.loc[i, "n_car"], charging_max[i])
-    
             self.PEVmin[i] = -min(0.001 * 22 * self.net.storage.loc[i, "n_car"], discharge_max[i])
     
 
-    def update_driving_consumption(self):
+    def update_consumption_connection_state(self):
         for i in range(self.N_EV):
             # fetch EV power demand from the EV profile
             EV_power_demand = (
@@ -384,13 +384,14 @@ class PowerGrid(Env):
             )  # power requirement from cars in MW
             self.EV_power_demand[i] = EV_power_demand
 
+            # update the connection state
             if self.EV_power_demand[i] != 0:
                 self.connect_EV_to_grid[i] = 0
                 self.net.storage.loc[i, "in_service"] = False
             else:
                 self.connect_EV_to_grid[i] = 1
                 self.net.storage.loc[i, "in_service"] = True
-
+        self.state[self.NL * 2 + self.NG + 2 * self.N_EV: ] = self.connect_EV_to_grid
 
     def add_noice_load_renew_state(self):
         # add some noice to PL and QL
@@ -414,7 +415,7 @@ class PowerGrid(Env):
 
 
     # read the active and reactive power of the loads, active power of gen from self.net.load
-    def read_state_from_grid(self):
+    def create_state(self):
         # read the active and reactive power of the loads
         self.mu_PL = self.net.load.loc[:, ["p_mw"]].to_numpy()
         self.mu_QL = self.net.load.loc[:, ["q_mvar"]].to_numpy()
@@ -434,7 +435,16 @@ class PowerGrid(Env):
             initial_soc, selected_start_time = self.select_randomly_day_EV_profile()
             self.time_step = selected_start_time
             self.net.storage.loc[:, "soc_percent"] = initial_soc
-            self.update_driving_consumption()
+
+            for i in range(self.N_EV):
+                # update the connection state
+                if self.EV_power_demand[i] != 0:
+                    self.connect_EV_to_grid[i] = 0
+                    self.net.storage.loc[i, "in_service"] = False
+                else:
+                    self.connect_EV_to_grid[i] = 1
+                    self.net.storage.loc[i, "in_service"] = True
+
             state = np.concatenate(
                 (
                     self.mu_PL.flatten("F").astype(np.float32),
@@ -499,9 +509,9 @@ class PowerGrid(Env):
             #         print("Negative SOC!")
             self.state[self.NL * 2 + self.NG + i] = self.net.storage.loc[i, "soc_percent"]
             
-        self.state[self.NL * 2 + self.NG + self.N_EV: self.NL * 2 + self.NG + 2 * self.N_EV] = self.df_EV.loc[(slice(None), self.time_step), "SOC"+self.EVScenario]
-        # update the EV charging limit since SOC is changed
-        self.update_EV_consumption_limit()
+        self.state[self.NL * 2 + self.NG + self.N_EV: self.NL * 2 + self.NG + 2 * self.N_EV] = self.df_EV.loc[(slice(None), self.time_step), "SOC"+self.EVScenario].to_numpy()
+
+        
 
     def load_EV_spec_profiles(self):
         # Load the EV specification
