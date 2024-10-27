@@ -734,7 +734,6 @@ class PowerGrid(Env):
                 violated_phase.append(i)
                 penalty_phase_angle += (self.theta_max - self.net.res_line.loc[i, "angle_diff"]) * 10
 
-
         # EV SOC violation
         if self.EVScenario is not None:
             penalty_EV = 0
