@@ -738,12 +738,18 @@ class PowerGrid(Env):
         if self.EVScenario is not None:
             penalty_EV = 0
             for i in range(self.N_EV):
+                energy_b4 = (self.net.storage.loc[i, "max_e_mwh"]* self.net.storage.loc[i, "soc_percent"])
+                energy_after = energy_b4 + self.net.res_storage.loc[i, "p_mw"] - self.EV_power_demand[i] 
+                updated_SOC = energy_after / self.net.storage.loc[i, "max_e_mwh"]
                 SOC_threshold = self.df_EV.loc[(i, self.time_step), "SOC"+self.EVScenario]
-                SOC_value = self.net.storage.loc[i, "soc_percent"]
-                if SOC_threshold > SOC_value:
+                if SOC_threshold > updated_SOC:
                     self.violation = True
                     self.SOCviolation = 1
-                    penalty_EV += (SOC_value - SOC_threshold) * 1000
+                    penalty_EV += (updated_SOC - SOC_threshold) * 1000
+                elif updated_SOC > 1:
+                    self.violation = True
+                    self.SOCviolation = 1
+                    penalty_EV += (1 - updated_SOC) * 1000
                 else:
                     self.SOCviolation = 0
 
