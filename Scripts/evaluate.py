@@ -42,13 +42,17 @@ def evaluate_PPO_model(n_steps=24, n_case=14, model=None):
     RLTime = 0
     generation_cost = 0
     rewards = []
+    bus_violation = 0
+    line_violation = 0
+    angle_violation = 0
+    SOCviolation = 0
 
     for step in range(n_steps):
         # set start time for RL model prediction
         start = time.process_time()
 
         # Predict the action
-        action, _state = model.predict(obs, deterministic=False)
+        action, _state = model.predict(obs, deterministic=True)
 
         # Record the time taken for RL model prediction
         RLTime += time.process_time() - start
@@ -95,8 +99,6 @@ def evaluate_PPO_model(n_steps=24, n_case=14, model=None):
 
             # Phase Angle Violation
             df_phase_angle_violation = pd.DataFrame(info["phase_angle_violation"]).transpose()
-
-
         else:
             ## State
             # Load
@@ -158,11 +160,19 @@ def evaluate_PPO_model(n_steps=24, n_case=14, model=None):
             # Phase Angle Violation
             df_phase_angle_violation = pd.concat([df_phase_angle_violation,pd.DataFrame(info["phase_angle_violation"]).transpose()])
 
-        # SOC Violation
-        if info["soc_violation"]:
-            SOCviolation = 1
-        else:
-            SOCviolation = 0
+        # Record the number of violations
+        if info["bus_violation"].size != 0:
+            bus_violation += 1
+        
+        if info["line_violation"].size != 0:
+            line_violation += 1
+        
+        if info["phase_angle_violation"].size != 0:
+            angle_violation += 1
+        
+        if info["SOC_violation"]:
+            SOCviolation += 1
+    
 
         # Generation Cost
         generation_cost += info["generation_cost"]
@@ -191,19 +201,12 @@ def evaluate_PPO_model(n_steps=24, n_case=14, model=None):
             # Save the dataframes to a csv file
             save_all_df_to_csv(n_case, df_EV_spec, df_load_p, df_load_q, df_renewable, df_ev_demand, df_ev_soc, df_gen_p, df_gen_v, df_ev_action, df_voltage, df_line_loading, df_bus_violation, df_line_violation, df_phase_angle_violation) #, df_generation_cost)
             
-            # Record the violation
-            if df_bus_violation.empty & df_line_violation.empty & df_phase_angle_violation.empty:
-                Violation_relax = 0
-                Violation = SOCviolation
-            else:
-                Violation_relax = 1
-                Violation = 1
 
             # Reset the environment for a new episode
             obs, info = eval_env.reset()
     eval_env.close()
 
-    return rewards, RLTime, generation_cost, Violation, Violation_relax
+    return rewards, RLTime, generation_cost, bus_violation, line_violation, angle_violation, SOCviolation
 
 def save_all_df_to_csv(n_case, df_EV_spec, df_load_p, df_load_q, df_renewable, df_ev_demand, df_ev_soc, df_gen_p, df_gen_v, df_ev_action, df_voltage, df_line_loading, df_bus_violation, df_line_violation, df_phase_angle_violation):
     # Create the directory if it does not exist
@@ -250,8 +253,11 @@ if __name__ == "__main__":
     # N_violations_relax = {EVScenario: [] for EVScenario in EVScenarios}
     Times = []
     Costs = []
-    N_violations = []
-    N_violations_relax = []
+    N_bus_violations = []
+    N_line_violations = []
+    N_angle_violations = []
+    N_SOC_violations = []
+
 
     for random_seed in range(sample_size):
         # for i in range(len(EVScenarios)):
@@ -264,20 +270,28 @@ if __name__ == "__main__":
         # model = PPO.load("Training/Model/Case%s/Case%s_2" %(n_case, n_case))
         model.set_random_seed(random_seed)
         # Evaluate the model
-        rewards, Time, Cost, N_violation, N_violation_relax = evaluate_PPO_model(
+        rewards, Time, Cost, bus_violation, line_violation, angle_violation, SOCviolation = evaluate_PPO_model(
             n_steps=n_steps, n_case=n_case, model=model
         )
         
         # append the metrics to the lists
         Times.append(Time)
         Costs.append(Cost)
-        N_violations.append(N_violation)
-        N_violations_relax.append(N_violation_relax)
+        N_bus_violations.append(bus_violation)
+        N_line_violations.append(line_violation)
+        N_angle_violations.append(angle_violation)
+        N_SOC_violations.append(SOCviolation)
+    
+        print("Sample: ", random_seed)
+        print("Total Rewards: ", sum(rewards))
+        print("Generation Cost: ", Cost)
+        print("Bus Violations: ", bus_violation, "Line Violations: ", line_violation, "Angle Violations: ", angle_violation, "SOC Violations: ", SOCviolation, "\n")
+
 
 
     # Save the metrics dicts
     with open("Evaluation/Case%s/Case%s_metrics.pkl" %(n_case, n_case), "wb") as f:
-        pickle.dump([Time, Cost, N_violation, N_violation_relax], f)
+        pickle.dump([Time, Cost, N_bus_violations, N_line_violations, N_angle_violations, N_SOC_violations], f)
 
 
         # # Plot rewards over time
