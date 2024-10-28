@@ -72,7 +72,7 @@ class PowerGrid(Env):
         self.SOCviolation = False
         self.N_EV = self.NL
         self.EV_power_demand = np.zeros(self.N_EV)
-        self.SOC_min = 0
+        self.SOC_min = 0.3
         self.SOC_max = 1
         self.connect_EV_to_grid = np.ones(self.N_EV) # 1: connected, 0: disconnected
         self.updated_SOC = np.zeros(self.N_EV)
@@ -163,7 +163,7 @@ class PowerGrid(Env):
         info["EV_demand"] = self.EV_power_demand
         info["EV_p"] = self.net.res_storage.loc[:, "p_mw"]
         info["EV_SOC"] = self.net.storage.loc[:, "soc_percent"]
-        info["soc_violation"] = self.SOCviolation
+        info["SOC_violation"] = self.SOCviolation
             # info["SOC_threshold"] = self.df_EV.loc[(slice(None), self.time_step), "SOC"+self.EVScenario].values
 
         # decrease the episode length and update time step
