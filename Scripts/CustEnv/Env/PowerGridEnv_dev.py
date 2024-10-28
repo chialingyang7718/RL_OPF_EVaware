@@ -19,7 +19,7 @@ Assumptions --- Environment
 - The environment is deterministic.
 - Actions: generation active power, generation voltage (omitted ext. grid since it is typically not a direct control target),
 EV (dis)charging power
-- States: load active power, load reactive power, active power generation from PV or wind, EV SOC, EV driving consumption, EV connection status
+- States: load active power, load reactive power, active power generation from PV or wind, EV SOC, EV connection status
 """
 
 # Import pandapower stuff
@@ -69,12 +69,13 @@ class PowerGrid(Env):
         self.load_EV_spec_profiles()
 
         # initialize the EV paramenters
-        self.SOCviolation = 0
+        self.SOCviolation = False
         self.N_EV = self.NL
         self.EV_power_demand = np.zeros(self.N_EV)
         self.SOC_min = 0
         self.SOC_max = 1
         self.connect_EV_to_grid = np.ones(self.N_EV) # 1: connected, 0: disconnected
+        self.updated_SOC = np.zeros(self.N_EV)
         
         # assign the EV group to the load buses
         if self.net.storage.index.size == 0:
@@ -90,9 +91,9 @@ class PowerGrid(Env):
 
         # define the observation space: PL, QL, P_renewable(max generation from renewable energy sources), SOC_EV, driving_consump, connetion status
         self.observation_space = Box(
-            low=np.zeros((2 * self.NL + self.NG + 3 * self.N_EV,)),
-            high=np.full((2 * self.NL + self.NG + 3 * self.N_EV,), 1),
-            shape=(2 * self.NL + self.NG + 3 * self.N_EV,),
+            low=np.zeros((2 * self.NL + self.NG + 2 * self.N_EV,)),
+            high=np.full((2 * self.NL + self.NG + 2 * self.N_EV,), 1),
+            shape=(2 * self.NL + self.NG + 2 * self.N_EV,),
             dtype=np.float32,
         )
 
@@ -335,7 +336,7 @@ class PowerGrid(Env):
 
         # update the EV (dis)charging limit
         self.update_EV_limit()
-        self.EV_cap = self.net.storage.loc[:, "max_e_mwh"].to_numpy().flatten("F").astype(np.float64)
+        # self.EV_cap = self.net.storage.loc[:, "max_e_mwh"].to_numpy().flatten("F").astype(np.float64)
 
     # update EV (dis)charging limit
     def update_EV_limit(self):
@@ -350,7 +351,7 @@ class PowerGrid(Env):
             )  # power requirement from cars in MW
             # reserve the power for EV demand (to avoid discharging too much that EVs demand is not fullfilled)
             discharge_max[i] -= EV_power_demand
-            # the charging speed is 22 kw and assume all the EVs are connected in parallel
+            # the charging speed is 3.7 kw and assume all the EVs are connected in parallel
             self.PEVmax[i] = min(0.001 * 3.7 * self.net.storage.loc[i, "n_car"], charging_max[i])
             self.PEVmin[i] = -min(0.001 * 3.7 * self.net.storage.loc[i, "n_car"], discharge_max[i])
 
@@ -375,24 +376,12 @@ class PowerGrid(Env):
                 self.connect_EV_to_grid[i] = 1
                 self.net.storage.loc[i, "in_service"] = True
         # update the state  
-        self.state[self.NL * 2 + self.NG + self.N_EV: self.NL * 2 + self.NG + 2 * self.N_EV] = self.EV_power_demand
-        self.state[self.NL * 2 + self.NG + 2 * self.N_EV: ] = self.connect_EV_to_grid
+        # self.state[self.NL * 2 + self.NG + self.N_EV: self.NL * 2 + self.NG + 2 * self.N_EV] = self.EV_power_demand
+        self.state[self.NL * 2 + self.NG + self.N_EV: ] = self.connect_EV_to_grid
         
 
 
     def add_noice_load_renew_state(self):
-        # add some noice to PL and QL
-        # for i in self.net.load.index:
-        #     while True:
-        #         random_PL = np.random.normal(self.mu_PL[i], self.stdD)
-        #         if self.PLmin[i] <= random_PL <= self.PLmax[i]:
-        #             self.state[i] = random_PL
-        #             break
-        #     while True:
-        #         random_QL = np.random.normal(self.mu_QL[i], self.stdD)
-        #         if self.QLmin[i] <= random_QL <= self.QLmax[i]:
-        #             self.state[i + self.NL] = random_QL
-        #             break
         self.state[: self.NL] = np.random.uniform(self.PLmin, self.PLmax)
         self.state[self.NL : 2 * self.NL] = np.random.uniform(self.QLmin, self.QLmax)
 
@@ -438,7 +427,7 @@ class PowerGrid(Env):
                 self.mu_QL.flatten("F").astype(np.float32),
                 self.PGcap,
                 initial_soc.to_numpy(),
-                self.EV_power_demand,
+                # self.EV_power_demand,
                 self.connect_EV_to_grid
             ),
             axis=None,
@@ -448,19 +437,19 @@ class PowerGrid(Env):
     def update_EV_SOC(self):
         for i in range(self.N_EV):
             # calculate the energy before (dis)charging
-            energy_b4 = (self.net.storage.loc[i, "max_e_mwh"]* self.net.storage.loc[i, "soc_percent"])
-            energy_after = energy_b4 + self.net.res_storage.loc[i, "p_mw"] - self.EV_power_demand[i] 
+            # energy_b4 = (self.net.storage.loc[i, "max_e_mwh"]* self.net.storage.loc[i, "soc_percent"])
+            # energy_after = energy_b4 + self.net.res_storage.loc[i, "p_mw"] - self.EV_power_demand[i] 
         
-            if energy_after > self.net.storage.loc[i, "max_e_mwh"] :
+            # if energy_after > self.net.storage.loc[i, "max_e_mwh"] :
+            if self.updated_SOC[i] > 1:
                 print("Overcharging!")
                 self.net.storage.loc[i, "soc_percent"] = 1
-            elif energy_after < 0:
+            # elif energy_after < 0:
+            elif self.updated_SOC[i] < 0:
                 print("Negative SOC!")
                 self.net.storage.loc[i, "soc_percent"] = 0
             else:
-                self.net.storage.loc[i, "soc_percent"] = (
-                    energy_after / self.net.storage.loc[i, "max_e_mwh"]
-                )
+                self.net.storage.loc[i, "soc_percent"] = self.updated_SOC[i]
             self.state[self.NL * 2 + self.NG + i] = self.net.storage.loc[i, "soc_percent"]
 
 
@@ -608,12 +597,12 @@ class PowerGrid(Env):
                 )
             )
 
-
-        normalized_obs.extend(self.state[self.NL * 2 + self.NG : self.NL * 2 + self.NG + self.N_EV])
-        for i in range(self.N_EV):
-            normalized_obs.append(self.normalize(self.state[self.NL * 2 + self.NG + self.N_EV + i], self.EV_cap[i], 0, 1, 0))
+        normalized_obs.extend(self.state[self.NL * 2 + self.NG :])
+        # normalized_obs.extend(self.state[self.NL * 2 + self.NG : self.NL * 2 + self.NG + self.N_EV])
+        # for i in range(self.N_EV):
+        #     normalized_obs.append(self.normalize(self.state[self.NL * 2 + self.NG + self.N_EV + i], self.EV_cap[i], 0, 1, 0))
         
-        normalized_obs.extend(self.state[self.NL * 2 + self.NG + 2 * self.N_EV: ])
+        # normalized_obs.extend(self.state[self.NL * 2 + self.NG + 2 * self.N_EV: ])
 
         return np.array(normalized_obs).astype(np.float32)
 
@@ -699,21 +688,23 @@ class PowerGrid(Env):
 
         # EV SOC violation
         penalty_EV = 0
+    
         for i in range(self.N_EV):
+            # if self.connect_EV_to_grid[i] == 1: 
             # calculate the energy before (dis)charging
             energy_b4 = (self.net.storage.loc[i, "max_e_mwh"]* self.net.storage.loc[i, "soc_percent"])
             energy_after = energy_b4 + self.net.res_storage.loc[i, "p_mw"] - self.EV_power_demand[i] 
-            updated_SOC = energy_after / self.net.storage.loc[i, "max_e_mwh"]
-            if updated_SOC < self.SOC_min:
+            self.updated_SOC[i] = energy_after / self.net.storage.loc[i, "max_e_mwh"]
+            if self.updated_SOC[i] < self.SOC_min:
                 self.violation = True
-                self.SOCviolation = 1
-                penalty_EV += (updated_SOC - self.SOC_min) * 1000
-            elif updated_SOC > self.SOC_max:
+                self.SOCviolation = True
+                penalty_EV += (self.updated_SOC[i] - self.SOC_min) * 1000
+            elif self.updated_SOC[i] > self.SOC_max:
                 self.violation = True
-                self.SOCviolation = 1
-                penalty_EV += (self.SOC_max - updated_SOC) * 1000
+                self.SOCviolation = True
+                penalty_EV += (self.SOC_max - self.updated_SOC[i]) * 1000
             else:
-                self.SOCviolation = 0
+                self.SOCviolation = False
 
         # assign rewards based on the violation condition and generation cost
         if self.violation == True:
