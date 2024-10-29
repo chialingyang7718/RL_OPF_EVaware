@@ -85,11 +85,6 @@ if __name__ == "__main__":
     env_id = "PowerGrid-v2"
     num_envs = 6
     Training = True
-    # EVScenarios = ["ImmediateFull", "ImmediateBalanced", "Home", "Night"]
-    
-    # for i in [1]:
-    # # for i in [0, 2, 3]:
-    #     EVScenario = EVScenarios[i]
 
     # Create the vectorized environment
     env = SubprocVecEnv(
@@ -113,13 +108,11 @@ if __name__ == "__main__":
 
 
     # choose a network size that is slightly larger than observation space
-    NN_size = nearestPowerOf2(n_case * 4)  
-
+    NN_size = nearestPowerOf2(n_case * 4) 
+    n_steps = 120
 
     # the policy network architecture (if the number of buses is less than 20, 2 layers; otherwise, 3 layers)
     if n_case <= 20:
-        n_steps = 120
-
         n_layers = 2 + int(n_case/10)
         policy_kwargs = dict(
                 activation_fn=th.nn.Tanh,
@@ -127,7 +120,6 @@ if __name__ == "__main__":
             )
 
     elif n_case > 20:
-        n_steps = 60
         if n_case == 30 or n_case == 33:
             policy_kwargs = dict(
                     activation_fn=th.nn.Tanh,
