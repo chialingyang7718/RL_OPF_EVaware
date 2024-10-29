@@ -244,7 +244,7 @@ if __name__ == "__main__":
     n_case = 9
     # n_case = int(input("Enter Test Case Number (9, 14, 30, 39, 57): "))
 
-    sample_size = 5
+    sample_size = 100
     # sample_size = int(input('Enter the number of samples: '))
 
     # check if the pkl exists
