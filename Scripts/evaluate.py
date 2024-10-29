@@ -20,7 +20,7 @@ import time
 import pickle
 
 
-def evaluate_PPO_model(n_steps=24, n_case=14, model=None):
+def evaluate_PPO_model(n_steps=24, n_case=14, model=None,random_seed=None):
     # Load the environment
     grid = load_test_case_grid(n_case)
     # eval_env = gym.make('PowerGrid-v0', net=grid, dispatching_intervals=24, EVaware=True, Training=True)
@@ -167,10 +167,10 @@ def evaluate_PPO_model(n_steps=24, n_case=14, model=None):
         if info["line_violation"].size != 0:
             line_violation += 1
         
-        if info["phase_angle_violation"].size != 0:
+        if len(info["phase_angle_violation"]) != 0:
             angle_violation += 1
-        
-        if info["SOC_violation"]:
+
+        if info["SOC_violation"] != 0:
             SOCviolation += 1
     
 
@@ -199,7 +199,7 @@ def evaluate_PPO_model(n_steps=24, n_case=14, model=None):
 
             """Save the dataframes to a csv file"""
             # Save the dataframes to a csv file
-            save_all_df_to_csv(n_case, df_EV_spec, df_load_p, df_load_q, df_renewable, df_ev_demand, df_ev_soc, df_gen_p, df_gen_v, df_ev_action, df_voltage, df_line_loading, df_bus_violation, df_line_violation, df_phase_angle_violation) #, df_generation_cost)
+            save_all_df_to_csv(random_seed, n_case, df_EV_spec, df_load_p, df_load_q, df_renewable, df_ev_demand, df_ev_soc, df_gen_p, df_gen_v, df_ev_action, df_voltage, df_line_loading, df_bus_violation, df_line_violation, df_phase_angle_violation) #, df_generation_cost)
             
 
             # Reset the environment for a new episode
@@ -208,32 +208,32 @@ def evaluate_PPO_model(n_steps=24, n_case=14, model=None):
 
     return rewards, RLTime, generation_cost, bus_violation, line_violation, angle_violation, SOCviolation
 
-def save_all_df_to_csv(n_case, df_EV_spec, df_load_p, df_load_q, df_renewable, df_ev_demand, df_ev_soc, df_gen_p, df_gen_v, df_ev_action, df_voltage, df_line_loading, df_bus_violation, df_line_violation, df_phase_angle_violation):
+def save_all_df_to_csv(random_seed, n_case, df_EV_spec, df_load_p, df_load_q, df_renewable, df_ev_demand, df_ev_soc, df_gen_p, df_gen_v, df_ev_action, df_voltage, df_line_loading, df_bus_violation, df_line_violation, df_phase_angle_violation):
     # Create the directory if it does not exist
-        if not os.path.exists("Evaluation/Case%s" %n_case):
-            os.makedirs("Evaluation/Case%s" %n_case)
+        if not os.path.exists("Evaluation/Case%s/%s" %(n_case,random_seed)):
+            os.makedirs("Evaluation/Case%s/%s" %(n_case,random_seed))
 
         # Save the dataframes to a csv file
-        df_EV_spec.to_csv("Evaluation/Case%s/EV_spec.csv" %n_case, index=False)
+        df_EV_spec.to_csv("Evaluation/Case%s/%s/EV_spec.csv" %(n_case,random_seed), index=False)
         # df_soc_threshold.to_csv("Evaluation/Case%s/soc_threshold.csv" %n_case, index=False)
-        df_load_p.to_csv("Evaluation/Case%s/load_p.csv" %n_case, index=False)
-        df_load_q.to_csv("Evaluation/Case%s/load_q.csv" %n_case, index=False)
-        df_renewable.to_csv("Evaluation/Case%s/renewable.csv" %n_case, index=False)
-        df_ev_demand.to_csv("Evaluation/Case%s/ev_demand.csv" %n_case, index=False)
-        df_ev_soc.to_csv("Evaluation/Case%s/ev_soc.csv" %n_case, index=False)
-        df_gen_p.to_csv("Evaluation/Case%s/gen_p.csv" %n_case, index=False)
-        df_gen_v.to_csv("Evaluation/Case%s/gen_v.csv" %n_case, index=False)
-        df_ev_action.to_csv("Evaluation/Case%s/ev_action.csv" %n_case, index=False)
-        df_voltage.to_csv("Evaluation/Case%s/voltage.csv" %n_case, index=False)
-        df_line_loading.to_csv("Evaluation/Case%s/line_loading.csv" %n_case, index=False)
+        df_load_p.to_csv("Evaluation/Case%s/%s/load_p.csv" %(n_case,random_seed), index=False)
+        df_load_q.to_csv("Evaluation/Case%s/%s/load_q.csv" %(n_case,random_seed), index=False)
+        df_renewable.to_csv("Evaluation/Case%s/%s/renewable.csv" %(n_case,random_seed), index=False)
+        df_ev_demand.to_csv("Evaluation/Case%s/%s/ev_demand.csv" %(n_case,random_seed), index=False)
+        df_ev_soc.to_csv("Evaluation/Case%s/%s/ev_soc.csv" %(n_case,random_seed), index=False)
+        df_gen_p.to_csv("Evaluation/Case%s/%s/gen_p.csv" %(n_case,random_seed), index=False)
+        df_gen_v.to_csv("Evaluation/Case%s/%s/gen_v.csv" %(n_case,random_seed), index=False)
+        df_ev_action.to_csv("Evaluation/Case%s/%s/ev_action.csv" %(n_case,random_seed), index=False)
+        df_voltage.to_csv("Evaluation/Case%s/%s/voltage.csv" %(n_case,random_seed), index=False)
+        df_line_loading.to_csv("Evaluation/Case%s/%s/line_loading.csv" %(n_case,random_seed), index=False)
         df_bus_violation.to_csv(
-            "Evaluation/Case%s/bus_violation.csv" %n_case, index=False
+            "Evaluation/Case%s/%s/bus_violation.csv" %(n_case,random_seed), index=False
         )
         df_line_violation.to_csv(
-            "Evaluation/Case%s/line_violation.csv" %n_case, index=False
+            "Evaluation/Case%s/%s/line_violation.csv" %(n_case,random_seed), index=False
         )
         df_phase_angle_violation.to_csv(
-            "Evaluation/Case%s/phase_angle_violation.csv" %n_case, index=False
+            "Evaluation/Case%s/%s/phase_angle_violation.csv" %(n_case,random_seed), index=False
         )
         # df_generation_cost.to_csv(
         #     "Evaluation/Case%s/Case%s_%s/generation_cost.csv" %(n_case, n_case, EVScenario), index=False
@@ -242,9 +242,10 @@ def save_all_df_to_csv(n_case, df_EV_spec, df_load_p, df_load_q, df_renewable, d
 if __name__ == "__main__":
 
     # EVScenarios = ["ImmediateFull", "ImmediateBalanced", "Home", "Night"]
-    n_case = 9
+    n_case = 30
     # n_case = int(input("Enter Test Case Number (9, 14, 30, 39, 57): "))
-    sample_size = 2
+    starting_sample = 0
+    sample_size = 1
     # sample_size = int(input('Enter the number of samples: '))
     # using dictionary comprehension to construct
     # Times = {EVScenario: [] for EVScenario in EVScenarios}
@@ -259,7 +260,7 @@ if __name__ == "__main__":
     N_SOC_violations = []
 
 
-    for random_seed in range(sample_size):
+    for random_seed in range(starting_sample,sample_size+starting_sample):
         # for i in range(len(EVScenarios)):
         # for i in [1]:
         #     # Define Parameters
@@ -271,7 +272,7 @@ if __name__ == "__main__":
         model.set_random_seed(random_seed)
         # Evaluate the model
         rewards, Time, Cost, bus_violation, line_violation, angle_violation, SOCviolation = evaluate_PPO_model(
-            n_steps=n_steps, n_case=n_case, model=model
+            n_steps=n_steps, n_case=n_case, model=model, random_seed=random_seed
         )
         
         # append the metrics to the lists
@@ -290,7 +291,7 @@ if __name__ == "__main__":
 
 
     # Save the metrics dicts
-    with open("Evaluation/Case%s/Case%s_metrics.pkl" %(n_case, n_case), "wb") as f:
+    with open(f"Evaluation/Case{n_case}/{random_seed}/RL_metrics.pkl" , "wb") as f:
         pickle.dump([Time, Cost, N_bus_violations, N_line_violations, N_angle_violations, N_SOC_violations], f)
 
 

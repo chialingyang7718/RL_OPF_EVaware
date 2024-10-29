@@ -69,7 +69,7 @@ class PowerGrid(Env):
         self.load_EV_spec_profiles()
 
         # initialize the EV paramenters
-        self.SOCviolation = False
+        self.SOCviolation = 0
         self.N_EV = self.NL
         self.EV_power_demand = np.zeros(self.N_EV)
         self.SOC_min = 0.3
@@ -104,9 +104,10 @@ class PowerGrid(Env):
         self.state = self.create_state()
 
     def step(self, action):
-        # intialize the terminated and truncated
+        # intialize the terminated, truncated and SOC violation counter
         terminated = False
         truncated = False
+        self.SOCviolation = 0
 
         # update net with action and state
         self.net = self.apply_state_to_load()
@@ -119,12 +120,13 @@ class PowerGrid(Env):
 
         except:
             # output the diagnostic report when the power flow does not converge
-            # print("Power flow does not converge!")
+            print("Power flow does not converge!")
             # print(pp.diagnostic(self.net, report_style="detailed"))
 
             # assign the reward in the case of the power flow does not converge
             reward = -5000
             diverged = True
+            
 
         else:
             diverged = False
@@ -164,7 +166,7 @@ class PowerGrid(Env):
         info["EV_p"] = self.net.res_storage.loc[:, "p_mw"]
         info["EV_SOC"] = self.net.storage.loc[:, "soc_percent"]
         info["SOC_violation"] = self.SOCviolation
-            # info["SOC_threshold"] = self.df_EV.loc[(slice(None), self.time_step), "SOC"+self.EVScenario].values
+
 
         # decrease the episode length and update time step
         self.episode_length -= 1
@@ -697,14 +699,15 @@ class PowerGrid(Env):
             self.updated_SOC[i] = energy_after / self.net.storage.loc[i, "max_e_mwh"]
             if self.updated_SOC[i] < self.SOC_min:
                 self.violation = True
-                self.SOCviolation = True
+                self.SOCviolation += 1
                 penalty_EV += (self.updated_SOC[i] - self.SOC_min) * 1000
             elif self.updated_SOC[i] > self.SOC_max:
                 self.violation = True
-                self.SOCviolation = True
+                self.SOCviolation += 1
                 penalty_EV += (self.SOC_max - self.updated_SOC[i]) * 1000
-            else:
-                self.SOCviolation = False
+
+            
+
 
         # assign rewards based on the violation condition and generation cost
         if self.violation == True:
