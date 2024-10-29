@@ -11,5 +11,5 @@ Images_Report/
 Thesis_Latex/
 Training/Logs/archieved_logs/
 Training/Model/archieved_models/
-Scripts/CustEnv/__pycache__/
-Scripts/CustEnv/Env/__pycache__/
+Scripts/CustEnv/__pycache__/*.pyc
+Scripts/CustEnv/Env/__pycache__/*.pyc
