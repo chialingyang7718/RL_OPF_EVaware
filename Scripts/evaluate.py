@@ -244,24 +244,26 @@ if __name__ == "__main__":
     n_case = 9
     # n_case = int(input("Enter Test Case Number (9, 14, 30, 39, 57): "))
 
-    sample_size = 100
+    sample_size = 5
     # sample_size = int(input('Enter the number of samples: '))
 
     # check if the pkl exists
-    if os.path.exists(f"Evaluation/Case{n_case}/RL_metrics.pkl"):
-        with open(f"Evaluation/Case{n_case}/RL_metrics.pkl", "rb") as f:
+    if os.path.exists(f"Evaluation/Case{n_case}/RL_metrics_Case{n_case}.pkl"):
+        with open(f"Evaluation/Case{n_case}/RL_metrics_Case{n_case}.pkl", "rb") as f:
             metrics = pickle.load(f)
             starting_sample = metrics["Sample"]
     else:
         starting_sample = 0
-        Times = []
-        Costs = []
-        Total_rewards = []
-        N_bus_violations = []
-        N_line_violations = []
-        N_angle_violations = []
-        N_SOC_violations = []
-        metrics = {}
+        # create the metrics dict with keys and empty lists
+        metrics = {
+            "Times": [],
+            "Costs": [],
+            "Total_rewards": [],
+            "N_bus_violations": [],
+            "N_line_violations": [],
+            "N_angle_violations": [],
+            "N_SOC_violations": []
+        }
 
 
     for random_seed in range(starting_sample,sample_size+starting_sample):
@@ -275,31 +277,25 @@ if __name__ == "__main__":
         )
     
         # append the metrics to the lists
-        Times.append(Time)
-        Costs.append(Cost)
-        Total_rewards.append(sum(rewards))
-        N_bus_violations.append(bus_violation)
-        N_line_violations.append(line_violation)
-        N_angle_violations.append(angle_violation)
-        N_SOC_violations.append(SOCviolation)
+        metrics["Times"].append(Time)
+        metrics["Costs"].append(Cost)
+        metrics["Total_rewards"].append(sum(rewards))
+        metrics["N_bus_violations"].append(bus_violation)
+        metrics["N_line_violations"].append(line_violation)
+        metrics["N_angle_violations"].append(angle_violation)
+        metrics["N_SOC_violations"].append(SOCviolation)
+        
     
-        print("Finished Sample: ", random_seed, "/", sample_size)
+        print("Finished Sample: ", random_seed+1, "/", (starting_sample+sample_size))
         # print("Total Rewards: ", sum(rewards))
         # print("Generation Cost: ", Cost)
         # print("Bus Violations: ", bus_violation, "Line Violations: ", line_violation, "Angle Violations: ", angle_violation, "SOC Violations: ", SOCviolation, "\n")
 
 
-    metrics["Times"] = Times
-    metrics["Costs"] = Costs
-    metrics["Total_rewards"] = Total_rewards
-    metrics["N_bus_violations"] = N_bus_violations
-    metrics["N_line_violations"] = N_line_violations
-    metrics["N_angle_violations"] = N_angle_violations
-    metrics["N_SOC_violations"] = N_SOC_violations
     metrics["Sample"] = starting_sample + sample_size
 
     # Save the metrics dicts
-    with open(f"Evaluation/Case{n_case}/RL_metrics.pkl" , "wb") as f:
+    with open(f"Evaluation/Case{n_case}/RL_metrics_Case{n_case}.pkl" , "wb") as f:
         pickle.dump(metrics, f)
         # pickle.dump([Time, Cost, Total_rewards, N_bus_violations, N_line_violations, N_angle_violations, N_SOC_violations], f)
 
