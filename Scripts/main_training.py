@@ -77,9 +77,10 @@ def create_unique_soc_log_path(base_log_dir):
 if __name__ == "__main__":
 
     # Load the grid
-    # n_case = int(input("Enter Test Case Number (9, 14, 30, 33bw, 39, 57, 118...): "))
-    n_case = 9
+    # n_case = int(input("Enter Test Case Number (6ww, 9, 14, 30, 33bw, 39, 57, 118...): "))
+    n_case = 5
     grid = load_test_case_grid(n_case)
+    # grid = load_test_case_grid(n_case, "ww")
 
     # Parameters
     env_id = "PowerGrid-v2"
@@ -123,12 +124,12 @@ if __name__ == "__main__":
         if n_case == 30 or n_case == 33:
             policy_kwargs = dict(
                     activation_fn=th.nn.Tanh,
-                    net_arch=dict(pi=[NN_size*4, NN_size*2, NN_size*2, NN_size, NN_size], vf=[NN_size*4, int(NN_size/2), int(NN_size/4)])  
+                    net_arch=dict(pi=[NN_size*4, NN_size*2, NN_size*2, NN_size, NN_size], vf=[NN_size*4, NN_size, NN_size])  
                 )
         elif n_case == 39:
             policy_kwargs = dict(
                     activation_fn=th.nn.Tanh,
-                    net_arch=dict(pi=[NN_size*4, NN_size*2, NN_size*2, NN_size*2, NN_size, NN_size], vf=[NN_size*4, int(NN_size/2), int(NN_size/4)])  
+                    net_arch=dict(pi=[NN_size*4, NN_size*2, NN_size*2, NN_size*2, NN_size, NN_size], vf=[NN_size*4, NN_size*2, NN_size/2])  
                 )
         elif n_case == 57:
             policy_kwargs = dict(

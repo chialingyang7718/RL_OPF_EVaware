@@ -108,11 +108,9 @@ class PowerGrid(Env):
         terminated = False
         truncated = False
         self.SOCviolation = 0
-
         # update net with action and state
         self.net = self.apply_state_to_load()
         self.net = self.apply_action_to_net(action)
-
         # run the power flow (Newton-Raphson method)
         try:
             pp.runpp(self.net)
@@ -135,14 +133,12 @@ class PowerGrid(Env):
                 self.calculate_reward()
             )
 
-
         # output the current episode length, reward, terminated, truncated
         # print("episode length: ", self.episode_length, "Reward:", reward, "; Terminated:", terminated, "; Truncated:", truncated)
 
         # save the reward for the current step
         # self.pre_reward = reward
         gen_cost = self.calculate_gen_cost()
-
         # update the info
         info = {
             "load_p": self.net.load.loc[:, ["p_mw"]],
@@ -179,7 +175,6 @@ class PowerGrid(Env):
 
         # update the next state if the episode is not terminated
         if terminated == False:
-
             # add some noice to load and renewable generation
             self.add_noice_load_renew_state()
             self.update_EV_SOC()
@@ -267,6 +262,13 @@ class PowerGrid(Env):
                 max_q_mvar=max_q_mvar,
                 min_q_mvar=min_q_mvar,
             )
+
+        # change the cost function as well
+        sgen_poly_cost = grid.poly_cost[grid.poly_cost["et"] == "sgen"]
+        grid.poly_cost = grid.poly_cost.drop(grid.poly_cost[grid.poly_cost["et"] == "sgen"].index)
+        grid.poly_cost = grid.poly_cost._append(sgen_poly_cost)
+        grid.poly_cost.loc[grid.poly_cost["et"] == "sgen", "et"] = "gen"
+
         return grid
 
     # assign the state and action limits
