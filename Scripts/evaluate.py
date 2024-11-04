@@ -241,10 +241,10 @@ def save_all_df_to_csv(random_seed, n_case, df_EV_spec, df_load_p, df_load_q, df
 
 if __name__ == "__main__":
 
-    n_case = 9
+    n_case = 57
     # n_case = int(input("Enter Test Case Number (9, 14, 30, 39, 57): "))
 
-    sample_size = 100
+    sample_size = 30
     # sample_size = int(input('Enter the number of samples: '))
 
     # check if the pkl exists
@@ -273,7 +273,7 @@ if __name__ == "__main__":
         model.set_random_seed(random_seed)
         # Evaluate the model
         rewards, Time, Cost, bus_violation, line_violation, angle_violation, SOCviolation = evaluate_PPO_model(
-            n_steps=n_steps, n_case=n_case, model=model, random_seed=random_seed, generate_csv=False
+            n_steps=n_steps, n_case=n_case, model=model, random_seed=random_seed, generate_csv=True
         )
     
         # append the metrics to the lists

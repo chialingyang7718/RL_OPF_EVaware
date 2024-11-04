@@ -9,7 +9,7 @@ import CustEnv
 from grid_loader import load_test_case_grid
 
 # load the grid for the environment
-grid = load_test_case_grid(9)
+grid = load_test_case_grid(5)
 
 # EVScenarios = ["ImmediateFull", "ImmediateBalanced", "Home", "Night"]
 EVScenarios = ["ImmediateBalanced"]
