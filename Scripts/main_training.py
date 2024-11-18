@@ -75,7 +75,7 @@ if __name__ == "__main__":
     grid = load_test_case_grid(n_case)
 
     # Parameters
-    env_id = "PowerGrid-v2"
+    env_id = "PowerGrid"
     num_envs = 6
     Training = True
 
