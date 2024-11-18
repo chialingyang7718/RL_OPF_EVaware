@@ -5,5 +5,8 @@ Master_Thesis_TUM.code-workspace
 Archieved/
 Images_Report/
 LaTeX_Vorlagen_Studienarbeiten/
-Training/
+Training/Logs
+Training/Model/archieved_models
 Evaluation/
+! *.pkl
+! *.pickle
