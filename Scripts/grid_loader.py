@@ -93,36 +93,17 @@ def change_sgen_into_gen(grid):
         )
     return grid
 
-
-# def change_extgrid_into_sgen(grid):
-#     for i in grid.ext_grid.index:
-#         bus = grid.ext_grid.loc[i, "bus"]
-#         max_pmw = grid.ext_grid.loc[i, "max_p_mw"]
-#         min_pmw = grid.ext_grid.loc[i, "min_p_mw"]
-#         max_qmvar = grid.ext_grid.loc[i, "max_q_mvar"]
-#         min_qmvar = grid.ext_grid.loc[i, "min_q_mvar"]
-#         grid.ext_grid.drop(i, inplace = True)
-#         #since no p_mw is specified, we assume the active power output is the average of the max and min active power output
-#         pp.create_sgen(grid, bus, p_mw=0.5*(max_pmw+min_pmw), q_mvar=0, max_p_mw=max_pmw, min_p_mw=min_pmw, max_q_mvar=max_qmvar, min_q_mvar=min_qmvar)
-#     return grid
-
-
 def load_test_case_grid(n, str = ""):
     # load the test grid from pandapower
     case = f"case{n}" + str  # n: case number in pandapower
     grid = getattr(pn, case)()
-    # grid = change_gen_into_sgen(grid) # change the generators into static generators
-    # grid = change_sgen_into_gen(grid) # change any static generators into generators
-    # grid = change_extgrid_into_sgen(grid) # change the external grids into static generators
     return grid
-
 
 def load_simple_grid():
     # load the simple grid from pandapower
     grid = pn.example_simple()
     grid = change_gen_into_sgen(grid)  # change the generators into static generators
     return grid
-
 
 def load_simbench_grid(grid_code):
     # load the grid from simbench
