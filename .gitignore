@@ -8,5 +8,6 @@ LaTeX_Vorlagen_Studienarbeiten/
 Training/Logs
 Training/Model/archieved_models
 Evaluation/
-! *.pkl
-! *.pickle
+!Evaluation/**/
+!Evaluation/**/*.pkl
+!Evaluation/**/*.pickle
