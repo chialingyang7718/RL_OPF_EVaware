@@ -9,13 +9,10 @@ import gymnasium as gym
 
 # Import stable baselines stuff
 from stable_baselines3 import PPO
-# from stable_baselines3.common.evaluation import evaluate_policy
 
 # Import other stuff
-import matplotlib.pyplot as plt
 import pandas as pd
 import os
-import seaborn as sns
 import time
 import pickle
 
@@ -23,19 +20,15 @@ import pickle
 def evaluate_PPO_model(n_steps=24, n_case=14, model=None,random_seed=None, generate_csv=False):
     # Load the environment
     grid = load_test_case_grid(n_case)
-    # eval_env = gym.make('PowerGrid-v0', net=grid, dispatching_intervals=24, EVaware=True, Training=True)
     eval_env = gym.make(
-        "PowerGrid-v2", net=grid, dispatching_intervals=n_steps, Training=False
+        "PowerGrid", net=grid, dispatching_intervals=n_steps, Training=False
     )
 
     # Initialize variables for tracking metrics
     truncated = False
     terminated = False
-
-    # Evaluate the model
     obs, info = eval_env.reset()
 
-    # Record EV battery capacity
     df_EV_spec = info["EV_spec"]
 
     # Initialize time list for RL model prediction
@@ -48,20 +41,12 @@ def evaluate_PPO_model(n_steps=24, n_case=14, model=None,random_seed=None, gener
     SOCviolation = 0
 
     for step in range(n_steps):
-        # set start time for RL model prediction
         start = time.process_time()
-
-        # Predict the action
         action, _state = model.predict(obs, deterministic=True)
-
-        # Record the time taken for RL model prediction
         RLTime += time.process_time() - start
-
         obs, reward, terminated, truncated, info = eval_env.step(action)
 
-
         # Log the metrics
-        # rewards
         rewards.append(round(reward, 3))
         if generate_csv:
             # infos
@@ -163,29 +148,22 @@ def evaluate_PPO_model(n_steps=24, n_case=14, model=None,random_seed=None, gener
         # Record the number of violations
         if info["bus_violation"].size != 0:
             bus_violation += 1
-        
         if info["line_violation"].size != 0:
             line_violation += 1
-        
         if len(info["phase_angle_violation"]) != 0:
             angle_violation += 1
-
         if info["SOC_violation"] != 0:
             SOCviolation += 1
-    
-        # Generation Cost
+            
         generation_cost += info["generation_cost"]
 
         if generate_csv:
             if terminated or truncated:
-                # print(f"Episode finished after {step + 1} steps")
-                # Set dataframes index
                 df_load_p.reset_index(drop=True, inplace=True)
                 df_load_q.reset_index(drop=True, inplace=True)
                 df_renewable.reset_index(drop=True, inplace=True)
                 df_ev_demand.reset_index(drop=True, inplace=True)
                 df_ev_soc.reset_index(drop=True, inplace=True)
-                # df_soc_threshold.reset_index(drop=True, inplace=True)
                 df_gen_p.reset_index(drop=True, inplace=True)
                 df_gen_v.reset_index(drop=True, inplace=True)
                 df_ev_action.reset_index(drop=True, inplace=True)
@@ -194,18 +172,11 @@ def evaluate_PPO_model(n_steps=24, n_case=14, model=None,random_seed=None, gener
                 df_bus_violation.reset_index(drop=True, inplace=True)
                 df_line_violation.reset_index(drop=True, inplace=True)
                 df_phase_angle_violation.reset_index(drop=True, inplace=True)
-                # df_generation_cost = pd.DataFrame(generation_cost)
 
-
-            """Save the dataframes to a csv file"""
-            # Save the dataframes to a csv file
             save_all_df_to_csv(random_seed, n_case, df_EV_spec, df_load_p, df_load_q, df_renewable, df_ev_demand, df_ev_soc, df_gen_p, df_gen_v, df_ev_action, df_voltage, df_line_loading, df_bus_violation, df_line_violation, df_phase_angle_violation) #, df_generation_cost)
             
-
-            # Reset the environment for a new episode
             obs, info = eval_env.reset()
     eval_env.close()
-
     return rewards, RLTime, generation_cost, bus_violation, line_violation, angle_violation, SOCviolation
 
 def save_all_df_to_csv(random_seed, n_case, df_EV_spec, df_load_p, df_load_q, df_renewable, df_ev_demand, df_ev_soc, df_gen_p, df_gen_v, df_ev_action, df_voltage, df_line_loading, df_bus_violation, df_line_violation, df_phase_angle_violation):
@@ -215,7 +186,6 @@ def save_all_df_to_csv(random_seed, n_case, df_EV_spec, df_load_p, df_load_q, df
 
         # Save the dataframes to a csv file
         df_EV_spec.to_csv("Evaluation/Case%s/%s/EV_spec.csv" %(n_case,random_seed), index=False)
-        # df_soc_threshold.to_csv("Evaluation/Case%s/soc_threshold.csv" %n_case, index=False)
         df_load_p.to_csv("Evaluation/Case%s/%s/load_p.csv" %(n_case,random_seed), index=False)
         df_load_q.to_csv("Evaluation/Case%s/%s/load_q.csv" %(n_case,random_seed), index=False)
         df_renewable.to_csv("Evaluation/Case%s/%s/renewable.csv" %(n_case,random_seed), index=False)
@@ -235,17 +205,13 @@ def save_all_df_to_csv(random_seed, n_case, df_EV_spec, df_load_p, df_load_q, df
         df_phase_angle_violation.to_csv(
             "Evaluation/Case%s/%s/phase_angle_violation.csv" %(n_case,random_seed), index=False
         )
-        # df_generation_cost.to_csv(
-        #     "Evaluation/Case%s/Case%s_%s/generation_cost.csv" %(n_case, n_case, EVScenario), index=False
-        # )
+
 
 if __name__ == "__main__":
 
-    n_case = 57
-    # n_case = int(input("Enter Test Case Number (9, 14, 30, 39, 57): "))
+    n_case = int(input("Enter Test Case Number (9, 14, 30, 57): "))
 
     sample_size = 30
-    # sample_size = int(input('Enter the number of samples: '))
 
     # check if the pkl exists
     if os.path.exists(f"Evaluation/Case{n_case}/RL_metrics_Case{n_case}.pkl"):
@@ -254,7 +220,6 @@ if __name__ == "__main__":
             starting_sample = metrics["Sample"]
     else:
         starting_sample = 0
-        # create the metrics dict with keys and empty lists
         metrics = {
             "Times": [],
             "Costs": [],
@@ -265,18 +230,14 @@ if __name__ == "__main__":
             "N_SOC_violations": []
         }
 
-
     for random_seed in range(starting_sample,sample_size+starting_sample):
         n_steps = 24
-        # Load the trained model
         model = PPO.load("Training/Model/Case%s/Case%s" %(n_case, n_case))
         model.set_random_seed(random_seed)
-        # Evaluate the model
         rewards, Time, Cost, bus_violation, line_violation, angle_violation, SOCviolation = evaluate_PPO_model(
             n_steps=n_steps, n_case=n_case, model=model, random_seed=random_seed, generate_csv=True
         )
-    
-        # append the metrics to the lists
+
         metrics["Times"].append(Time)
         metrics["Costs"].append(Cost)
         metrics["Total_rewards"].append(sum(rewards))
@@ -287,28 +248,9 @@ if __name__ == "__main__":
         
     
         print("Finished Sample: ", random_seed+1, "/", (starting_sample+sample_size))
-        # print("Total Rewards: ", sum(rewards))
-        # print("Generation Cost: ", Cost)
-        # print("Bus Violations: ", bus_violation, "Line Violations: ", line_violation, "Angle Violations: ", angle_violation, "SOC Violations: ", SOCviolation, "\n")
-
-
+       
     metrics["Sample"] = starting_sample + sample_size
 
     # Save the metrics dicts
     with open(f"Evaluation/Case{n_case}/RL_metrics_Case{n_case}.pkl" , "wb") as f:
         pickle.dump(metrics, f)
-        # pickle.dump([Time, Cost, Total_rewards, N_bus_violations, N_line_violations, N_angle_violations, N_SOC_violations], f)
-
-
-        # # Plot rewards over time
-        # plt.plot(rewards, "-o")
-        # plt.title("Reward at Each Time Step")
-        # plt.xlabel("Time Steps")
-        # plt.ylabel("Reward")
-        # for i in range(len(rewards)):
-        #     plt.annotate("%s" % rewards[i], xy=(i, rewards[i]), textcoords="data")
-        # plt.show()
-    # mean_reward, std_reward = evaluate_policy(model, eval_env, n_eval_episodes=1, deterministic=True, return_episode_rewards=False)
-    # reward_list, episode_len = evaluate_policy(model, eval_env, n_eval_episodes=1, callback=, deterministic=True, return_episode_rewards=True)
-
-    # print(f"Mean reward: {mean_reward} +/- {std_reward}")
