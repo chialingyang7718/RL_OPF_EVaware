@@ -8,14 +8,5 @@ Archieved/
 Scripts/main_simple_example.py
 Images_Report/
 LaTeX_Vorlagen_Studienarbeiten/
-Training/Logs/archieved_logs/
-Training/Model/archieved_models/
-<<<<<<< HEAD
-*.pyc
-=======
-Scripts/CustEnv/__pycache__/*.pyc
-Scripts/CustEnv/Env/__pycache__/*.pyc
-Training/Logs
-Training/Model
-Evaluation
->>>>>>> origin/env/omit_EVScenario
+Training/
+Evaluation/
