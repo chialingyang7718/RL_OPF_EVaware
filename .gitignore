@@ -7,7 +7,4 @@ Images_Report/
 LaTeX_Vorlagen_Studienarbeiten/
 Training/Logs
 Training/Model/archieved_models
-Evaluation/
-!Evaluation/**/
-!Evaluation/**/*.pkl
-!Evaluation/**/*.pickle
+Evaluation/**/*.csv
