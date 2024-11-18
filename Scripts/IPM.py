@@ -1,14 +1,12 @@
 import grid_loader as gl
 import pandas as pd
-import numpy as np
 import pandapower as pp
 import time
-import os
 import pickle
 
 # Test case
-n_case = 9 #Working cases: 6ww, 9, 14, 30, 33bw, 39, 118
-feasible_seeds = [0, 2, 5, 12, 17, 19, 20, 21, 25, 26, 28, 29] # for Case9
+n_case = 9 
+feasible_seeds = [0, 2, 5, 12, 17, 19, 20, 21, 25, 26, 28, 29] 
 
 # Define time periods
 time_periods = range(0, 24)  # T
@@ -66,23 +64,20 @@ for random_seed in feasible_seeds:
             controllable=True,
         )
         df_EV_demand.iloc[i] = df_EV_demand.iloc[i]/net.storage.loc[i, "scaling"]
-
-        # Save results
-    # # df_cost = pd.DataFrame(index=time_periods)
-    # df_gen_p = pd.DataFrame(index=time_periods, columns=net.gen.index)
-    # df_gen_q = pd.DataFrame(index=time_periods, columns=net.gen.index)
-    # df_charge = pd.DataFrame(index=time_periods, columns=net.storage.index)
-    # df_soc = pd.DataFrame(index=time_periods, columns=net.storage.index)
+ 
+    # initialize dataframes
+    df_gen_p = pd.DataFrame(index=time_periods, columns=net.gen.index)
+    df_gen_q = pd.DataFrame(index=time_periods, columns=net.gen.index)
+    df_charge = pd.DataFrame(index=time_periods, columns=net.storage.index)
+    df_soc = pd.DataFrame(index=time_periods, columns=net.storage.index)
     IPtime = []
     Cost = []
     for t in time_periods:
         if t == 0:
             net.storage.loc[:, "soc_percent"] = df_EV_SOC.loc[:, t].values
             for i in range(N_D):
-                # if net.storage.loc[i, "in_service"] == True:
                 future_SOC = (net.storage.loc[i, "soc_percent"]* max_e_mwh[i] - df_EV_demand.loc[:,0].iloc[i])/max_e_mwh[i]
                 if future_SOC <= SOC_min:
-                    # no discharging allowed 
                     net.storage.loc[i, "min_p_mw"] = min(charging_rate, (SOC_min - future_SOC) * max_e_mwh[i])
                     net.storage.loc[i, "max_p_mw"] = min(charging_rate, max_e_mwh[i]*(1-future_SOC))
                 else:
@@ -103,8 +98,6 @@ for random_seed in feasible_seeds:
         # Renewable energy data
         net.gen.loc[:, "max_p_mw"]= df_renewable.loc[:, t].values
 
-        # Record SOC at the beginning of the time period
-        # df_soc.loc[t] = net.storage.loc[:, "soc_percent"]
 
         # Run optimal power flow
         start_time = time.process_time()
@@ -113,9 +106,10 @@ for random_seed in feasible_seeds:
         # Record results
         IPtime.append(time.process_time() - start_time)
         Cost.append(net.res_cost)
-        # df_gen_p.loc[t] = net.res_gen.loc[:, "p_mw"]
-        # df_gen_q.loc[t] = net.res_gen.loc[:, "q_mvar"]
-        # df_charge.loc[t] = net.res_storage.loc[:, "p_mw"]
+        df_gen_p.loc[t] = net.res_gen.loc[:, "p_mw"]
+        df_gen_q.loc[t] = net.res_gen.loc[:, "q_mvar"]
+        df_charge.loc[t] = net.res_storage.loc[:, "p_mw"]
+        df_soc.loc[t] = net.storage.loc[:, "soc_percent"]
 
         # Update EV charging limits
         if t != 23:
@@ -136,9 +130,15 @@ for random_seed in feasible_seeds:
                     net.storage.loc[i, "min_p_mw"] = max(-charging_rate, max_e_mwh[i] * (SOC_min - future_SOC))
                     net.storage.loc[i, "max_p_mw"] = min(charging_rate, max_e_mwh[i]*(1-future_SOC))
         
-        # df_soc.loc[t+1] = net.storage.loc[:, "soc_percent"]
+
     total_IPtime.append(sum(IPtime))
     total_cost.append(sum(Cost))
+
+    # Save results
+    df_gen_p.to_csv(f"{file_path}/IPM_gen_p.csv")
+    df_gen_q.to_csv(f"{file_path}/IPM_gen_q.csv")
+    df_charge.to_csv(f"{file_path}/IPM_charge.csv")
+    df_soc.to_csv(f"{file_path}/IPM_soc.csv")
 
 metrics = {
     "IPtime": total_IPtime,
