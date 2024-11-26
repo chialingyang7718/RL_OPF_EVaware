@@ -31,7 +31,7 @@ Reinforcement Learning (RL) is a type of machine learning where an agent learns 
 + Evaluation: This is where the output of evaluate.py stores.
 + Literature_Review.xlsx: This contains a table of all the related literatures for this project.
 ## EV Profile Data Source: https://zenodo.org/records/4514928
-## Reference:
+## Reference
 1. Zimmerman, Ray D., and Hongye Wang. "Matpower Interior Point Solver MIPS 1.3 User’s Manual." (2016).
 2. Thurner, Leon, et al. "pandapower—an open-source python tool for convenient modeling, analysis, and optimization of electric power systems." IEEE Transactions on Power Systems 33.6 (2018): 6510-6521.
 
